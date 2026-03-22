@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>博客 · Hanz Zhang</title>
+  <meta name="description" content="张翰宸的技术博客：AI、医学影像、智能体、数字人文" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">&lt;BronzeSky /&gt;</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="research.html">研究</a></li>
+      <li><a href="blog.html">博客</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <p class="section-label">// Blog</p>
+      <h1 class="page-hero-title">博客</h1>
+      <p class="page-hero-desc">技术笔记、研究感悟与学习记录</p>
+    </div>
+
+    <section class="section">
+      <!-- Categories -->
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:2.5rem; justify-content:center;">
+        <span class="tag" style="cursor:pointer; padding:0.4rem 1rem; font-size:0.85rem;">全部</span>
+        <span class="tag purple" style="cursor:pointer; padding:0.4rem 1rem; font-size:0.85rem;">医学 AI</span>
+        <span class="tag pink" style="cursor:pointer; padding:0.4rem 1rem; font-size:0.85rem;">LLM / Agent</span>
+        <span class="tag" style="cursor:pointer; padding:0.4rem 1rem; font-size:0.85rem; border-color:rgba(124,77,255,0.3); color:#b39ddb; background:rgba(124,77,255,0.08);">数字人文</span>
+        <span class="tag" style="cursor:pointer; padding:0.4rem 1rem; font-size:0.85rem; border-color:rgba(41,121,255,0.3); color:#90caf9; background:rgba(41,121,255,0.08);">学习笔记</span>
+      </div>
+
+      <!-- Blog grid - placeholder cards -->
+      <div class="blog-grid">
+
+        <a href="#" class="blog-card fade-in">
+          <div class="blog-card-date">2025 · 即将发布</div>
+          <div class="blog-card-title">Frozen2FFPE：用扩散模型弥合冰冻切片与 FFPE 的鸿沟</div>
+          <p class="blog-card-excerpt">
+            介绍冰冻切片与 FFPE 病理图像的差异，以及如何利用 Diffusion Model 实现高质量图像转化，
+            辅助术中脑肿瘤快速诊断…
+          </p>
+          <div class="blog-card-read">即将发布 →</div>
+        </a>
+
+        <a href="#" class="blog-card fade-in">
+          <div class="blog-card-date">2025 · 即将发布</div>
+          <div class="blog-card-title">构建 MediAgent：从零搭建医疗全流程 LLM 智能体</div>
+          <p class="blog-card-excerpt">
+            详解 MediAgent 的系统架构设计，包括多模态感知模块、RAG 医学知识库、
+            工具调用链与报告自动生成的工程实践…
+          </p>
+          <div class="blog-card-read">即将发布 →</div>
+        </a>
+
+        <a href="#" class="blog-card fade-in">
+          <div class="blog-card-date">2025 · 即将发布</div>
+          <div class="blog-card-title">古汉语 NLP：为什么现有 LLM 在古籍理解上还差得远</div>
+          <p class="blog-card-excerpt">
+            分析现有大语言模型在古汉语语境下的局限性，以及多跳搜索 Benchmark
+            的构建思路与评测挑战…
+          </p>
+          <div class="blog-card-read">即将发布 →</div>
+        </a>
+
+        <a href="#" class="blog-card fade-in">
+          <div class="blog-card-date">2025 · 即将发布</div>
+          <div class="blog-card-title">计算历史学：用 NLP 量化史书的可信度</div>
+          <p class="blog-card-excerpt">
+            探讨如何将文本挖掘与统计分析应用于传统史学，
+            构建量化框架评估历史记载的置信度与一致性…
+          </p>
+          <div class="blog-card-read">即将发布 →</div>
+        </a>
+
+        <a href="#" class="blog-card fade-in">
+          <div class="blog-card-date">2025 · 即将发布</div>
+          <div class="blog-card-title">入学复旦大数据学院：一年级的技术成长记录</div>
+          <p class="blog-card-excerpt">
+            分享从高中到复旦大数据学院的转变，第一年的课程学习、
+            科研初探与个人思考…
+          </p>
+          <div class="blog-card-read">即将发布 →</div>
+        </a>
+
+        <a href="#" class="blog-card fade-in">
+          <div class="blog-card-date">2025 · 即将发布</div>
+          <div class="blog-card-title">RAG 系统工程实践：从原型到可靠生产系统</div>
+          <p class="blog-card-excerpt">
+            深入剖析 RAG（Retrieval-Augmented Generation）系统在实际工程落地中的
+            常见陷阱与优化策略…
+          </p>
+          <div class="blog-card-read">即将发布 →</div>
+        </a>
+
+      </div>
+
+      <div class="empty-state" style="margin-top:3rem; border:1px solid var(--border-glow); border-radius:var(--radius); padding:3rem; background:var(--bg-card); backdrop-filter:blur(10px);">
+        <div class="empty-state-icon">✍️</div>
+        <p style="font-size:1rem; color:var(--text-secondary); font-weight:500;">文章正在撰写中</p>
+        <p style="font-size:0.875rem; color:var(--text-dim); margin-top:0.5rem;">
+          上方为计划发布的文章预告，正式内容将陆续更新。<br>
+          欢迎通过邮件订阅或关注 GitHub 获取最新动态。
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024–2028 <a href="index.html">Hanz Zhang (张翰宸)</a> · Fudan University · Built with ❤️ &amp; ☕</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hanz Zhang · 张翰宸</title>
+  <meta name="description" content="复旦大学大数据学院在读生，从事脑癌诊断AI研究与智能体开发" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Neural network background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">&lt;BronzeSky /&gt;</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="research.html">研究</a></li>
+      <li><a href="blog.html">博客</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+      <div class="hero-content">
+        <!-- LEFT: intro text -->
+        <div class="hero-left">
+          <div class="hero-badge">在线 · 开放合作</div>
+
+          <h1 class="hero-title">
+            <span class="name">张翰宸</span>
+            <span class="name" style="font-size:0.7em">Hanz Zhang</span>
+            <span class="subtitle">AI Researcher &amp; Agent Developer</span>
+          </h1>
+
+          <p class="hero-typing">
+            <span id="typing-text"></span><span class="cursor"></span>
+          </p>
+
+          <p class="hero-desc">
+            就读于<strong style="color:var(--text-primary)">复旦大学大数据学院</strong>，
+            专注于脑肿瘤 AI 辅助诊断与大模型智能体研发。
+            将深度学习、医学影像与自然语言处理技术融合，推动 AI 在医疗与人文领域落地。
+          </p>
+
+          <div class="hero-actions">
+            <a href="research.html" class="btn btn-primary">🔬 查看研究项目</a>
+            <a href="contact.html" class="btn btn-outline">✉️ 联系我</a>
+          </div>
+        </div>
+
+        <!-- RIGHT: info cards -->
+        <div class="hero-right">
+          <!-- Education -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <div class="info-card-icon icon-edu">🎓</div>
+              <div class="info-card-title">Education</div>
+            </div>
+            <div class="info-card-body">复旦大学 · 大数据学院</div>
+            <div class="info-card-sub">本科在读 · 2024.9 — 2028</div>
+            <div class="tag-list">
+              <span class="tag">数据科学</span>
+              <span class="tag">机器学习</span>
+              <span class="tag purple">复旦大学</span>
+            </div>
+          </div>
+
+          <!-- Research Focus -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <div class="info-card-icon icon-research">🧠</div>
+              <div class="info-card-title">Research Focus</div>
+            </div>
+            <div class="info-card-body">脑癌诊断 · 医学影像 AI</div>
+            <div class="info-card-sub">Brain Tumor Diagnosis &amp; Medical Imaging</div>
+            <div class="tag-list">
+              <span class="tag">Deep Learning</span>
+              <span class="tag pink">Medical AI</span>
+              <span class="tag">Image Processing</span>
+            </div>
+          </div>
+
+          <!-- Current Focus -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <div class="info-card-icon icon-focus">🤖</div>
+              <div class="info-card-title">Also Working On</div>
+            </div>
+            <div class="info-card-body">智能体开发 · LLM Agent</div>
+            <div class="info-card-sub">Full-pipeline AI Agent &amp; NLP Benchmarks</div>
+            <div class="tag-list">
+              <span class="tag">LLM</span>
+              <span class="tag purple">Agent</span>
+              <span class="tag">NLP</span>
+              <span class="tag pink">Benchmark</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== RESEARCH PROJECTS ===== -->
+    <section class="section" id="projects">
+      <div class="section-header">
+        <p class="section-label">// Current Research</p>
+        <h2 class="section-title">当前研究项目</h2>
+        <p class="section-desc">正在进行中的五个研究方向，涵盖医学影像、智能体与人文计算</p>
+      </div>
+
+      <div class="projects-grid">
+
+        <div class="project-card fade-in">
+          <div class="project-card-top">
+            <span class="project-icon">🔬</span>
+            <span class="project-status status-active">Active</span>
+          </div>
+          <div class="project-title">Frozen2FFPE</div>
+          <p class="project-desc">
+            基于深度学习的冰冻切片→福尔马林固定石蜡包埋 (FFPE) 组织病理图像转化模型。
+            提升术中快速诊断的精度，弥合两种制备方式的图像质量差距，辅助脑肿瘤手术决策。
+          </p>
+          <div class="project-tags">
+            <span class="tag">Medical Imaging</span>
+            <span class="tag purple">GAN / Diffusion</span>
+            <span class="tag pink">Pathology</span>
+          </div>
+        </div>
+
+        <div class="project-card fade-in">
+          <div class="project-card-top">
+            <span class="project-icon">🤖</span>
+            <span class="project-status status-active">Active</span>
+          </div>
+          <div class="project-title">MediAgent</div>
+          <p class="project-desc">
+            面向脑癌全流程诊疗的大模型智能体系统。集成多模态感知、工具调用、知识检索与
+            报告生成等能力，构建端到端的 AI 辅助诊断 Pipeline。
+          </p>
+          <div class="project-tags">
+            <span class="tag">LLM Agent</span>
+            <span class="tag purple">RAG</span>
+            <span class="tag pink">Clinical AI</span>
+          </div>
+        </div>
+
+        <div class="project-card fade-in">
+          <div class="project-card-top">
+            <span class="project-icon">📚</span>
+            <span class="project-status status-active">Active</span>
+          </div>
+          <div class="project-title">古籍多跳检索 Benchmark</div>
+          <p class="project-desc">
+            针对中文古典文献的多跳问答搜索评测基准。构建覆盖历史、哲学、文学的复杂推理
+            问题集，评估大模型在古汉语语境下的深层语义理解与跨文献推理能力。
+          </p>
+          <div class="project-tags">
+            <span class="tag">NLP</span>
+            <span class="tag purple">Multi-hop QA</span>
+            <span class="tag">Ancient Chinese</span>
+          </div>
+        </div>
+
+        <div class="project-card fade-in">
+          <div class="project-card-top">
+            <span class="project-icon">📜</span>
+            <span class="project-status status-ongoing">Ongoing</span>
+          </div>
+          <div class="project-title">史书置信度研究</div>
+          <p class="project-desc">
+            利用计算人文学方法，对中国传统史书记载进行置信度（可靠性）量化分析。
+            结合历史语料、内部一致性与外部文献交叉验证，构建历史文本可信度评估框架。
+          </p>
+          <div class="project-tags">
+            <span class="tag">Digital Humanities</span>
+            <span class="tag purple">Text Analysis</span>
+            <span class="tag pink">Historiography</span>
+          </div>
+        </div>
+
+        <div class="project-card fade-in">
+          <div class="project-card-top">
+            <span class="project-icon">⚡</span>
+            <span class="project-status status-ongoing">Ongoing</span>
+          </div>
+          <div class="project-title">YICGG26</div>
+          <p class="project-desc">
+            2026 年度综合性研究项目，整合多领域前沿技术探索与实践。
+            具体内容持续更新中，欢迎关注后续进展。
+          </p>
+          <div class="project-tags">
+            <span class="tag">Research</span>
+            <span class="tag purple">Innovation</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center; margin-top:2.5rem;">
+        <a href="research.html" class="btn btn-outline">查看全部研究详情 →</a>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== SKILLS ===== -->
+    <section class="section" id="skills">
+      <div class="section-header">
+        <p class="section-label">// Tech Stack</p>
+        <h2 class="section-title">技术栈 &amp; 工具</h2>
+      </div>
+
+      <div class="skills-grid">
+        <div class="skill-group fade-in">
+          <div class="skill-group-name">Languages</div>
+          <div class="skill-items">
+            <div class="skill-item">Python</div>
+            <div class="skill-item">R</div>
+            <div class="skill-item">JavaScript</div>
+            <div class="skill-item">Bash</div>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-name">Deep Learning</div>
+          <div class="skill-items">
+            <div class="skill-item">PyTorch</div>
+            <div class="skill-item">Hugging Face</div>
+            <div class="skill-item">MONAI</div>
+            <div class="skill-item">OpenCV</div>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-name">LLM / Agent</div>
+          <div class="skill-items">
+            <div class="skill-item">LangChain</div>
+            <div class="skill-item">LlamaIndex</div>
+            <div class="skill-item">OpenAI API</div>
+            <div class="skill-item">RAG Pipeline</div>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-name">Tools</div>
+          <div class="skill-items">
+            <div class="skill-item">Git / GitHub</div>
+            <div class="skill-item">Docker</div>
+            <div class="skill-item">Linux / HPC</div>
+            <div class="skill-item">Jupyter</div>
+          </div>
+        </div>
+        <div class="skill-group fade-in">
+          <div class="skill-group-name">Research Areas</div>
+          <div class="skill-items">
+            <div class="skill-item">Medical Imaging</div>
+            <div class="skill-item">NLP / 古汉语</div>
+            <div class="skill-item">Digital Humanities</div>
+            <div class="skill-item">AI Agent Systems</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== EDUCATION TIMELINE ===== -->
+    <section class="section" id="education">
+      <div class="section-header">
+        <p class="section-label">// Background</p>
+        <h2 class="section-title">教育经历</h2>
+      </div>
+
+      <div class="timeline" style="max-width:600px; margin:0 auto;">
+        <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2024.09 — 2028.06 (预计)</div>
+          <div class="timeline-title">本科 · 数据科学与大数据技术</div>
+          <div class="timeline-org">复旦大学 · 大数据学院</div>
+          <div class="timeline-desc">
+            主修数据科学、机器学习、深度学习等核心课程；
+            研究方向涵盖医学影像 AI、智能体开发与数字人文。
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT CTA ===== -->
+    <div class="section-divider"></div>
+    <section class="contact-section fade-in">
+      <p class="section-label" style="text-align:center">// Get In Touch</p>
+      <h2 class="section-title" style="text-align:center">欢迎交流合作</h2>
+      <p style="color:var(--text-secondary); margin-top:0.75rem;">
+        无论是学术合作、项目交流还是技术探讨，都欢迎联系我。
+      </p>
+      <div class="contact-links">
+        <a href="mailto:hanzzhang@fudan.edu.cn" class="contact-link">✉️ Email</a>
+        <a href="https://github.com/bronzesky" class="contact-link" target="_blank" rel="noopener">🐙 GitHub</a>
+        <a href="contact.html" class="contact-link">📬 更多联系方式</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024–2028 <a href="index.html">Hanz Zhang (张翰宸)</a> · Fudan University · Built with ❤️ &amp; ☕</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
