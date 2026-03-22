@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>联系我 · Hanz Zhang</title>
+  <meta name="description" content="联系张翰宸：学术合作、项目交流或技术探讨" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 680px) {
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+
+    .contact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius);
+      padding: 2rem;
+      backdrop-filter: blur(10px);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .contact-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 229, 255, 0.1);
+    }
+
+    .contact-card-icon {
+      font-size: 2rem;
+    }
+
+    .contact-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .contact-card-value {
+      font-size: 0.875rem;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      word-break: break-all;
+    }
+
+    .contact-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .availability-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0, 229, 255, 0.06);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      margin: 1.5rem auto 0;
+      width: fit-content;
+    }
+
+    .availability-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: #4caf50;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4caf50;
+      animation: pulse 2s infinite;
+    }
+
+    .collab-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .collab-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      backdrop-filter: blur(10px);
+      transition: var(--transition);
+    }
+
+    .collab-item:hover {
+      border-color: var(--accent-cyan);
+      color: var(--text-primary);
+    }
+
+    .collab-item::before {
+      content: '✓';
+      color: var(--accent-cyan);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">&lt;BronzeSky /&gt;</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="research.html">研究</a></li>
+      <li><a href="blog.html">博客</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <p class="section-label">// Get In Touch</p>
+      <h1 class="page-hero-title">联系我</h1>
+      <p class="page-hero-desc">欢迎学术合作、项目交流与技术探讨</p>
+      <div class="availability-badge">
+        目前开放合作中 · Open to Collaboration
+      </div>
+    </div>
+
+    <section class="section">
+
+      <!-- Contact cards -->
+      <div class="contact-grid">
+
+        <a href="mailto:hanzzhang@fudan.edu.cn" class="contact-card fade-in">
+          <div class="contact-card-icon">✉️</div>
+          <div class="contact-card-title">学术邮件</div>
+          <div class="contact-card-value">hanzzhang@fudan.edu.cn</div>
+          <div class="contact-card-desc">学术合作、项目讨论，通常 24–48 小时内回复</div>
+        </a>
+
+        <a href="https://github.com/bronzesky" target="_blank" rel="noopener" class="contact-card fade-in">
+          <div class="contact-card-icon">🐙</div>
+          <div class="contact-card-title">GitHub</div>
+          <div class="contact-card-value">github.com/bronzesky</div>
+          <div class="contact-card-desc">查看代码仓库与开源项目，欢迎 Issue / PR</div>
+        </a>
+
+        <a href="#" class="contact-card fade-in">
+          <div class="contact-card-icon">🎓</div>
+          <div class="contact-card-title">复旦大学</div>
+          <div class="contact-card-value">大数据学院 · 2024 级</div>
+          <div class="contact-card-desc">上海市杨浦区邯郸路 220 号</div>
+        </a>
+
+        <a href="#" class="contact-card fade-in">
+          <div class="contact-card-icon">💬</div>
+          <div class="contact-card-title">WeChat / 微信</div>
+          <div class="contact-card-value">可邮件询问</div>
+          <div class="contact-card-desc">学术交流优先邮件，日常交流可微信</div>
+        </a>
+
+      </div>
+
+      <!-- What I'm open to -->
+      <div style="max-width:900px; margin:3rem auto 0;">
+        <h2 class="section-title" style="font-size:1.4rem; margin-bottom:1.25rem;">欢迎以下类型的交流 👋</h2>
+        <div class="collab-list">
+          <div class="collab-item">学术合作 / 联合研究项目</div>
+          <div class="collab-item">脑肿瘤 AI 诊断 · 医学影像处理相关讨论</div>
+          <div class="collab-item">LLM 智能体 · RAG 系统工程交流</div>
+          <div class="collab-item">中文古籍数字化 · 计算人文学探讨</div>
+          <div class="collab-item">数据科学 · 机器学习技术问题</div>
+          <div class="collab-item">复旦校内 / 跨校学生项目合作</div>
+          <div class="collab-item">开源社区贡献与技术分享</div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024–2028 <a href="index.html">Hanz Zhang (张翰宸)</a> · Fudan University · Built with ❤️ &amp; ☕</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

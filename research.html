@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>研究项目 · Hanz Zhang</title>
+  <meta name="description" content="张翰宸的研究项目：Frozen2FFPE、MediAgent、古籍多跳检索、史书置信度、YICGG26" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .research-detail {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: var(--radius);
+      padding: 2rem 2.5rem;
+      backdrop-filter: blur(10px);
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .research-detail::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-purple));
+      border-radius: 0 3px 3px 0;
+    }
+    .research-detail:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.1);
+      transform: translateX(4px);
+    }
+    .research-detail-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .research-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      background: rgba(0, 229, 255, 0.08);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .research-detail-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .research-detail-body {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+    .research-detail-body p + p {
+      margin-top: 0.75rem;
+    }
+    .research-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    .meta-item span:first-child {
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">&lt;BronzeSky /&gt;</a>
+    <ul class="nav-links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="research.html">研究</a></li>
+      <li><a href="blog.html">博客</a></li>
+      <li><a href="contact.html">联系</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main>
+    <div class="page-hero">
+      <p class="section-label">// Research Projects</p>
+      <h1 class="page-hero-title">研究项目</h1>
+      <p class="page-hero-desc">五个正在进行中的研究方向，横跨医学 AI、智能体与数字人文</p>
+    </div>
+
+    <section class="section">
+
+      <!-- Project 1 -->
+      <div class="research-detail fade-in">
+        <div class="research-detail-header">
+          <span class="research-num">01</span>
+          <span class="project-icon" style="font-size:1.5rem">🔬</span>
+          <h2 class="research-detail-title">Frozen2FFPE 图像转化模型</h2>
+          <span class="project-status status-active">Active</span>
+        </div>
+        <div class="research-detail-body">
+          <p>
+            脑肿瘤手术中，冰冻切片（Frozen Section）可在术中快速制备，但图像质量较差；
+            福尔马林固定石蜡包埋（FFPE）切片质量高，但需数天才能完成制备。
+          </p>
+          <p>
+            本项目研究如何利用深度生成模型（扩散模型 / GAN）将冰冻切片图像转化为高质量的
+            FFPE 风格图像，从而在不延长手术等待时间的前提下，提升术中诊断精度，
+            辅助神经外科医生做出更准确的切除边界判断。
+          </p>
+        </div>
+        <div class="research-meta">
+          <div class="meta-item"><span>🔧</span><span>PyTorch · MONAI · Diffusion Model</span></div>
+          <div class="meta-item"><span>🏷️</span><span>Medical Imaging · Pathology · AI</span></div>
+        </div>
+        <div class="tag-list" style="margin-top:1rem">
+          <span class="tag">Frozen Section</span>
+          <span class="tag purple">FFPE</span>
+          <span class="tag pink">Image-to-Image</span>
+          <span class="tag">Brain Tumor</span>
+        </div>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="research-detail fade-in">
+        <div class="research-detail-header">
+          <span class="research-num">02</span>
+          <span class="project-icon" style="font-size:1.5rem">🤖</span>
+          <h2 class="research-detail-title">MediAgent 全流程智能体研发</h2>
+          <span class="project-status status-active">Active</span>
+        </div>
+        <div class="research-detail-body">
+          <p>
+            MediAgent 是一个面向脑癌全流程诊疗的大语言模型（LLM）驱动智能体系统。
+            系统整合多模态感知（影像 + 病理 + 临床报告）、工具调用、医学知识库检索
+            与结构化报告自动生成等模块。
+          </p>
+          <p>
+            目标是构建一个端到端、可解释、可审核的 AI 辅助诊断 Pipeline，
+            覆盖从图像采集、特征提取、差异诊断到最终报告生成的完整临床流程。
+          </p>
+        </div>
+        <div class="research-meta">
+          <div class="meta-item"><span>🔧</span><span>LangChain · RAG · OpenAI API · HuggingFace</span></div>
+          <div class="meta-item"><span>🏷️</span><span>LLM Agent · Clinical NLP · Multi-modal</span></div>
+        </div>
+        <div class="tag-list" style="margin-top:1rem">
+          <span class="tag">LLM Agent</span>
+          <span class="tag purple">RAG</span>
+          <span class="tag pink">Clinical AI</span>
+          <span class="tag">Multi-modal</span>
+        </div>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="research-detail fade-in">
+        <div class="research-detail-header">
+          <span class="research-num">03</span>
+          <span class="project-icon" style="font-size:1.5rem">📚</span>
+          <h2 class="research-detail-title">中文古籍多跳搜索 Benchmark</h2>
+          <span class="project-status status-active">Active</span>
+        </div>
+        <div class="research-detail-body">
+          <p>
+            现有 NLP Benchmark 对古汉语语境下的复杂推理覆盖不足。
+            本项目构建一套针对中国古典文献（经史子集）的多跳问答评测基准，
+            要求模型跨越多篇文献进行链式推理，方能得出正确答案。
+          </p>
+          <p>
+            数据集覆盖《史记》《资治通鉴》《四书五经》等核心典籍，
+            评测维度包括事实抽取、关系推理、时序理解与指代消解。
+          </p>
+        </div>
+        <div class="research-meta">
+          <div class="meta-item"><span>🔧</span><span>Python · FAISS · Elasticsearch · LLM Eval</span></div>
+          <div class="meta-item"><span>🏷️</span><span>NLP · Multi-hop QA · Digital Humanities</span></div>
+        </div>
+        <div class="tag-list" style="margin-top:1rem">
+          <span class="tag">Multi-hop QA</span>
+          <span class="tag purple">Ancient Chinese</span>
+          <span class="tag pink">Benchmark</span>
+          <span class="tag">NLP</span>
+        </div>
+      </div>
+
+      <!-- Project 4 -->
+      <div class="research-detail fade-in">
+        <div class="research-detail-header">
+          <span class="research-num">04</span>
+          <span class="project-icon" style="font-size:1.5rem">📜</span>
+          <h2 class="research-detail-title">史书置信度研究</h2>
+          <span class="project-status status-ongoing">Ongoing</span>
+        </div>
+        <div class="research-detail-body">
+          <p>
+            中国传统史书历经千年传抄与编纂，记载的可靠性差异显著。
+            本研究借助计算人文学方法，对史书记载进行系统性置信度（Credibility）量化分析。
+          </p>
+          <p>
+            研究框架综合考量：文本内部一致性、多源文献交叉印证、成书年代与史家立场，
+            最终构建可量化、可对比的历史文本可信度评估体系，
+            为历史学研究提供数字化分析工具。
+          </p>
+        </div>
+        <div class="research-meta">
+          <div class="meta-item"><span>🔧</span><span>Python · NLP · Statistical Analysis</span></div>
+          <div class="meta-item"><span>🏷️</span><span>Digital Humanities · Historiography</span></div>
+        </div>
+        <div class="tag-list" style="margin-top:1rem">
+          <span class="tag">Digital Humanities</span>
+          <span class="tag purple">Historiography</span>
+          <span class="tag pink">Text Mining</span>
+          <span class="tag">Credibility</span>
+        </div>
+      </div>
+
+      <!-- Project 5 -->
+      <div class="research-detail fade-in">
+        <div class="research-detail-header">
+          <span class="research-num">05</span>
+          <span class="project-icon" style="font-size:1.5rem">⚡</span>
+          <h2 class="research-detail-title">YICGG26 项目</h2>
+          <span class="project-status status-ongoing">Ongoing</span>
+        </div>
+        <div class="research-detail-body">
+          <p>
+            YICGG26 是 2026 年度综合性研究项目，整合多领域前沿技术探索与应用实践。
+            目前项目处于早期阶段，具体研究内容与合作计划持续规划中。
+          </p>
+          <p>
+            如果您对项目感兴趣或希望了解更多，欢迎通过邮件或其他方式与我联系。
+          </p>
+        </div>
+        <div class="research-meta">
+          <div class="meta-item"><span>🏷️</span><span>Research · Innovation · 2026</span></div>
+        </div>
+        <div class="tag-list" style="margin-top:1rem">
+          <span class="tag">Research</span>
+          <span class="tag purple">Innovation</span>
+          <span class="tag">2026</span>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024–2028 <a href="index.html">Hanz Zhang (张翰宸)</a> · Fudan University · Built with ❤️ &amp; ☕</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
