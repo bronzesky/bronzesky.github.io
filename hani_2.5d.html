@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>哈尼梯田 · 四素同构生态系统</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#1a2535;font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden;}
+.scene-wrap{display:flex;width:100%;height:100vh;align-items:stretch;}
+#svg-scene{flex:1;min-width:0;}
+#info-panel{width:300px;min-width:260px;flex-shrink:0;background:linear-gradient(160deg,#17261a 0%,#0d1f14 100%);border-left:1px solid rgba(93,202,165,0.18);display:flex;flex-direction:column;padding:28px 22px 22px;color:#fff;position:relative;overflow:hidden;}
+#info-panel::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(93,202,165,0.12) 0%,transparent 70%);pointer-events:none;}
+.panel-logo{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.28);text-transform:uppercase;margin-bottom:26px;}
+.panel-default{display:flex;flex-direction:column;gap:11px;}
+.panel-title-main{font-size:18px;font-weight:700;line-height:1.3;color:#EAF3DE;margin-bottom:2px;}
+.panel-sub{font-size:12px;color:rgba(234,243,222,0.5);line-height:1.7;}
+.hint-items{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+.hint-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.04);cursor:pointer;transition:background 0.2s,border-color 0.2s;border:1px solid rgba(255,255,255,0.06);}
+.hint-item:hover{background:rgba(255,255,255,0.09);}
+.hint-item.hl{border-color:var(--hc,rgba(93,202,165,0.5));background:rgba(93,202,165,0.08);}
+.hint-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.hint-label{font-size:12px;color:rgba(255,255,255,0.75);}
+.panel-detail{display:none;flex-direction:column;}
+.panel-detail.show{display:flex;}
+.detail-badge{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:13px;}
+.detail-badge-dot{width:7px;height:7px;border-radius:50%;}
+.detail-title{font-size:22px;font-weight:700;line-height:1.2;margin-bottom:9px;}
+.detail-desc{font-size:12px;line-height:1.8;color:rgba(255,255,255,0.62);margin-bottom:16px;}
+.detail-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.stat-box{padding:10px;border-radius:9px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);}
+.stat-val{font-size:16px;font-weight:700;margin-bottom:2px;}
+.stat-key{font-size:10px;color:rgba(255,255,255,0.4);}
+.detail-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.tag{padding:3px 10px;border-radius:20px;font-size:10px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.09);}
+.back-btn{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.07);border:none;color:rgba(255,255,255,0.55);padding:9px 14px;border-radius:8px;cursor:pointer;font-size:12px;transition:background 0.2s;width:fit-content;font-family:inherit;}
+.back-btn:hover{background:rgba(255,255,255,0.14);color:#fff;}
+.eco-flow{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07);}
+.flow-title{font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:1px;margin-bottom:7px;}
+.flow-row{display:flex;align-items:center;gap:5px;margin-top:5px;}
+.flow-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.flow-arrow{font-size:9px;color:rgba(255,255,255,0.18);}
+.flow-lbl{font-size:10px;color:rgba(255,255,255,0.25);}
+</style>
+</head>
+<body>
+<div class="scene-wrap">
+<svg id="svg-scene" viewBox="0 0 720 700" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="sky-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0e1e36"/><stop offset="60%" stop-color="#1a3a5c"/><stop offset="100%" stop-color="#2a5a7a"/></linearGradient>
+  <linearGradient id="ftop" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2e6810"/><stop offset="100%" stop-color="#1d4a08"/></linearGradient>
+  <linearGradient id="fside" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#193d07"/><stop offset="100%" stop-color="#0f2604"/></linearGradient>
+  <linearGradient id="vtop" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4894a"/><stop offset="100%" stop-color="#a86630"/></linearGradient>
+  <linearGradient id="vside" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8c5525"/><stop offset="100%" stop-color="#5c3510"/></linearGradient>
+  <linearGradient id="t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6fd4b0"/><stop offset="100%" stop-color="#45b090"/></linearGradient>
+  <linearGradient id="t2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5bc8a4"/><stop offset="100%" stop-color="#38a880"/></linearGradient>
+  <linearGradient id="t3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4abe98"/><stop offset="100%" stop-color="#2c9870"/></linearGradient>
+  <linearGradient id="t4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5dc9a8"/><stop offset="100%" stop-color="#3aab85"/></linearGradient>
+  <linearGradient id="t5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#68d0b0"/><stop offset="100%" stop-color="#44b290"/></linearGradient>
+  <linearGradient id="t6" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#78dcbe"/><stop offset="100%" stop-color="#54bc9e"/></linearGradient>
+  <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a7060"/><stop offset="100%" stop-color="#2a4a40"/></linearGradient>
+  <linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#1055a0"/><stop offset="50%" stop-color="#1a78c8"/><stop offset="100%" stop-color="#1055a0"/></linearGradient>
+  <linearGradient id="mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(160,200,210,0.32)"/><stop offset="100%" stop-color="rgba(160,200,210,0)"/></linearGradient>
+  <filter id="glow" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="bright" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncR type="linear" slope="1.5" intercept="0.08"/><feFuncG type="linear" slope="1.5" intercept="0.08"/><feFuncB type="linear" slope="1.5" intercept="0.08"/></feComponentTransfer></filter>
+  <filter id="dim" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.2"/><feComponentTransfer><feFuncR type="linear" slope="0.38"/><feFuncG type="linear" slope="0.38"/><feFuncB type="linear" slope="0.38"/></feComponentTransfer></filter>
+</defs>
+<rect width="720" height="700" fill="url(#sky-g)"/>
+<g opacity="0.5" fill="white">
+<circle cx="55" cy="35" r="1"/><circle cx="120" cy="20" r="1.2"/><circle cx="200" cy="52" r="0.8"/><circle cx="280" cy="16" r="1"/><circle cx="360" cy="40" r="0.8"/><circle cx="450" cy="10" r="1.2"/><circle cx="540" cy="33" r="0.9"/><circle cx="620" cy="18" r="1"/><circle cx="690" cy="46" r="0.8"/><circle cx="88" cy="68" r="0.7"/><circle cx="248" cy="60" r="0.9"/><circle cx="415" cy="26" r="0.8"/><circle cx="590" cy="55" r="1"/>
+</g>
+<g opacity="0.28">
+<polygon points="0,255 95,145 190,208 305,108 415,188 525,118 635,172 720,135 720,275 0,275" fill="#1e3a52"/>
+<polygon points="0,275 55,198 145,248 252,153 368,228 478,158 590,212 688,145 720,182 720,292 0,292" fill="#162e42"/>
+</g>
+<ellipse cx="360" cy="308" rx="370" ry="30" fill="url(#mg)" opacity="0.5"/>
+<ellipse cx="360" cy="462" rx="350" ry="22" fill="url(#mg)" opacity="0.35"/>
+<g id="zone-forest" data-zone="forest" style="cursor:pointer">
+<polygon points="100,178 390,112 560,162 270,228" fill="url(#ftop)" stroke="rgba(60,160,40,0.2)" stroke-width="1"/>
+<polygon points="100,178 270,228 270,264 100,214" fill="url(#fside)"/>
+<polygon points="270,228 560,162 560,198 270,264" fill="url(#fside)" opacity="0.72"/>
+<g opacity="0.88">
+<g transform="translate(185,153)"><ellipse rx="19" ry="12" fill="#1a5c08"/><rect x="-3" y="0" width="6" height="14" fill="#0d2f04"/></g>
+<g transform="translate(235,142)"><ellipse rx="23" ry="14" fill="#226a0a"/><rect x="-3" y="0" width="6" height="16" fill="#0d2f04"/></g>
+<g transform="translate(285,132)"><ellipse rx="21" ry="13" fill="#1d5f08"/><rect x="-3" y="0" width="6" height="15" fill="#0d2f04"/></g>
+<g transform="translate(334,123)"><ellipse rx="25" ry="15" fill="#286e10"/><rect x="-3" y="0" width="6" height="17" fill="#0d2f04"/></g>
+<g transform="translate(382,115)"><ellipse rx="19" ry="12" fill="#1a5c08"/><rect x="-3" y="0" width="6" height="14" fill="#0d2f04"/></g>
+<g transform="translate(430,121)"><ellipse rx="21" ry="13" fill="#226a0a"/><rect x="-3" y="0" width="6" height="15" fill="#0d2f04"/></g>
+<g transform="translate(478,132)"><ellipse rx="18" ry="11" fill="#1d5f08"/><rect x="-3" y="0" width="5" height="13" fill="#0d2f04"/></g>
+<g transform="translate(520,142)"><ellipse rx="16" ry="10" fill="#1a5c08"/><rect x="-3" y="0" width="5" height="12" fill="#0d2f04"/></g>
+</g>
+<g opacity="0.95">
+<g transform="translate(152,170)"><ellipse rx="17" ry="11" fill="#1d5f08"/><rect x="-3" y="0" width="5" height="13" fill="#0d2f04"/></g>
+<g transform="translate(202,160)"><ellipse rx="20" ry="12" fill="#226a0a"/><rect x="-3" y="0" width="6" height="14" fill="#0d2f04"/></g>
+<g transform="translate(252,150)"><ellipse rx="22" ry="14" fill="#1d5f08"/><rect x="-3" y="0" width="6" height="15" fill="#0d2f04"/></g>
+<g transform="translate(302,141)"><ellipse rx="19" ry="12" fill="#286e10"/><rect x="-3" y="0" width="5" height="13" fill="#0d2f04"/></g>
+<g transform="translate(350,133)"><ellipse rx="21" ry="13" fill="#226a0a"/><rect x="-3" y="0" width="6" height="14" fill="#0d2f04"/></g>
+<g transform="translate(398,124)"><ellipse rx="18" ry="11" fill="#1a5c08"/><rect x="-3" y="0" width="5" height="12" fill="#0d2f04"/></g>
+<g transform="translate(445,134)"><ellipse rx="20" ry="12" fill="#1d5f08"/><rect x="-3" y="0" width="6" height="13" fill="#0d2f04"/></g>
+<g transform="translate(492,144)"><ellipse rx="17" ry="11" fill="#226a0a"/><rect x="-3" y="0" width="5" height="12" fill="#0d2f04"/></g>
+</g>
+<text x="335" y="194" text-anchor="middle" font-size="12" font-weight="600" fill="rgba(200,240,180,0.9)" font-family="sans-serif" pointer-events="none">森  林</text>
+</g>
+<g id="zone-village" data-zone="village" style="cursor:pointer">
+<polygon points="95,285 280,243 430,282 245,324" fill="url(#vtop)" stroke="rgba(200,140,60,0.2)" stroke-width="1"/>
+<polygon points="95,285 245,324 245,360 95,320" fill="url(#vside)"/>
+<polygon points="245,324 430,282 430,318 245,360" fill="url(#vside)" opacity="0.75"/>
+<g transform="translate(145,283)"><rect x="-14" y="-12" width="28" height="18" fill="#c07838" rx="1"/><polygon points="-18,-12 0,-27 18,-12" fill="#7a3e18"/><rect x="-4" y="-5" width="8" height="11" fill="#5c2e10"/></g>
+<g transform="translate(198,272)"><rect x="-17" y="-14" width="34" height="21" fill="#c87a3a" rx="1"/><polygon points="-21,-14 0,-31 21,-14" fill="#7a3e18"/><rect x="-5" y="-6" width="10" height="13" fill="#5c2e10"/><rect x="5" y="-12" width="6" height="6" fill="rgba(255,200,80,0.4)"/></g>
+<g transform="translate(255,265)"><rect x="-13" y="-11" width="26" height="17" fill="#bf7130" rx="1"/><polygon points="-17,-11 0,-25 17,-11" fill="#7a3e18"/><rect x="-3" y="-5" width="6" height="10" fill="#5c2e10"/></g>
+<g transform="translate(305,272)"><rect x="-16" y="-13" width="32" height="20" fill="#c07838" rx="1"/><polygon points="-20,-13 0,-29 20,-13" fill="#7a3e18"/><rect x="-5" y="-6" width="10" height="12" fill="#5c2e10"/></g>
+<g transform="translate(356,262)"><rect x="-14" y="-12" width="28" height="18" fill="#c87a3a" rx="1"/><polygon points="-18,-12 0,-26 18,-12" fill="#7a3e18"/><rect x="-4" y="-5" width="8" height="11" fill="#5c2e10"/></g>
+<g transform="translate(400,270)"><rect x="-12" y="-10" width="24" height="15" fill="#bf7130" rx="1"/><polygon points="-15,-10 0,-22 15,-10" fill="#7a3e18"/><rect x="-3" y="-4" width="6" height="9" fill="#5c2e10"/></g>
+<text x="265" y="340" text-anchor="middle" font-size="12" font-weight="600" fill="rgba(250,220,170,0.9)" font-family="sans-serif" pointer-events="none">哈尼村寨</text>
+</g>
+<g id="zone-terraces" data-zone="terraces" style="cursor:pointer">
+<!-- Terrace 1 -->
+<polygon points="80,368 290,322 450,362 240,408" fill="url(#t1)" stroke="rgba(80,200,160,0.25)" stroke-width="1"/>
+<polygon points="80,368 240,408 240,428 80,388" fill="url(#wg)"/>
+<polygon points="240,408 450,362 450,382 240,428" fill="url(#wg)" opacity="0.7"/>
+<!-- water shimmer -->
+<polygon points="95,374 280,330 440,368 225,414" fill="rgba(100,210,180,0.12)"/>
+<!-- Terrace 2 -->
+<polygon points="70,435 260,388 460,430 270,477" fill="url(#t2)" stroke="rgba(80,200,160,0.2)" stroke-width="1"/>
+<polygon points="70,435 270,477 270,497 70,455" fill="url(#wg)"/>
+<polygon points="270,477 460,430 460,450 270,497" fill="url(#wg)" opacity="0.7"/>
+<polygon points="85,441 248,396 446,437 258,483" fill="rgba(80,190,160,0.1)"/>
+<!-- Terrace 3 -->
+<polygon points="60,500 255,452 470,496 275,544" fill="url(#t3)" stroke="rgba(80,200,160,0.2)" stroke-width="1"/>
+<polygon points="60,500 275,544 275,564 60,520" fill="url(#wg)"/>
+<polygon points="275,544 470,496 470,516 275,564" fill="url(#wg)" opacity="0.7"/>
+<polygon points="75,506 242,460 456,503 262,550" fill="rgba(60,180,150,0.1)"/>
+<!-- Terrace 4 -->
+<polygon points="50,565 250,516 480,562 280,612" fill="url(#t4)" stroke="rgba(80,200,160,0.18)" stroke-width="1"/>
+<polygon points="50,565 280,612 280,632 50,585" fill="url(#wg)"/>
+<polygon points="280,612 480,562 480,582 280,632" fill="url(#wg)" opacity="0.7"/>
+<!-- Terrace 5 wide -->
+<polygon points="40,628 265,578 495,626 270,676" fill="url(#t5)" stroke="rgba(80,200,160,0.15)" stroke-width="1"/>
+<polygon points="40,628 270,676 270,696 40,648" fill="url(#wg)"/>
+<polygon points="270,676 495,626 495,646 270,696" fill="url(#wg)" opacity="0.7"/>
+<!-- Rice stalks on terraces -->
+<g opacity="0.6" fill="#3a8850" stroke="none">
+<rect x="105" y="357" width="2" height="12"/><rect x="130" y="350" width="2" height="11"/>
+<rect x="160" y="344" width="2" height="12"/><rect x="190" y="340" width="2" height="11"/>
+<rect x="220" y="335" width="2" height="12"/><rect x="250" y="332" width="2" height="11"/>
+<rect x="280" y="329" width="2" height="12"/><rect x="310" y="332" width="2" height="11"/>
+<rect x="340" y="336" width="2" height="12"/><rect x="370" y="340" width="2" height="11"/>
+<rect x="400" y="346" width="2" height="12"/><rect x="430" y="352" width="2" height="11"/>
+</g>
+<text x="265" y="420" text-anchor="middle" font-size="12" font-weight="600" fill="rgba(180,255,230,0.9)" font-family="sans-serif" pointer-events="none">层级梯田湿地</text>
+</g>
+<g id="zone-river" data-zone="river" style="cursor:pointer">
+<polygon points="490,340 600,315 720,348 720,395 600,362 490,387" fill="url(#rg)" stroke="rgba(80,160,220,0.3)" stroke-width="1"/>
+<polygon points="490,387 600,362 720,395 720,430 600,397 490,422" fill="url(#rg)" opacity="0.7"/>
+<!-- River shine/ripple -->
+<path d="M510,352 Q555,345 600,352 Q645,359 690,352" fill="none" stroke="rgba(150,220,255,0.4)" stroke-width="2"/>
+<path d="M505,365 Q550,358 595,365 Q640,372 685,365" fill="none" stroke="rgba(150,220,255,0.3)" stroke-width="1.5"/>
+<path d="M508,378 Q553,371 598,378 Q643,385 688,378" fill="none" stroke="rgba(150,220,255,0.25)" stroke-width="1"/>
+<!-- Water flow arrows -->
+<g fill="rgba(100,200,240,0.35)">
+<polygon points="540,358 548,354 548,362"/>
+<polygon points="580,355 588,351 588,359"/>
+<polygon points="620,358 628,354 628,362"/>
+<polygon points="660,362 668,358 668,366"/>
+<polygon points="700,360 708,356 708,364"/>
+</g>
+<text x="605" y="368" text-anchor="middle" font-size="12" font-weight="600" fill="rgba(160,220,255,0.9)" font-family="sans-serif" pointer-events="none">水  系</text>
+</g>
+<!-- Waterfall connecting forest to terraces -->
+<g opacity="0.7">
+<path d="M560,198 Q575,240 565,285" fill="none" stroke="rgba(100,180,220,0.5)" stroke-width="3"/>
+<path d="M555,200 Q568,242 560,287" fill="none" stroke="rgba(130,200,240,0.3)" stroke-width="1.5"/>
+</g>
+<!-- Water channel from terraces to river -->
+<g opacity="0.6">
+<path d="M460,390 Q490,380 510,360" fill="none" stroke="rgba(80,160,210,0.5)" stroke-width="2.5"/>
+</g>
+</svg>
+<div id="info-panel">
+  <div class="panel-logo">YICGG · 遗产保护碳循环体系</div>
+  <div class="panel-default" id="panel-default">
+    <div class="panel-title-main">哈尼梯田<br>四素同构</div>
+    <div class="panel-sub">森林·村寨·梯田·水系构成的千年农业生态智慧系统，点击图中各区域了解详情。</div>
+    <div class="hint-items">
+      <div class="hint-item" style="--hc:rgba(80,180,60,0.6)" onclick="selectZone('forest')">
+        <div class="hint-dot" style="background:#5cb840"></div>
+        <div class="hint-label">森林 — 水源涵养与碳汇</div>
+      </div>
+      <div class="hint-item" style="--hc:rgba(210,140,60,0.6)" onclick="selectZone('village')">
+        <div class="hint-dot" style="background:#d4894a"></div>
+        <div class="hint-label">哈尼村寨 — 文化传承核心</div>
+      </div>
+      <div class="hint-item" style="--hc:rgba(80,200,160,0.6)" onclick="selectZone('terraces')">
+        <div class="hint-dot" style="background:#5dcaa5"></div>
+        <div class="hint-label">层级梯田湿地 — 粮食与固碳</div>
+      </div>
+      <div class="hint-item" style="--hc:rgba(60,140,220,0.6)" onclick="selectZone('river')">
+        <div class="hint-dot" style="background:#4a9ae0"></div>
+        <div class="hint-label">水系 — 生态循环动脉</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel-detail" id="panel-detail">
+    <div class="detail-badge"><div class="detail-badge-dot" id="detail-dot"></div><span id="detail-cat"></span></div>
+    <div class="detail-title" id="detail-title"></div>
+    <div class="detail-desc" id="detail-desc"></div>
+    <div class="detail-stats" id="detail-stats"></div>
+    <div class="detail-tags" id="detail-tags"></div>
+    <button class="back-btn" onclick="clearZone()">← 返回总览</button>
+  </div>
+  <div class="eco-flow">
+    <div class="flow-title">生态循环</div>
+    <div class="flow-row"><div class="flow-dot" style="background:#5cb840"></div><span class="flow-lbl">森林蓄水</span><span class="flow-arrow">→</span><div class="flow-dot" style="background:#4a9ae0"></div><span class="flow-lbl">水系输送</span></div>
+    <div class="flow-row"><div class="flow-dot" style="background:#4a9ae0"></div><span class="flow-lbl">灌溉梯田</span><span class="flow-arrow">→</span><div class="flow-dot" style="background:#5dcaa5"></div><span class="flow-lbl">固碳产粮</span></div>
+    <div class="flow-row"><div class="flow-dot" style="background:#5dcaa5"></div><span class="flow-lbl">养育村寨</span><span class="flow-arrow">→</span><div class="flow-dot" style="background:#d4894a"></div><span class="flow-lbl">守护生态</span></div>
+  </div>
+</div>
+</div>
+<script>
+const ZONES = {
+  forest: {
+    cat: "ECOSYSTEM · 生态系统",
+    color: "#5cb840",
+    title: "森林",
+    desc: "哈尼梯田最上层的茂密森林是整个生态系统的水塔。森林通过截留降水、涵养水源，将雨水缓慢释放至下方的村寨与梯田，形成可持续的自然灌溉体系。同时，森林是重要的碳汇，每年固定大量CO₂。",
+    stats: [{v:"5,000+",k:"植物物种"},{v:"82%",k:"流域森林覆盖率"},{v:"1,200t",k:"年固碳量"},{v:"800年",k:"生态系统年龄"}],
+    tags: ["碳汇","水源涵养","生物多样性","气候调节"]
+  },
+  village: {
+    cat: "HERITAGE · 文化遗产",
+    color: "#d4894a",
+    title: "哈尼村寨",
+    desc: "哈尼族村寨建于森林与梯田之间的山腰地带，蘑菇房与茂竹掩映。村民世代掌握精妙的水资源管理技术与梯田耕作知识，是四素同构体系中人与自然协调的核心节点。",
+    stats: [{v:"1,300+",k:"传统村寨"},{v:"10万",k:"哈尼族农户"},{v:"1,200年",k:"开垦历史"},{v:"82项",k:"非遗技艺"}],
+    tags: ["世界文化遗产","传统知识","蘑菇房","人地和谐"]
+  },
+  terraces: {
+    cat: "AGRICULTURE · 农业湿地",
+    color: "#5dcaa5",
+    title: "层级梯田湿地",
+    desc: "连绵不绝的梯田从山腰一直延伸至山脚，水田如镜，层层叠叠。梯田同时具备粮食生产、湿地固碳、调蓄洪水等多重生态服务功能，是全球最具代表性的山地农业景观之一。",
+    stats: [{v:"16,603ha",k:"梯田总面积"},{v:"2,500级",k:"最大垂直梯田数"},{v:"4,000t",k:"年固碳量"},{v:"65%",k:"湿地占比"},{v:"350种",k:"水生物种"}],
+    tags: ["湿地碳汇","粮食安全","灌溉农业","景观遗产"]
+  },
+  river: {
+    cat: "HYDROLOGY · 水文系统",
+    color: "#4a9ae0",
+    title: "水  系",
+    desc: "哈尼梯田的水系由天然溪流与数千条人工水渠交织构成。森林中的水源沿山势流入各级水渠，依靠重力无泵自流灌溉全部梯田，体现了哈尼先民对水力学的深刻理解。水系同时提供饮水、养鱼、洗涤等多重生活功能。",
+    stats: [{v:"数千条",k:"灌溉水渠"},{v:"全重力",k:"无泵自流"},{v:"4条",k:"主要河流"},{v:"1,200mm",k:"年降雨量"}],
+    tags: ["重力灌溉","水资源管理","生态廊道","传统水利"]
+  }
+};
+
+let current = null;
+
+function selectZone(zone) {
+  if (current === zone) { clearZone(); return; }
+  current = zone;
+  const z = ZONES[zone];
+
+  // SVG zone highlighting
+  ["forest","village","terraces","river"].forEach(id => {
+    const el = document.getElementById("zone-" + id);
+    if (!el) return;
+    el.style.filter = (id === zone) ? "url(#bright)" : "url(#dim)";
+    el.style.transition = "filter 0.35s";
+  });
+
+  // Panel
+  document.getElementById("panel-default").style.display = "none";
+  const det = document.getElementById("panel-detail");
+  det.classList.add("show");
+
+  document.getElementById("detail-dot").style.background = z.color;
+  document.getElementById("detail-cat").textContent = z.cat;
+  document.getElementById("detail-title").textContent = z.title;
+  document.getElementById("detail-title").style.color = z.color;
+  document.getElementById("detail-desc").textContent = z.desc;
+
+  const statsEl = document.getElementById("detail-stats");
+  statsEl.innerHTML = z.stats.map(s =>
+    `<div class="stat-box"><div class="stat-val" style="color:${z.color}">${s.v}</div><div class="stat-key">${s.k}</div></div>`
+  ).join("");
+
+  const tagsEl = document.getElementById("detail-tags");
+  tagsEl.innerHTML = z.tags.map(t => `<span class="tag">${t}</span>`).join("");
+
+  // Highlight panel hint
+  document.querySelectorAll(".hint-item").forEach(el => el.classList.remove("hl"));
+}
+
+function clearZone() {
+  current = null;
+  ["forest","village","terraces","river"].forEach(id => {
+    const el = document.getElementById("zone-" + id);
+    if (el) { el.style.filter = ""; }
+  });
+  document.getElementById("panel-default").style.display = "";
+  document.getElementById("panel-detail").classList.remove("show");
+}
+
+// Wire up SVG zones
+["forest","village","terraces","river"].forEach(id => {
+  const el = document.getElementById("zone-" + id);
+  if (el) el.addEventListener("click", () => selectZone(id));
+});
+</script>
+</body>
+</html>

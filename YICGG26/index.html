@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HCCS — 世界遗产碳信用系统</title>
+<link rel="stylesheet" href="css/style.css">
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<!-- D3 + TopoJSON -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav id="topnav">
+  <div class="nav-brand" onclick="scrollTo(0,0)">HCCS</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="navTo('s-map')">全球遗产</button>
+    <button class="nav-link" onclick="navTo('s-flow')">资金流向</button>
+    <button class="nav-link" onclick="window.openOverlay('A')">碳汇交易</button>
+    <button class="nav-link" onclick="window.openOverlay('B')">碳税收入</button>
+    <button class="nav-link" onclick="window.openOverlay('C')">ESG贡献</button>
+    <button class="nav-link" onclick="window.openOverlay('D')">基金详情</button>
+    <button class="nav-link" onclick="window.openOverlay('E')">分配公式</button>
+  </div>
+</nav>
+
+<!-- ===== SECTION 1: MAP ===== -->
+<section id="s-map" class="full-section">
+  <div id="map-container">
+    <div id="leaflet-map"></div>
+    <div class="map-stats-bar">
+      <div class="map-stat">
+        <div class="map-stat-val" id="stat-sites">1,157</div>
+        <div class="map-stat-label">UNESCO 世界遗产地</div>
+      </div>
+      <div class="map-stat">
+        <div class="map-stat-val" id="stat-countries">168</div>
+        <div class="map-stat-label">覆盖国家</div>
+      </div>
+      <div class="map-stat">
+        <div class="map-stat-val" id="stat-carbon">--</div>
+        <div class="map-stat-label">30天碳汇收入</div>
+      </div>
+      <div class="map-stat">
+        <div class="map-stat-val" id="stat-fund">--</div>
+        <div class="map-stat-label">基金余额</div>
+      </div>
+    </div>
+    <button id="hani-btn">查看示例：哈尼梯田 →</button>
+    <!-- Hani side panel -->
+    <div id="hani-panel">
+      <button id="hani-close">✕</button>
+      <iframe id="hani-iframe" src="../hani_2.5d.html"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 2: FLOW DASHBOARD ===== -->
+<section id="s-flow" class="full-section">
+  <div class="flow-header">
+    <h2>HCCA 世界遗产保护基金 — 资金流向</h2>
+    <p>实时展示碳汇、碳税与ESG资金的汇集与分配路径</p>
+  </div>
+  <div class="flow-body">
+    <!-- Left: income sources -->
+    <div class="flow-col">
+      <div class="flow-col-label">资金来源</div>
+      <div class="income-card" id="card-carbon" onclick="window.openOverlay('A')">
+        <div class="card-icon">🌿</div>
+        <div class="card-title">生态碳汇收入</div>
+        <div class="card-val" id="cv-carbon">--</div>
+        <div class="card-sub">过去30天累计</div>
+        <div class="sparkline-wrap"><canvas id="sp-carbon"></canvas></div>
+      </div>
+      <div class="income-card" id="card-tax" onclick="window.openOverlay('B')">
+        <div class="card-icon">🎫</div>
+        <div class="card-title">旅游碳税收入</div>
+        <div class="card-val" id="cv-tax">--</div>
+        <div class="card-sub">过去30天累计</div>
+        <div class="sparkline-wrap"><canvas id="sp-tax"></canvas></div>
+      </div>
+      <div class="income-card" id="card-esg" onclick="window.openOverlay('C')">
+        <div class="card-icon">🏢</div>
+        <div class="card-title">企业ESG认购</div>
+        <div class="card-val" id="cv-esg">--</div>
+        <div class="card-sub">过去30天累计</div>
+        <div class="sparkline-wrap"><canvas id="sp-esg"></canvas></div>
+      </div>
+    </div>
+    <!-- Center: HCCA node + SVG -->
+    <div class="flow-col" id="flow-svg-wrap">
+      <svg id="flow-svg"></svg>
+      <div class="hcca-node" id="hcca-node" onclick="window.openOverlay('D')">
+        <div class="hcca-pulse"></div>
+        <div class="hcca-node-label">HCCA基金</div>
+        <div class="hcca-node-val" id="hcca-bal">--</div>
+        <div class="hcca-node-sub">基金余额</div>
+      </div>
+    </div>
+    <!-- Right: expenditure -->
+    <div class="flow-col">
+      <div class="flow-col-label">资金分配</div>
+      <div class="expense-card" id="card-alloc" onclick="window.openOverlay('E')">
+        <div class="card-icon">🏛️</div>
+        <div class="card-title">遗址保护拨付</div>
+        <div class="card-val" id="cv-alloc">--</div>
+        <div class="card-sub">25个遗址 · 本月拨付</div>
+      </div>
+      <div class="expense-card" id="card-ops">
+        <div class="card-icon">🔬</div>
+        <div class="card-title">核查与运营费用</div>
+        <div class="card-val" id="cv-ops">--</div>
+        <div class="card-sub">UNESCO合规 + AI遥感 + 运营</div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3)">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>UNESCO合规审查</span><span style="color:var(--teal)">87%</span></div>
+          <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px"><div style="width:87%;height:100%;background:var(--teal);border-radius:2px"></div></div>
+          <div style="display:flex;justify-content:space-between;margin:6px 0 4px"><span>AI遥感核验</span><span style="color:var(--amber)">61%</span></div>
+          <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px"><div style="width:61%;height:100%;background:var(--amber);border-radius:2px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OVERLAY A: CARBON TRADING ===== -->
+<div class="overlay" id="ov-A">
+  <div class="ov-header">
+    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
+    <div class="ov-title">生态碳汇交易大屏</div>
+    <button class="ov-close" onclick="window.closeOverlay('A')">✕</button>
+  </div>
+  <div class="ov-body">
+    <div class="ov-ticker">
+      <div class="ov-ticker-header">实时交易记录</div>
+      <div class="ticker-feed"><div class="ticker-list" id="ov-a-feed"></div></div>
+      <div class="ov-progress">
+        <div class="progress-label"><span id="ov-a-plbl">--</span><span>播放中</span></div>
+        <div class="progress-track"><div class="progress-fill" id="ov-a-pf" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="ov-charts">
+      <div class="ov-charts-top">
+        <div class="chart-box"><div class="chart-box-title">日成交量 (tCO₂)</div><div id="ov-a-chart1" style="flex:1"></div></div>
+        <div class="chart-box"><div class="chart-box-title">日收入 (¥)</div><div id="ov-a-chart2" style="flex:1"></div></div>
+        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">买方类型分布</div><div id="ov-a-chart3" style="flex:1"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OVERLAY B: TOURISM TAX ===== -->
+<div class="overlay" id="ov-B">
+  <div class="ov-header">
+    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
+    <div class="ov-title">旅游碳税收入大屏</div>
+    <button class="ov-close" onclick="window.closeOverlay('B')">✕</button>
+  </div>
+  <div class="ov-body">
+    <div class="ov-ticker">
+      <div class="ov-ticker-header">景区收入记录</div>
+      <div class="ticker-feed"><div class="ticker-list" id="ov-b-feed"></div></div>
+      <div class="ov-progress">
+        <div class="progress-label"><span>景区碳税</span><span>实时更新</span></div>
+        <div class="progress-track"><div class="progress-fill" id="ov-b-pf" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="ov-charts">
+      <div class="ov-charts-top">
+        <div class="chart-box"><div class="chart-box-title">景区收入排名 (前15)</div><div id="ov-b-chart1" style="flex:1"></div></div>
+        <div class="chart-box"><div class="chart-box-title">日收入趋势 (¥)</div><div id="ov-b-chart2" style="flex:1"></div></div>
+        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">遗址类型分布</div><div id="ov-b-chart3" style="flex:1"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OVERLAY C: ESG ===== -->
+<div class="overlay" id="ov-C">
+  <div class="ov-header">
+    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
+    <div class="ov-title">企业ESG认购大屏</div>
+    <button class="ov-close" onclick="window.closeOverlay('C')">✕</button>
+  </div>
+  <div class="ov-body">
+    <div class="ov-ticker">
+      <div class="ov-ticker-header">企业认购记录</div>
+      <div class="ticker-feed"><div class="ticker-list" id="ov-c-feed"></div></div>
+      <div class="ov-progress">
+        <div class="progress-label"><span>ESG认购</span><span>实时更新</span></div>
+        <div class="progress-track"><div class="progress-fill" id="ov-c-pf" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="ov-charts">
+      <div class="ov-charts-top">
+        <div class="chart-box"><div class="chart-box-title">企业认购排名 (前10)</div><div id="ov-c-chart1" style="flex:1"></div></div>
+        <div class="chart-box"><div class="chart-box-title">月度认购趋势 ($)</div><div id="ov-c-chart2" style="flex:1"></div></div>
+        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">认购类型分布</div><div id="ov-c-chart3" style="flex:1"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OVERLAY D: FUND DETAIL ===== -->
+<div class="overlay" id="ov-D">
+  <div class="ov-header">
+    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
+    <div class="ov-title">HCCA基金详情</div>
+    <button class="ov-close" onclick="window.closeOverlay('D')">✕</button>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-val" id="kpi-bal">--</div><div class="kpi-label">基金余额</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-in">--</div><div class="kpi-label">30天流入</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-out">--</div><div class="kpi-label">30天支出</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-net">--</div><div class="kpi-label">净增长</div></div>
+  </div>
+  <div class="ov-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 18px;">
+    <div class="chart-box"><div class="chart-box-title">每日净流入瀑布图</div><div id="ov-d-chart1" style="flex:1"></div></div>
+    <div class="chart-box"><div class="chart-box-title">资金来源堆叠面积</div><div id="ov-d-chart2" style="flex:1"></div></div>
+    <div class="chart-box"><div class="chart-box-title">基金余额曲线</div><div id="ov-d-chart3" style="flex:1"></div></div>
+    <div class="chart-box"><div class="chart-box-title">拨付率 vs 核查率</div><div id="ov-d-chart4" style="flex:1"></div></div>
+  </div>
+</div>
+
+<!-- ===== OVERLAY E: ALLOCATION ===== -->
+<div class="overlay" id="ov-E">
+  <div class="ov-header">
+    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
+    <div class="ov-title">遗址保护拨付分配大屏</div>
+    <button class="ov-close" onclick="window.closeOverlay('E')">✕</button>
+  </div>
+  <div class="formula-bar">
+    <div class="formula-item"><strong>优先权得分</strong> = 遗址评分(70%) × 国家系数(30%)</div>
+    <div class="formula-item"><strong>遗址评分</strong> = 濒危度 × 稀缺性 × 保护缺口</div>
+    <div class="formula-item"><strong>拨付节奏</strong>：30% 预拨 | 40% 中期核查 | 30% 尾款</div>
+  </div>
+  <div class="alloc-body">
+    <div class="alloc-map" id="ov-e-map"></div>
+    <div class="alloc-list">
+      <div class="alloc-list-header">拨付明细 · 25个遗址</div>
+      <div class="alloc-scroll" id="ov-e-list"></div>
+      <div class="verify-panel">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">三层核查状态</div>
+        <div class="verify-item">
+          <span style="font-size:11px;color:var(--text2);width:100px">UNESCO合规</span>
+          <div class="verify-bar-wrap"><div class="verify-bar" id="vb-unesco" style="width:0%"></div></div>
+          <span style="font-size:10px;color:var(--teal)">87%</span>
+        </div>
+        <div class="verify-item">
+          <span style="font-size:11px;color:var(--text2);width:100px">ACHA技术质量</span>
+          <div class="verify-bar-wrap"><div class="verify-bar" id="vb-acha" style="width:0%"></div></div>
+          <span style="font-size:10px;color:var(--teal)">74%</span>
+        </div>
+        <div class="verify-item">
+          <span style="font-size:11px;color:var(--text2);width:100px">AI遥感验证</span>
+          <div class="verify-bar-wrap"><div class="verify-bar" id="vb-ai" style="width:0%"></div></div>
+          <span style="font-size:10px;color:var(--amber)">61%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="js/data-gen.js"></script>
+<script src="js/map.js"></script>
+<script src="js/flow.js"></script>
+<script src="js/dashboards.js"></script>
+<script>
+(function(){
+'use strict';
+
+function fmtVal(v){
+  if(v>=1e6)return '$'+(v/1e6).toFixed(1)+'M';
+  if(v>=1e3)return '$'+(v/1e3).toFixed(0)+'K';
+  return '$'+v;
+}
+function fmtCNY(v){
+  if(v>=1e6)return '¥'+(v/1e6).toFixed(1)+'M';
+  if(v>=1e3)return '¥'+(v/1e3).toFixed(0)+'K';
+  return '¥'+v;
+}
+
+function initStats(){
+  const D=window.HCCS;
+  if(!D)return;
+  function set(id,t){const e=document.getElementById(id);if(e)e.textContent=t;}
+  set('stat-carbon',fmtCNY(D.totalCarbon));
+  set('stat-fund',fmtVal(D.finalBalance));
+  set('cv-carbon',fmtCNY(D.totalCarbon));
+  set('cv-tax',fmtCNY(D.totalTax));
+  set('cv-esg',fmtVal(D.totalESG));
+  set('hcca-bal',fmtVal(D.finalBalance));
+  const lastDay=D.FUND_DAILY[29];
+  const allocTotal=D.ALLOC_SITES.reduce((s,site)=>s+Math.round(site.score*50000),0);
+  set('cv-alloc',fmtVal(allocTotal));
+  set('cv-ops',fmtVal(Math.round(lastDay.outflow*0.18)));
+  drawSparkline('sp-carbon',D.CARBON_DAILY.map(r=>r.rev),'#5DCAA5');
+  drawSparkline('sp-tax',D.TAX_DAILY.map(r=>r.rev),'#85B7EB');
+  drawSparkline('sp-esg',D.ESG_DAILY.map(r=>r.rev),'#EF9F27');
+}
+
+function drawSparkline(id,vals,color){
+  const canvas=document.getElementById(id);
+  if(!canvas)return;
+  const w=canvas.offsetWidth||180,h=32;
+  canvas.width=w;canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  const max=Math.max(...vals),min=Math.min(...vals);
+  const range=max-min||1;
+  ctx.clearRect(0,0,w,h);
+  ctx.beginPath();
+  ctx.strokeStyle=color;
+  ctx.lineWidth=1.5;
+  vals.forEach((v,i)=>{
+    const x=i/(vals.length-1)*w;
+    const y=h-(v-min)/range*(h-4)-2;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Fill
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+  ctx.fillStyle=color.replace(')',',0.12)').replace('rgb','rgba').replace('#','')
+    .replace(/^([a-f0-9]{6}),/,(_,hex)=>`rgba(${parseInt(hex.slice(0,2),16)},${parseInt(hex.slice(2,4),16)},${parseInt(hex.slice(4,6),16)},`);
+  // simpler fill
+  ctx.beginPath();
+  vals.forEach((v,i)=>{
+    const x=i/(vals.length-1)*w;
+    const y=h-(v-min)/range*(h-4)-2;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+  ctx.globalAlpha=0.13;ctx.fillStyle=color;ctx.fill();ctx.globalAlpha=1;
+}
+
+function navTo(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth'});
+  document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+window.navTo=navTo;
+
+// Scroll-based nav highlight
+const sections=['s-map','s-flow'];
+const navBtns=document.querySelectorAll('.nav-link');
+window.addEventListener('scroll',()=>{
+  let cur=sections[0];
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=80)cur=id;
+  });
+  navBtns[0].classList.toggle('active',cur==='s-map');
+  navBtns[1].classList.toggle('active',cur==='s-flow');
+},{ passive:true });
+
+window.addEventListener('load',()=>{
+  window.initMap();
+  initStats();
+  setTimeout(()=>window.initFlow(),400);
+});
+
+})();
+</script>
+</body>
+</html>
