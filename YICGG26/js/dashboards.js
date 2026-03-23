@@ -2,43 +2,20 @@
 (function(){
 'use strict';
 
-// === OVERLAY MANAGEMENT ===
-let activeOv=null;
-function openOv(id){
-  if(activeOv){closeOv(activeOv);}
-  const el=document.getElementById('ov-'+id);
-  if(!el)return;
-  el.style.display='flex';
-  requestAnimationFrame(()=>el.classList.add('visible'));
-  activeOv=id;
-  startPlayback(id);
-}
-function closeOv(id){
-  const el=document.getElementById('ov-'+id);
-  if(!el)return;
-  el.classList.remove('visible');
-  setTimeout(()=>{el.style.display='none';},260);
-  stopPlayback(id);
-  if(activeOv===id)activeOv=null;
-}
-window.openOverlay=openOv;
-window.closeOverlay=closeOv;
-
-// === PLAYBACK ===
-const pbState={A:0,B:0,C:0,D:0,E:0};
+// === SECTION INITIALIZATION ===
 const pbIv={};
-function startPlayback(id){
-  stopPlayback(id);
-  const D=window.HCCS;
-  if(id==='A'){initOvA();}
-  else if(id==='B'){initOvB();}
-  else if(id==='C'){initOvC();}
-  else if(id==='D'){initOvD();}
-  else if(id==='E'){initOvE();}
-}
 function stopPlayback(id){
   if(pbIv[id]){clearInterval(pbIv[id]);delete pbIv[id];}
 }
+
+// Initialize all sections on page load
+document.addEventListener('DOMContentLoaded',()=>{
+  initSectionA();
+  initSectionB();
+  initSectionC();
+  initSectionD();
+  initSectionE();
+});
 
 // === D3 HELPERS ===
 function clearSvg(sel){d3.select(sel).selectAll('*').remove();}
@@ -50,11 +27,11 @@ function dims(sel){
 const fmt=d3.format(',');
 const fmtM=v=>v>=1e6?`$${(v/1e6).toFixed(1)}M`:v>=1e3?`$${(v/1e3).toFixed(0)}K`:`$${v}`;
 const fmtCNY=v=>v>=1e6?`¥${(v/1e6).toFixed(1)}M`:v>=1e3?`¥${(v/1e3).toFixed(0)}K`:`¥${v}`;
-// === OVERLAY A: CARBON TRADING ===
-function initOvA(){
+// === SECTION A: CARBON TRADING ===
+function initSectionA(){
   const D=window.HCCS;
   let tickIdx=0;
-  const feed=document.getElementById('ov-a-feed');
+  const feed=document.getElementById('s-carbon-feed');
   if(feed)feed.innerHTML='';
 
   function addTick(){
@@ -73,12 +50,21 @@ function initOvA(){
     updateProgressA(tickIdx%rows.length,rows.length);
   }
   addTick();
-  pbIv.A=setInterval(addTick,1800);
+  pbIv.A=setInterval(addTick,1000);
 
-  // Charts
-  drawBarLine('#ov-a-chart1',D.CARBON_DAILY.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5');
-  drawBarLine('#ov-a-chart2',D.CARBON_DAILY.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27');
-  drawPie('#ov-a-chart3',[
+  // Animated Charts
+  let dayIdx=0;
+  function updateCharts(){
+    const days=Math.min(dayIdx+1,30);
+    const sliceData=D.CARBON_DAILY.slice(0,days);
+    drawBarLine('#s-carbon-chart1',sliceData.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5');
+    drawBarLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27');
+    dayIdx=(dayIdx+1)%30;
+  }
+  updateCharts();
+  setInterval(updateCharts,2000);
+
+  drawPie('#s-carbon-chart3',[
     {label:'控排企业',v:0.52,color:'#5DCAA5'},
     {label:'CORSIA',v:0.31,color:'#85B7EB'},
     {label:'ESG自愿',v:0.17,color:'#EF9F27'},
@@ -86,17 +72,17 @@ function initOvA(){
 }
 function updateProgressA(idx,total){
   const pct=idx/total*100;
-  const fill=document.getElementById('ov-a-pf');
+  const fill=document.getElementById('s-carbon-pf');
   const D=window.HCCS;
   if(fill){fill.style.width=pct+'%';}
-  const lbl=document.getElementById('ov-a-plbl');
+  const lbl=document.getElementById('s-carbon-plbl');
   if(lbl){const r=D.CARBON_TRADES[idx]||D.CARBON_TRADES[0];lbl.textContent=r.date+' '+r.time;}
 }
-// === OVERLAY B: TOURISM TAX ===
-function initOvB(){
+// === SECTION B: TOURISM TAX ===
+function initSectionB(){
   const D=window.HCCS;
   let idx=0;
-  const feed=document.getElementById('ov-b-feed');
+  const feed=document.getElementById('s-tax-feed');
   if(feed)feed.innerHTML='';
 
   function addTick(){
@@ -112,30 +98,41 @@ function initOvB(){
     feed.prepend(div);
     while(feed.children.length>14)feed.removeChild(feed.lastChild);
     idx++;
-    const fill=document.getElementById('ov-b-pf');
+    const fill=document.getElementById('s-tax-pf');
     if(fill)fill.style.width=(idx%rows.length/rows.length*100)+'%';
   }
   addTick();
-  pbIv.B=setInterval(addTick,1400);
+  pbIv.B=setInterval(addTick,800);
 
-  // Site revenue ranking
-  const siteRevMap={};
-  D.TAX_RECORDS.forEach(r=>{siteRevMap[r.site]=(siteRevMap[r.site]||0)+r.tax;});
-  const siteRev=Object.entries(siteRevMap).map(([k,v])=>({site:k,rev:v})).sort((a,b)=>b.rev-a.rev).slice(0,15);
-  drawHBar('#ov-b-chart1',siteRev.map(r=>({label:r.site,v:r.rev})),'#85B7EB');
-  drawBarLine('#ov-b-chart2',D.TAX_DAILY.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB');
-  drawPie('#ov-b-chart3',[
+  // Animated Charts
+  let dayIdx=0;
+  function updateCharts(){
+    const days=Math.min(dayIdx+1,30);
+    const sliceData=D.TAX_DAILY.slice(0,days);
+    const siteRevMap={};
+    D.TAX_RECORDS.slice(0,Math.floor(D.TAX_RECORDS.length*days/30)).forEach(r=>{
+      siteRevMap[r.site]=(siteRevMap[r.site]||0)+r.tax;
+    });
+    const siteRev=Object.entries(siteRevMap).map(([k,v])=>({site:k,rev:v})).sort((a,b)=>b.rev-a.rev).slice(0,15);
+    drawHBar('#s-tax-chart1',siteRev.map(r=>({label:r.site,v:r.rev})),'#85B7EB');
+    drawBarLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB');
+    dayIdx=(dayIdx+1)%30;
+  }
+  updateCharts();
+  setInterval(updateCharts,2000);
+
+  drawPie('#s-tax-chart3',[
     {label:'文化遗址',v:0.58,color:'#85B7EB'},
     {label:'自然遗产',v:0.28,color:'#5DCAA5'},
     {label:'混合遗产',v:0.14,color:'#EF9F27'},
   ]);
 }
 
-// === OVERLAY C: ESG ===
-function initOvC(){
+// === SECTION C: ESG ===
+function initSectionC(){
   const D=window.HCCS;
   let idx=0;
-  const feed=document.getElementById('ov-c-feed');
+  const feed=document.getElementById('s-esg-feed');
   if(feed)feed.innerHTML='';
 
   function addTick(){
@@ -151,28 +148,40 @@ function initOvC(){
     feed.prepend(div);
     while(feed.children.length>14)feed.removeChild(feed.lastChild);
     idx++;
-    const fill=document.getElementById('ov-c-pf');
+    const fill=document.getElementById('s-esg-pf');
     if(fill)fill.style.width=(idx%rows.length/rows.length*100)+'%';
   }
   addTick();
-  pbIv.C=setInterval(addTick,1600);
+  pbIv.C=setInterval(addTick,1000);
 
-  const coRevMap={};
-  D.ESG_RECORDS.forEach(r=>{coRevMap[r.company]=(coRevMap[r.company]||0)+r.amount;});
-  const coRev=Object.entries(coRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,10);
-  drawHBar('#ov-c-chart1',coRev,'#EF9F27');
-  drawBarLine('#ov-c-chart2',D.ESG_DAILY.map(r=>({x:r.date,y:r.rev})),'$','#EF9F27');
+  // Animated Charts
+  let dayIdx=0;
+  function updateCharts(){
+    const days=Math.min(dayIdx+1,30);
+    const sliceData=D.ESG_DAILY.slice(0,days);
+    const coRevMap={};
+    D.ESG_RECORDS.slice(0,Math.floor(D.ESG_RECORDS.length*days/30)).forEach(r=>{
+      coRevMap[r.company]=(coRevMap[r.company]||0)+r.amount;
+    });
+    const coRev=Object.entries(coRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,10);
+    drawHBar('#s-esg-chart1',coRev,'#EF9F27');
+    drawBarLine('#s-esg-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'$','#EF9F27');
+    dayIdx=(dayIdx+1)%30;
+  }
+  updateCharts();
+  setInterval(updateCharts,2000);
+
   const typeMap={};
   D.ESG_RECORDS.forEach(r=>{typeMap[r.type]=(typeMap[r.type]||0)+r.amount;});
   const total=Object.values(typeMap).reduce((a,b)=>a+b,0);
-  drawPie('#ov-c-chart3',[
+  drawPie('#s-esg-chart3',[
     {label:'CCER履约',v:typeMap['CCER履约抵消']/total,color:'#EF9F27'},
     {label:'CORSIA',v:typeMap['CORSIA强制']/total,color:'#F0997B'},
     {label:'ESG自愿',v:typeMap['ESG自愿认购']/total,color:'#5DCAA5'},
   ]);
 }
-// === OVERLAY D: FUND DETAIL ===
-function initOvD(){
+// === SECTION D: FUND DETAIL ===
+function initSectionD(){
   const D=window.HCCS;
   function fK(v){return v>=1e6?`$${(v/1e6).toFixed(1)}M`:v>=1e3?`$${(v/1e3).toFixed(0)}K`:`$${v}`;}
   const tot=D.FUND_DAILY.reduce((a,r)=>({in:a.in+r.inflow,out:a.out+r.outflow}),{in:0,out:0});
@@ -181,21 +190,31 @@ function initOvD(){
   set('kpi-in',fK(tot.in));
   set('kpi-out',fK(tot.out));
   set('kpi-net',(tot.in-tot.out>=0?'+':'')+fK(tot.in-tot.out));
-  drawWaterfall('#ov-d-chart1',D.FUND_DAILY.map(r=>({x:r.date,y:r.net})));
-  drawStackedArea('#ov-d-chart2',D.FUND_DAILY,[
-    {key:'inflow',label:'流入',color:'#5DCAA5'},
-    {key:'outflow',label:'支出',color:'#EF9F27'}
-  ]);
-  drawBarLine('#ov-d-chart3',D.FUND_DAILY.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB');
-  drawDualLine('#ov-d-chart4',
-    D.FUND_DAILY.map(r=>({x:r.date,y1:+(r.outflow/r.inflow*100).toFixed(1),y2:+(D.ALLOC_SITES.filter(s=>s.verif>=60).length/D.ALLOC_SITES.length*100).toFixed(1)})),
-    '拨付率%','核查率%');
+
+  // Animated Charts
+  let dayIdx=0;
+  function updateCharts(){
+    const days=Math.min(dayIdx+1,30);
+    const sliceData=D.FUND_DAILY.slice(0,days);
+    drawWaterfall('#s-fund-chart1',sliceData.map(r=>({x:r.date,y:r.net})));
+    drawStackedArea('#s-fund-chart2',sliceData,[
+      {key:'inflow',label:'流入',color:'#5DCAA5'},
+      {key:'outflow',label:'支出',color:'#EF9F27'}
+    ]);
+    drawBarLine('#s-fund-chart3',sliceData.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB');
+    drawDualLine('#s-fund-chart4',
+      sliceData.map(r=>({x:r.date,y1:+(r.outflow/r.inflow*100).toFixed(1),y2:+(D.ALLOC_SITES.filter(s=>s.verif>=60).length/D.ALLOC_SITES.length*100).toFixed(1)})),
+      '拨付率%','核查率%');
+    dayIdx=(dayIdx+1)%30;
+  }
+  updateCharts();
+  setInterval(updateCharts,2000);
 }
-// === OVERLAY E: ALLOCATION ===
-function initOvE(){
+// === SECTION E: ALLOCATION ===
+function initSectionE(){
   const D=window.HCCS;
-  drawGeo('#ov-e-map',D.ALLOC_SITES);
-  const list=document.getElementById('ov-e-list');
+  drawGeo('#s-allocation-map',D.ALLOC_SITES);
+  const list=document.getElementById('s-allocation-list');
   if(list){
     list.innerHTML='';
     [...D.ALLOC_SITES].sort((a,b)=>b.score-a.score).forEach(s=>{
