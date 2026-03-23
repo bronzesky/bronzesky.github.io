@@ -343,8 +343,10 @@ function navTo(id){
     const el=document.getElementById(id);
     if(el)el.scrollIntoView({behavior:'smooth'});
   }
+  // Update active nav button
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
+  const targetBtn=Array.from(document.querySelectorAll('.nav-link')).find(b=>b.onclick&&b.onclick.toString().includes(id));
+  if(targetBtn)targetBtn.classList.add('active');
 }
 window.navTo=navTo;
 
