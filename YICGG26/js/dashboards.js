@@ -1,21 +1,34 @@
-// dashboards.js — 5 overlay dashboards with D3 charts and auto-play tickers
+// dashboards.js — 5 section dashboards with D3 charts and auto-play tickers
 (function(){
 'use strict';
+
+// === SECTION NAVIGATION ===
+let activeSection=null;
+const sectionsInitialized={};
+
+function showSection(id){
+  // Hide all dashboard sections
+  document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
+  // Show target section
+  const el=document.getElementById(id);
+  if(el){
+    el.classList.add('active');
+    activeSection=id;
+    // Initialize section if needed
+    if(id==='s-carbon')initSectionA();
+    else if(id==='s-tax')initSectionB();
+    else if(id==='s-esg')initSectionC();
+    else if(id==='s-fund')initSectionD();
+    else if(id==='s-allocation')initSectionE();
+  }
+}
+window.showSection=showSection;
 
 // === SECTION INITIALIZATION ===
 const pbIv={};
 function stopPlayback(id){
   if(pbIv[id]){clearInterval(pbIv[id]);delete pbIv[id];}
 }
-
-// Initialize all sections on page load
-document.addEventListener('DOMContentLoaded',()=>{
-  initSectionA();
-  initSectionB();
-  initSectionC();
-  initSectionD();
-  initSectionE();
-});
 
 // === D3 HELPERS ===
 function clearSvg(sel){d3.select(sel).selectAll('*').remove();}
