@@ -339,7 +339,8 @@ function navTo(id){
       window.showSection(id);
     }
   } else {
-    // Regular sections use scroll
+    // Regular sections use scroll - hide all dashboard sections first
+    document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
     const el=document.getElementById(id);
     if(el)el.scrollIntoView({behavior:'smooth'});
   }
