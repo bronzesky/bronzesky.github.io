@@ -333,8 +333,16 @@ function drawSparkline(id,vals,color){
 }
 
 function navTo(id){
-  const el=document.getElementById(id);
-  if(el)el.scrollIntoView({behavior:'smooth'});
+  // Dashboard sections use showSection
+  if(id.startsWith('s-') && !['s-map','s-flow'].includes(id)){
+    if(window.showSection){
+      window.showSection(id);
+    }
+  } else {
+    // Regular sections use scroll
+    const el=document.getElementById(id);
+    if(el)el.scrollIntoView({behavior:'smooth'});
+  }
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
 }

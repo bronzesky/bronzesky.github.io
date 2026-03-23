@@ -29,6 +29,9 @@ const fmtM=v=>v>=1e6?`$${(v/1e6).toFixed(1)}M`:v>=1e3?`$${(v/1e3).toFixed(0)}K`:
 const fmtCNY=v=>v>=1e6?`¥${(v/1e6).toFixed(1)}M`:v>=1e3?`¥${(v/1e3).toFixed(0)}K`:`¥${v}`;
 // === SECTION A: CARBON TRADING ===
 function initSectionA(){
+  if(sectionsInitialized.A)return;
+  sectionsInitialized.A=true;
+
   const D=window.HCCS;
   let tickIdx=0;
   const feed=document.getElementById('s-carbon-feed');
@@ -52,23 +55,35 @@ function initSectionA(){
   addTick();
   pbIv.A=setInterval(addTick,1000);
 
-  // Animated Charts
-  let dayIdx=0;
+  // Animated Charts - sliding window
+  let dayOffset=0;
   function updateCharts(){
-    const days=Math.min(dayIdx+1,30);
-    const sliceData=D.CARBON_DAILY.slice(0,days);
-    drawBarLine('#s-carbon-chart1',sliceData.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5');
-    drawBarLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27');
-    dayIdx=(dayIdx+1)%30;
+    const windowSize=30;
+    const startIdx=dayOffset%D.CARBON_DAILY.length;
+    const sliceData=[];
+    for(let i=0;i<windowSize;i++){
+      sliceData.push(D.CARBON_DAILY[(startIdx+i)%D.CARBON_DAILY.length]);
+    }
+    drawLine('#s-carbon-chart1',sliceData.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5');
+    drawLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27');
+    dayOffset++;
   }
   updateCharts();
-  setInterval(updateCharts,2000);
+  pbIv.A_chart=setInterval(updateCharts,2000);
 
-  drawPie('#s-carbon-chart3',[
-    {label:'控排企业',v:0.52,color:'#5DCAA5'},
-    {label:'CORSIA',v:0.31,color:'#85B7EB'},
-    {label:'ESG自愿',v:0.17,color:'#EF9F27'},
-  ]);
+  // Animated Pie Chart
+  let pieIdx=0;
+  const pieData=[
+    [{label:'控排企业',v:0.52,color:'#5DCAA5'},{label:'CORSIA',v:0.31,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
+    [{label:'控排企业',v:0.48,color:'#5DCAA5'},{label:'CORSIA',v:0.35,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
+    [{label:'控排企业',v:0.55,color:'#5DCAA5'},{label:'CORSIA',v:0.28,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
+  ];
+  function updatePie(){
+    drawPie('#s-carbon-chart3',pieData[pieIdx%pieData.length]);
+    pieIdx++;
+  }
+  updatePie();
+  pbIv.A_pie=setInterval(updatePie,3000);
 }
 function updateProgressA(idx,total){
   const pct=idx/total*100;
@@ -80,6 +95,9 @@ function updateProgressA(idx,total){
 }
 // === SECTION B: TOURISM TAX ===
 function initSectionB(){
+  if(sectionsInitialized.B)return;
+  sectionsInitialized.B=true;
+
   const D=window.HCCS;
   let idx=0;
   const feed=document.getElementById('s-tax-feed');
@@ -104,32 +122,50 @@ function initSectionB(){
   addTick();
   pbIv.B=setInterval(addTick,800);
 
-  // Animated Charts
-  let dayIdx=0;
+  // Animated Charts - sliding window
+  let dayOffset=0;
   function updateCharts(){
-    const days=Math.min(dayIdx+1,30);
-    const sliceData=D.TAX_DAILY.slice(0,days);
+    const windowSize=30;
+    const startIdx=dayOffset%D.TAX_DAILY.length;
+    const sliceData=[];
+    for(let i=0;i<windowSize;i++){
+      sliceData.push(D.TAX_DAILY[(startIdx+i)%D.TAX_DAILY.length]);
+    }
+
     const siteRevMap={};
-    D.TAX_RECORDS.slice(0,Math.floor(D.TAX_RECORDS.length*days/30)).forEach(r=>{
+    const recordWindow=Math.floor(D.TAX_RECORDS.length*windowSize/D.TAX_DAILY.length);
+    for(let i=0;i<recordWindow;i++){
+      const r=D.TAX_RECORDS[(startIdx*10+i)%D.TAX_RECORDS.length];
       siteRevMap[r.site]=(siteRevMap[r.site]||0)+r.tax;
-    });
+    }
     const siteRev=Object.entries(siteRevMap).map(([k,v])=>({site:k,rev:v})).sort((a,b)=>b.rev-a.rev).slice(0,15);
     drawHBar('#s-tax-chart1',siteRev.map(r=>({label:r.site,v:r.rev})),'#85B7EB');
-    drawBarLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB');
-    dayIdx=(dayIdx+1)%30;
+    drawLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB');
+    dayOffset++;
   }
   updateCharts();
-  setInterval(updateCharts,2000);
+  pbIv.B_chart=setInterval(updateCharts,2000);
 
-  drawPie('#s-tax-chart3',[
-    {label:'文化遗址',v:0.58,color:'#85B7EB'},
-    {label:'自然遗产',v:0.28,color:'#5DCAA5'},
-    {label:'混合遗产',v:0.14,color:'#EF9F27'},
-  ]);
+  // Animated Pie Chart
+  let pieIdx=0;
+  const pieData=[
+    [{label:'文化遗址',v:0.58,color:'#85B7EB'},{label:'自然遗产',v:0.28,color:'#5DCAA5'},{label:'混合遗产',v:0.14,color:'#EF9F27'}],
+    [{label:'文化遗址',v:0.55,color:'#85B7EB'},{label:'自然遗产',v:0.32,color:'#5DCAA5'},{label:'混合遗产',v:0.13,color:'#EF9F27'}],
+    [{label:'文化遗址',v:0.60,color:'#85B7EB'},{label:'自然遗产',v:0.26,color:'#5DCAA5'},{label:'混合遗产',v:0.14,color:'#EF9F27'}],
+  ];
+  function updatePie(){
+    drawPie('#s-tax-chart3',pieData[pieIdx%pieData.length]);
+    pieIdx++;
+  }
+  updatePie();
+  pbIv.B_pie=setInterval(updatePie,3000);
 }
 
 // === SECTION C: ESG ===
 function initSectionC(){
+  if(sectionsInitialized.C)return;
+  sectionsInitialized.C=true;
+
   const D=window.HCCS;
   let idx=0;
   const feed=document.getElementById('s-esg-feed');
@@ -154,34 +190,49 @@ function initSectionC(){
   addTick();
   pbIv.C=setInterval(addTick,1000);
 
-  // Animated Charts
-  let dayIdx=0;
+  // Animated Charts - sliding window
+  let dayOffset=0;
   function updateCharts(){
-    const days=Math.min(dayIdx+1,30);
-    const sliceData=D.ESG_DAILY.slice(0,days);
+    const windowSize=30;
+    const startIdx=dayOffset%D.ESG_DAILY.length;
+    const sliceData=[];
+    for(let i=0;i<windowSize;i++){
+      sliceData.push(D.ESG_DAILY[(startIdx+i)%D.ESG_DAILY.length]);
+    }
+
     const coRevMap={};
-    D.ESG_RECORDS.slice(0,Math.floor(D.ESG_RECORDS.length*days/30)).forEach(r=>{
+    const recordWindow=Math.floor(D.ESG_RECORDS.length*windowSize/D.ESG_DAILY.length);
+    for(let i=0;i<recordWindow;i++){
+      const r=D.ESG_RECORDS[(startIdx*10+i)%D.ESG_RECORDS.length];
       coRevMap[r.company]=(coRevMap[r.company]||0)+r.amount;
-    });
+    }
     const coRev=Object.entries(coRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,10);
     drawHBar('#s-esg-chart1',coRev,'#EF9F27');
-    drawBarLine('#s-esg-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'$','#EF9F27');
-    dayIdx=(dayIdx+1)%30;
+    drawLine('#s-esg-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'$','#EF9F27');
+    dayOffset++;
   }
   updateCharts();
-  setInterval(updateCharts,2000);
+  pbIv.C_chart=setInterval(updateCharts,2000);
 
-  const typeMap={};
-  D.ESG_RECORDS.forEach(r=>{typeMap[r.type]=(typeMap[r.type]||0)+r.amount;});
-  const total=Object.values(typeMap).reduce((a,b)=>a+b,0);
-  drawPie('#s-esg-chart3',[
-    {label:'CCER履约',v:typeMap['CCER履约抵消']/total,color:'#EF9F27'},
-    {label:'CORSIA',v:typeMap['CORSIA强制']/total,color:'#F0997B'},
-    {label:'ESG自愿',v:typeMap['ESG自愿认购']/total,color:'#5DCAA5'},
-  ]);
+  // Animated Pie Chart
+  let pieIdx=0;
+  const pieData=[
+    [{label:'CCER履约',v:0.45,color:'#EF9F27'},{label:'CORSIA',v:0.32,color:'#F0997B'},{label:'ESG自愿',v:0.23,color:'#5DCAA5'}],
+    [{label:'CCER履约',v:0.48,color:'#EF9F27'},{label:'CORSIA',v:0.30,color:'#F0997B'},{label:'ESG自愿',v:0.22,color:'#5DCAA5'}],
+    [{label:'CCER履约',v:0.42,color:'#EF9F27'},{label:'CORSIA',v:0.35,color:'#F0997B'},{label:'ESG自愿',v:0.23,color:'#5DCAA5'}],
+  ];
+  function updatePie(){
+    drawPie('#s-esg-chart3',pieData[pieIdx%pieData.length]);
+    pieIdx++;
+  }
+  updatePie();
+  pbIv.C_pie=setInterval(updatePie,3000);
 }
 // === SECTION D: FUND DETAIL ===
 function initSectionD(){
+  if(sectionsInitialized.D)return;
+  sectionsInitialized.D=true;
+
   const D=window.HCCS;
   function fK(v){return v>=1e6?`$${(v/1e6).toFixed(1)}M`:v>=1e3?`$${(v/1e3).toFixed(0)}K`:`$${v}`;}
   const tot=D.FUND_DAILY.reduce((a,r)=>({in:a.in+r.inflow,out:a.out+r.outflow}),{in:0,out:0});
@@ -191,27 +242,34 @@ function initSectionD(){
   set('kpi-out',fK(tot.out));
   set('kpi-net',(tot.in-tot.out>=0?'+':'')+fK(tot.in-tot.out));
 
-  // Animated Charts
-  let dayIdx=0;
+  // Animated Charts - sliding window
+  let dayOffset=0;
   function updateCharts(){
-    const days=Math.min(dayIdx+1,30);
-    const sliceData=D.FUND_DAILY.slice(0,days);
+    const windowSize=30;
+    const startIdx=dayOffset%D.FUND_DAILY.length;
+    const sliceData=[];
+    for(let i=0;i<windowSize;i++){
+      sliceData.push(D.FUND_DAILY[(startIdx+i)%D.FUND_DAILY.length]);
+    }
     drawWaterfall('#s-fund-chart1',sliceData.map(r=>({x:r.date,y:r.net})));
     drawStackedArea('#s-fund-chart2',sliceData,[
       {key:'inflow',label:'流入',color:'#5DCAA5'},
       {key:'outflow',label:'支出',color:'#EF9F27'}
     ]);
-    drawBarLine('#s-fund-chart3',sliceData.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB');
+    drawLine('#s-fund-chart3',sliceData.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB');
     drawDualLine('#s-fund-chart4',
       sliceData.map(r=>({x:r.date,y1:+(r.outflow/r.inflow*100).toFixed(1),y2:+(D.ALLOC_SITES.filter(s=>s.verif>=60).length/D.ALLOC_SITES.length*100).toFixed(1)})),
       '拨付率%','核查率%');
-    dayIdx=(dayIdx+1)%30;
+    dayOffset++;
   }
   updateCharts();
-  setInterval(updateCharts,2000);
+  pbIv.D_chart=setInterval(updateCharts,2000);
 }
 // === SECTION E: ALLOCATION ===
 function initSectionE(){
+  if(sectionsInitialized.E)return;
+  sectionsInitialized.E=true;
+
   const D=window.HCCS;
   drawGeo('#s-allocation-map',D.ALLOC_SITES);
   const list=document.getElementById('s-allocation-list');
@@ -241,6 +299,26 @@ function initSectionE(){
   });
 }
 // === D3 CHART RENDERERS ===
+function drawLine(sel,data,unit,color){
+  clearSvg(sel);
+  const {w,h}=dims(sel);
+  const mg={t:10,r:14,b:28,l:36};
+  const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
+  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
+  const x=d3.scalePoint().domain(data.map(d=>d.x)).range([0,iw]);
+  const y=d3.scaleLinear().domain([0,d3.max(data,d=>d.y)*1.12]).range([ih,0]);
+  g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
+    .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0))
+    .select('.domain').remove();
+  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v));
+  const line=d3.line().x(d=>x(d.x)).y(d=>y(d.y)).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d',line).attr('fill','none').attr('stroke',color).attr('stroke-width',2.5).attr('opacity',.9);
+  g.selectAll('.dot').data(data).join('circle').attr('class','dot')
+    .attr('cx',d=>x(d.x)).attr('cy',d=>y(d.y)).attr('r',3)
+    .attr('fill',color).attr('opacity',.8);
+}
+
 function drawBarLine(sel,data,unit,color){
   clearSvg(sel);
   const {w,h}=dims(sel);
@@ -275,21 +353,43 @@ function drawHBar(sel,data,color){
     .attr('fill',color).attr('rx',2).attr('opacity',.82);
 }
 function drawPie(sel,data){
-  clearSvg(sel);
-  const {w,h}=dims(sel);
-  const r=Math.min(w*.38,h*.44);
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
-  const g=svg.append('g').attr('transform',`translate(${r+12},${h/2})`);
-  const pie=d3.pie().value(d=>d.v).sort(null);
-  const arc=d3.arc().innerRadius(r*.52).outerRadius(r);
-  g.selectAll('path').data(pie(data)).join('path')
-    .attr('d',arc).attr('fill',d=>d.data.color).attr('stroke','rgba(0,0,0,.3)').attr('stroke-width',1);
-  const lg=svg.append('g').attr('transform',`translate(${r*2+28},${h/2-data.length*10})`);
-  data.forEach((d,i)=>{
-    const row=lg.append('g').attr('transform',`translate(0,${i*20})`);
-    row.append('circle').attr('r',5).attr('fill',d.color);
-    row.append('text').attr('x',10).attr('y',4).attr('fill','rgba(234,243,222,.7)').attr('font-size',10).text(`${d.label} ${(d.v*100).toFixed(0)}%`);
-  });
+  const svg=d3.select(sel).select('svg');
+  const isUpdate=!svg.empty();
+
+  if(!isUpdate){
+    clearSvg(sel);
+    const {w,h}=dims(sel);
+    const r=Math.min(w*.38,h*.44);
+    const newSvg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+    const g=newSvg.append('g').attr('transform',`translate(${r+12},${h/2})`);
+    const pie=d3.pie().value(d=>d.v).sort(null);
+    const arc=d3.arc().innerRadius(r*.52).outerRadius(r);
+    g.selectAll('path').data(pie(data)).join('path')
+      .attr('d',arc).attr('fill',d=>d.data.color).attr('stroke','rgba(0,0,0,.3)').attr('stroke-width',1);
+    const lg=newSvg.append('g').attr('transform',`translate(${r*2+28},${h/2-data.length*10})`);
+    data.forEach((d,i)=>{
+      const row=lg.append('g').attr('transform',`translate(0,${i*20})`);
+      row.append('circle').attr('r',5).attr('fill',d.color);
+      row.append('text').attr('x',10).attr('y',4).attr('fill','rgba(234,243,222,.7)').attr('font-size',10).text(`${d.label} ${(d.v*100).toFixed(0)}%`);
+    });
+  } else {
+    const {w,h}=dims(sel);
+    const r=Math.min(w*.38,h*.44);
+    const g=svg.select('g');
+    const pie=d3.pie().value(d=>d.v).sort(null);
+    const arc=d3.arc().innerRadius(r*.52).outerRadius(r);
+    g.selectAll('path').data(pie(data))
+      .transition().duration(800)
+      .attrTween('d',function(d){
+        const i=d3.interpolate(this._current||d,d);
+        this._current=i(1);
+        return t=>arc(i(t));
+      });
+    const lg=svg.selectAll('g').filter(function(){return this!==g.node();});
+    lg.selectAll('text').data(data)
+      .transition().duration(800)
+      .text(d=>`${d.label} ${(d.v*100).toFixed(0)}%`);
+  }
 }
 function drawWaterfall(sel,data){
   clearSvg(sel);

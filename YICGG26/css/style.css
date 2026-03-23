@@ -149,15 +149,19 @@ nav#topnav{
 
 /* === DASHBOARD SECTIONS === */
 .dashboard-section{
+  position:fixed;
+  inset:0;
+  top:var(--nav-h);
   background:var(--bg);
-  display:flex;flex-direction:column;
-  margin-bottom:60px;
-  padding-bottom:40px;
-  border-bottom:1px solid rgba(255,255,255,0.05);
+  display:none;
+  flex-direction:column;
+  opacity:0;
+  transition:opacity .3s ease;
+  z-index:100;
 }
-.dashboard-section:last-of-type{
-  border-bottom:none;
-  margin-bottom:0;
+.dashboard-section.active{
+  display:flex;
+  opacity:1;
 }
 .section-header{
   display:flex;align-items:center;gap:16px;
@@ -166,7 +170,14 @@ nav#topnav{
   flex-shrink:0;
 }
 .section-title{font-size:18px;font-weight:700;color:var(--text);flex:1;}
-.section-body{flex:1;display:flex;gap:0;overflow:hidden;min-height:0;}
+.section-body{
+  flex:1;
+  display:flex;
+  gap:0;
+  overflow:hidden;
+  min-height:0;
+  height:calc(100vh - var(--nav-h) - 60px);
+}
 
 /* Section left ticker pane */
 .section-ticker{
