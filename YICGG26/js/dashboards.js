@@ -315,16 +315,25 @@ function initSectionE(){
 function drawLine(sel,data,unit,color){
   clearSvg(sel);
   const {w,h}=dims(sel);
-  const mg={t:10,r:14,b:28,l:36};
+  const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
   const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const defs=svg.append('defs');
+  const gradId='grad_'+sel.replace(/[^a-zA-Z0-9]/g,'_');
+  const grad=defs.append('linearGradient').attr('id',gradId).attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
+  grad.append('stop').attr('offset','0%').attr('stop-color',color).attr('stop-opacity',0.22);
+  grad.append('stop').attr('offset','100%').attr('stop-color',color).attr('stop-opacity',0.02);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const x=d3.scalePoint().domain(data.map(d=>d.x)).range([0,iw]);
   const y=d3.scaleLinear().domain([0,d3.max(data,d=>d.y)*1.12]).range([ih,0]);
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0))
     .select('.domain').remove();
-  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v));
+  g.append('g').attr('class','axis')
+    .call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v))
+    .selectAll('text').style('text-anchor','end').attr('dx','-3px');
+  const area=d3.area().x(d=>x(d.x)).y0(ih).y1(d=>y(d.y)).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d',area).attr('fill',`url(#${gradId})`);
   const line=d3.line().x(d=>x(d.x)).y(d=>y(d.y)).curve(d3.curveMonotoneX);
   g.append('path').datum(data).attr('d',line).attr('fill','none').attr('stroke',color).attr('stroke-width',2.5).attr('opacity',.9);
   g.selectAll('.dot').data(data).join('circle').attr('class','dot')
@@ -335,7 +344,7 @@ function drawLine(sel,data,unit,color){
 function drawBarLine(sel,data,unit,color){
   clearSvg(sel);
   const {w,h}=dims(sel);
-  const mg={t:10,r:14,b:28,l:36};
+  const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
   const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
@@ -344,7 +353,9 @@ function drawBarLine(sel,data,unit,color){
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0))
     .select('.domain').remove();
-  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v));
+  g.append('g').attr('class','axis')
+    .call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v))
+    .selectAll('text').style('text-anchor','end').attr('dx','-3px');
   g.selectAll('.bar').data(data).join('rect').attr('class','bar')
     .attr('x',d=>x(d.x)).attr('y',d=>y(d.y))
     .attr('width',x.bandwidth()).attr('height',d=>ih-y(d.y))
@@ -366,48 +377,46 @@ function drawHBar(sel,data,color){
     .attr('fill',color).attr('rx',2).attr('opacity',.82);
 }
 function drawPie(sel,data){
-  const svg=d3.select(sel).select('svg');
-  const isUpdate=!svg.empty();
-
-  if(!isUpdate){
-    clearSvg(sel);
-    const {w,h}=dims(sel);
-    const r=Math.min(w*.38,h*.44);
-    const newSvg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
-    const g=newSvg.append('g').attr('transform',`translate(${r+12},${h/2})`);
-    const pie=d3.pie().value(d=>d.v).sort(null);
-    const arc=d3.arc().innerRadius(r*.52).outerRadius(r);
-    g.selectAll('path').data(pie(data)).join('path')
-      .attr('d',arc).attr('fill',d=>d.data.color).attr('stroke','rgba(0,0,0,.3)').attr('stroke-width',1);
-    const lg=newSvg.append('g').attr('transform',`translate(${r*2+28},${h/2-data.length*10})`);
-    data.forEach((d,i)=>{
-      const row=lg.append('g').attr('transform',`translate(0,${i*20})`);
-      row.append('circle').attr('r',5).attr('fill',d.color);
-      row.append('text').attr('x',10).attr('y',4).attr('fill','rgba(234,243,222,.7)').attr('font-size',10).text(`${d.label} ${(d.v*100).toFixed(0)}%`);
-    });
-  } else {
-    const {w,h}=dims(sel);
-    const r=Math.min(w*.38,h*.44);
-    const g=svg.select('g');
-    const pie=d3.pie().value(d=>d.v).sort(null);
-    const arc=d3.arc().innerRadius(r*.52).outerRadius(r);
-    g.selectAll('path').data(pie(data))
+  clearSvg(sel);
+  const {w,h}=dims(sel);
+  const r=Math.min(w*0.28,h*0.36);
+  const cx=w/2,cy=h*0.40;
+  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const g=svg.append('g').attr('transform',`translate(${cx},${cy})`);
+  const pie=d3.pie().value(d=>d.v).sort(null);
+  const arc=d3.arc().innerRadius(r*0.52).outerRadius(r);
+  const paths=g.selectAll('path').data(pie(data)).join('path');
+  paths.attr('d',arc).attr('fill',d=>d.data.color).attr('stroke','rgba(0,0,0,.3)').attr('stroke-width',1);
+  paths.each(function(d){this._current=d;});
+  // Legend: horizontal row below pie
+  const lgY=cy+r+18;
+  const itemW=w/data.length;
+  const lg=svg.append('g').attr('transform',`translate(0,${lgY})`);
+  data.forEach((d,i)=>{
+    const row=lg.append('g').attr('transform',`translate(${itemW*i+itemW/2-30},0)`);
+    row.append('circle').attr('r',5).attr('cy',0).attr('fill',d.color);
+    row.append('text').attr('x',10).attr('y',4).attr('fill','rgba(234,243,222,.7)').attr('font-size',10).text(`${d.label} ${(d.v*100).toFixed(0)}%`);
+  });
+  // Store update function for animation
+  svg.node()._update=function(newData){
+    const newPie=d3.pie().value(d=>d.v).sort(null);
+    g.selectAll('path').data(newPie(newData))
       .transition().duration(800)
       .attrTween('d',function(d){
-        const i=d3.interpolate(this._current||d,d);
-        this._current=i(1);
-        return t=>arc(i(t));
+        const interp=d3.interpolate(this._current||d,d);
+        this._current=interp(1);
+        return t=>arc(interp(t));
       });
-    const lg=svg.selectAll('g').filter(function(){return this!==g.node();});
-    lg.selectAll('text').data(data)
-      .transition().duration(800)
-      .text(d=>`${d.label} ${(d.v*100).toFixed(0)}%`);
-  }
+    lg.selectAll('g').each(function(d,i){
+      d3.select(this).select('text').transition().duration(800)
+        .text(`${newData[i].label} ${(newData[i].v*100).toFixed(0)}%`);
+    });
+  };
 }
 function drawWaterfall(sel,data){
   clearSvg(sel);
   const {w,h}=dims(sel);
-  const mg={t:10,r:14,b:28,l:40};
+  const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
   const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
@@ -418,7 +427,9 @@ function drawWaterfall(sel,data){
   g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(0)).attr('y2',y(0)).attr('stroke','rgba(255,255,255,.15)');
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0)).select('.domain').remove();
-  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v));
+  g.append('g').attr('class','axis')
+    .call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v))
+    .selectAll('text').style('text-anchor','end').attr('dx','-3px');
   g.selectAll('.wbar').data(data).join('rect')
     .attr('x',d=>x(d.x)).attr('y',d=>d.y>=0?y(d.y):y(0))
     .attr('width',x.bandwidth()).attr('height',d=>Math.abs(y(d.y)-y(0)))
@@ -427,7 +438,7 @@ function drawWaterfall(sel,data){
 function drawStackedArea(sel,data,keys){
   clearSvg(sel);
   const {w,h}=dims(sel);
-  const mg={t:10,r:14,b:28,l:40};
+  const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
   const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
@@ -436,7 +447,9 @@ function drawStackedArea(sel,data,keys){
   const y=d3.scaleLinear().domain([0,ymax]).range([ih,0]);
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0)).select('.domain').remove();
-  g.append('g').attr('class','axis').call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v));
+  g.append('g').attr('class','axis')
+    .call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v))
+    .selectAll('text').style('text-anchor','end').attr('dx','-3px');
   let base=data.map(()=>0);
   keys.forEach(k=>{
     const areaData=data.map((d,i)=>({x:d.date,y0:base[i],y1:base[i]+d[k.key]}));
@@ -448,17 +461,33 @@ function drawStackedArea(sel,data,keys){
 function drawDualLine(sel,data,l1,l2){
   clearSvg(sel);
   const {w,h}=dims(sel);
-  const mg={t:10,r:44,b:28,l:40};
+  const mg={t:10,r:44,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
   const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const defs=svg.append('defs');
+  const gradId1='grad_dual1_'+sel.replace(/[^a-zA-Z0-9]/g,'_');
+  const gradId2='grad_dual2_'+sel.replace(/[^a-zA-Z0-9]/g,'_');
+  function makeGrad(id,color){
+    const grad=defs.append('linearGradient').attr('id',id).attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
+    grad.append('stop').attr('offset','0%').attr('stop-color',color).attr('stop-opacity',0.18);
+    grad.append('stop').attr('offset','100%').attr('stop-color',color).attr('stop-opacity',0.02);
+  }
+  makeGrad(gradId1,'#5DCAA5');
+  makeGrad(gradId2,'#EF9F27');
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const x=d3.scalePoint().domain(data.map(d=>d.x)).range([0,iw]);
   const y1=d3.scaleLinear().domain([0,d3.max(data,d=>d.y1)*1.2]).range([ih,0]);
   const y2=d3.scaleLinear().domain([0,100]).range([ih,0]);
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0)).select('.domain').remove();
-  g.append('g').attr('class','axis').call(d3.axisLeft(y1).ticks(4));
+  g.append('g').attr('class','axis')
+    .call(d3.axisLeft(y1).ticks(4))
+    .selectAll('text').style('text-anchor','end').attr('dx','-3px');
   g.append('g').attr('class','axis').attr('transform',`translate(${iw},0)`).call(d3.axisRight(y2).ticks(4));
+  const area1=d3.area().x(d=>x(d.x)).y0(ih).y1(d=>y1(d.y1)).curve(d3.curveMonotoneX);
+  const area2=d3.area().x(d=>x(d.x)).y0(ih).y1(d=>y2(d.y2)).curve(d3.curveMonotoneX);
+  g.append('path').datum(data).attr('d',area1).attr('fill',`url(#${gradId1})`);
+  g.append('path').datum(data).attr('d',area2).attr('fill',`url(#${gradId2})`);
   const line1=d3.line().x(d=>x(d.x)).y(d=>y1(d.y1)).curve(d3.curveMonotoneX);
   const line2=d3.line().x(d=>x(d.x)).y(d=>y2(d.y2)).curve(d3.curveMonotoneX);
   g.append('path').datum(data).attr('d',line1).attr('fill','none').attr('stroke','#5DCAA5').attr('stroke-width',2);
