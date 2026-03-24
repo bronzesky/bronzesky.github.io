@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HCCS — 世界遗产碳信用系统</title>
+<title>YICGG26 — 世界遗产碳信用系统</title>
 <link rel="stylesheet" href="css/style.css">
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -17,7 +17,7 @@
 
 <!-- ===== NAV ===== -->
 <nav id="topnav">
-  <div class="nav-brand" onclick="scrollTo(0,0)">HCCS</div>
+  <div class="nav-brand" onclick="scrollTo(0,0)">YICGG26</div>
   <div class="nav-links">
     <button class="nav-link active" onclick="navTo('s-map')">全球遗产</button>
     <button class="nav-link" onclick="navTo('s-flow')">资金流向</button>
@@ -26,6 +26,7 @@
     <button class="nav-link" onclick="navTo('s-esg')">ESG贡献</button>
     <button class="nav-link" onclick="navTo('s-fund')">基金详情</button>
     <button class="nav-link" onclick="navTo('s-allocation')">分配公式</button>
+    <button class="nav-link" onclick="navTo('s-ai')">AI灵敏度</button>
   </div>
 </nav>
 
@@ -124,6 +125,7 @@
           <div style="display:flex;justify-content:space-between;margin:6px 0 4px"><span>AI遥感核验</span><span style="color:var(--amber)">61%</span></div>
           <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px"><div style="width:61%;height:100%;background:var(--amber);border-radius:2px"></div></div>
         </div>
+        <button onclick="navTo('s-ai')" style="margin-top:12px;width:100%;padding:6px 0;border-radius:6px;background:rgba(93,202,165,0.12);color:var(--teal);font-weight:600;font-size:11px;border:1px solid var(--teal-border);cursor:pointer;letter-spacing:.3px;">⚖ 核查费用 AI灵敏度 →</button>
       </div>
     </div>
   </div>
@@ -234,7 +236,7 @@
     <div class="formula-item"><strong>优先权得分</strong> = 遗址评分(70%) × 国家系数(30%)</div>
     <div class="formula-item"><strong>遗址评分</strong> = 濒危度 × 稀缺性 × 保护缺口</div>
     <div class="formula-item"><strong>拨付节奏</strong>：30% 预拨 | 40% 中期核查 | 30% 尾款</div>
-    <button onclick="window.open('sensitivity.html','_blank')" style="margin-left:auto;padding:6px 16px;border-radius:6px;background:var(--teal);color:#061208;font-weight:700;font-size:12px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:.4px;">⚖ AI权重灵敏度分析 →</button>
+    <button onclick="navTo('s-ai')" style="margin-left:auto;padding:6px 16px;border-radius:6px;background:var(--teal);color:#061208;font-weight:700;font-size:12px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:.4px;">⚖ 分配公式 AI灵敏度 →</button>
   </div>
   <div class="alloc-body">
     <div class="alloc-map" id="s-allocation-map"></div>
@@ -261,6 +263,19 @@
       </div>
     </div>
   </div>
+</section>
+
+<!-- ===== SECTION F: AI SENSITIVITY ===== -->
+<section class="full-section dashboard-section" id="s-ai">
+  <div class="section-header">
+    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
+    <div class="section-title">AI权重灵敏度分析</div>
+    <div style="display:flex;gap:8px;margin-left:auto;">
+      <button onclick="navTo('s-allocation')" style="padding:5px 14px;border-radius:6px;background:rgba(255,255,255,0.07);color:var(--text2);font-size:11px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;">← 分配公式</button>
+      <button onclick="navTo('s-flow')" style="padding:5px 14px;border-radius:6px;background:rgba(255,255,255,0.07);color:var(--text2);font-size:11px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;">← 核查与运营</button>
+    </div>
+  </div>
+  <iframe src="sensitivity.html" style="flex:1;border:none;width:100%;min-height:0;"></iframe>
 </section>
 
 <!-- ===== SCRIPTS ===== -->

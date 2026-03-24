@@ -192,8 +192,16 @@ nav#topnav{
 .chart-box{
   background:var(--card-bg);border:1px solid var(--card-border);
   border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:hidden;
+  min-height:0;
 }
 .chart-box-title{font-size:11px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;flex-shrink:0;}
+/* Chart inner container: takes remaining height, never grows box */
+.chart-box > div[id]{
+  flex:1;min-height:0;overflow:hidden;position:relative;
+}
+.chart-box > div[id] > svg{
+  position:absolute;inset:0;width:100%;height:100%;
+}
 .chart-box svg{flex:1;min-height:0;}
 
 /* Progress bar row */

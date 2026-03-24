@@ -1,4 +1,4 @@
-// dashboards.js — 5 section dashboards with D3 charts and auto-play tickers
+// dashboards.js — fixed axes, proportion bars, AI sensitivity section
 (function(){
 'use strict';
 
@@ -7,39 +7,36 @@ let activeSection=null;
 const sectionsInitialized={};
 
 function showSection(id){
-  // Hide all dashboard sections
   document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
-  // Show target section
   const el=document.getElementById(id);
   if(el){
     el.classList.add('active');
     activeSection=id;
-    // Initialize section if needed
     if(id==='s-carbon')initSectionA();
     else if(id==='s-tax')initSectionB();
     else if(id==='s-esg')initSectionC();
     else if(id==='s-fund')initSectionD();
     else if(id==='s-allocation')initSectionE();
+    else if(id==='s-ai')initSectionAI();
   }
 }
 window.showSection=showSection;
 
 // === SECTION INITIALIZATION ===
 const pbIv={};
-function stopPlayback(id){
-  if(pbIv[id]){clearInterval(pbIv[id]);delete pbIv[id];}
-}
 
 // === D3 HELPERS ===
 function clearSvg(sel){d3.select(sel).selectAll('*').remove();}
 function dims(sel){
   const el=document.querySelector(sel);
   if(!el)return{w:300,h:180};
-  return{w:el.clientWidth||300,h:el.clientHeight||180};
+  const r=el.getBoundingClientRect();
+  return{w:r.width||300,h:r.height||180};
 }
 const fmt=d3.format(',');
 const fmtM=v=>v>=1e6?`$${(v/1e6).toFixed(1)}M`:v>=1e3?`$${(v/1e3).toFixed(0)}K`:`$${v}`;
 const fmtCNY=v=>v>=1e6?`¥${(v/1e6).toFixed(1)}M`:v>=1e3?`¥${(v/1e3).toFixed(0)}K`:`¥${v}`;
+
 // === SECTION A: CARBON TRADING ===
 function initSectionA(){
   if(sectionsInitialized.A)return;
@@ -49,6 +46,10 @@ function initSectionA(){
   let tickIdx=0;
   const feed=document.getElementById('s-carbon-feed');
   if(feed)feed.innerHTML='';
+
+  // Pre-compute global max for stable axes
+  const carbonVolMax=d3.max(D.CARBON_DAILY,r=>r.vol)*1.15;
+  const carbonRevMax=d3.max(D.CARBON_DAILY,r=>r.rev)*1.15;
 
   function addTick(){
     const rows=D.CARBON_TRADES;
@@ -68,7 +69,7 @@ function initSectionA(){
   addTick();
   pbIv.A=setInterval(addTick,1000);
 
-  // Animated Charts - sliding window
+  // Animated Charts - sliding window, fixed axes
   let dayOffset=0;
   function updateCharts(){
     const windowSize=30;
@@ -77,26 +78,26 @@ function initSectionA(){
     for(let i=0;i<windowSize;i++){
       sliceData.push(D.CARBON_DAILY[(startIdx+i)%D.CARBON_DAILY.length]);
     }
-    drawLine('#s-carbon-chart1',sliceData.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5');
-    drawLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27');
+    drawLine('#s-carbon-chart1',sliceData.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5',carbonVolMax);
+    drawLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27',carbonRevMax);
     dayOffset++;
   }
   updateCharts();
   pbIv.A_chart=setInterval(updateCharts,2000);
 
-  // Animated Pie Chart
-  let pieIdx=0;
-  const pieData=[
+  // Proportion bar (replaces pie)
+  let barIdx=0;
+  const barData=[
     [{label:'控排企业',v:0.52,color:'#5DCAA5'},{label:'CORSIA',v:0.31,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
     [{label:'控排企业',v:0.48,color:'#5DCAA5'},{label:'CORSIA',v:0.35,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
     [{label:'控排企业',v:0.55,color:'#5DCAA5'},{label:'CORSIA',v:0.28,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
   ];
-  function updatePie(){
-    drawPie('#s-carbon-chart3',pieData[pieIdx%pieData.length]);
-    pieIdx++;
+  function updateBar(){
+    drawProportionBar('#s-carbon-chart3',barData[barIdx%barData.length]);
+    barIdx++;
   }
-  updatePie();
-  pbIv.A_pie=setInterval(updatePie,3000);
+  updateBar();
+  pbIv.A_bar=setInterval(updateBar,3000);
 }
 function updateProgressA(idx,total){
   const pct=idx/total*100;
@@ -106,6 +107,7 @@ function updateProgressA(idx,total){
   const lbl=document.getElementById('s-carbon-plbl');
   if(lbl){const r=D.CARBON_TRADES[idx]||D.CARBON_TRADES[0];lbl.textContent=r.date+' '+r.time;}
 }
+
 // === SECTION B: TOURISM TAX ===
 function initSectionB(){
   if(sectionsInitialized.B)return;
@@ -115,6 +117,13 @@ function initSectionB(){
   let idx=0;
   const feed=document.getElementById('s-tax-feed');
   if(feed)feed.innerHTML='';
+
+  // Pre-compute global max for stable axes
+  const taxRevMax=d3.max(D.TAX_DAILY,r=>r.rev)*1.15;
+  // Global max for ranking bars: compute total tax per site across all records
+  const allSiteRevMap={};
+  D.TAX_RECORDS.forEach(r=>{allSiteRevMap[r.site]=(allSiteRevMap[r.site]||0)+r.tax;});
+  const taxHBarMax=d3.max(Object.values(allSiteRevMap))*1.15;
 
   function addTick(){
     const rows=D.TAX_RECORDS;
@@ -135,7 +144,7 @@ function initSectionB(){
   addTick();
   pbIv.B=setInterval(addTick,800);
 
-  // Animated Charts - sliding window
+  // Animated Charts - sliding window, fixed axes
   let dayOffset=0;
   function updateCharts(){
     const windowSize=30;
@@ -144,34 +153,34 @@ function initSectionB(){
     for(let i=0;i<windowSize;i++){
       sliceData.push(D.TAX_DAILY[(startIdx+i)%D.TAX_DAILY.length]);
     }
-
     const siteRevMap={};
     const recordWindow=Math.floor(D.TAX_RECORDS.length*windowSize/D.TAX_DAILY.length);
     for(let i=0;i<recordWindow;i++){
       const r=D.TAX_RECORDS[(startIdx*10+i)%D.TAX_RECORDS.length];
       siteRevMap[r.site]=(siteRevMap[r.site]||0)+r.tax;
     }
-    const siteRev=Object.entries(siteRevMap).map(([k,v])=>({site:k,rev:v})).sort((a,b)=>b.rev-a.rev).slice(0,15);
-    drawHBar('#s-tax-chart1',siteRev.map(r=>({label:r.site,v:r.rev})),'#85B7EB');
-    drawLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB');
+    const siteRev=Object.entries(siteRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,15);
+    // Pass global max so bars stay fixed width overall
+    drawHBar('#s-tax-chart1',siteRev,'#85B7EB',taxHBarMax);
+    drawLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB',taxRevMax);
     dayOffset++;
   }
   updateCharts();
   pbIv.B_chart=setInterval(updateCharts,2000);
 
-  // Animated Pie Chart
-  let pieIdx=0;
-  const pieData=[
+  // Proportion bar
+  let barIdx=0;
+  const barData=[
     [{label:'文化遗址',v:0.58,color:'#85B7EB'},{label:'自然遗产',v:0.28,color:'#5DCAA5'},{label:'混合遗产',v:0.14,color:'#EF9F27'}],
     [{label:'文化遗址',v:0.55,color:'#85B7EB'},{label:'自然遗产',v:0.32,color:'#5DCAA5'},{label:'混合遗产',v:0.13,color:'#EF9F27'}],
     [{label:'文化遗址',v:0.60,color:'#85B7EB'},{label:'自然遗产',v:0.26,color:'#5DCAA5'},{label:'混合遗产',v:0.14,color:'#EF9F27'}],
   ];
-  function updatePie(){
-    drawPie('#s-tax-chart3',pieData[pieIdx%pieData.length]);
-    pieIdx++;
+  function updateBar(){
+    drawProportionBar('#s-tax-chart3',barData[barIdx%barData.length]);
+    barIdx++;
   }
-  updatePie();
-  pbIv.B_pie=setInterval(updatePie,3000);
+  updateBar();
+  pbIv.B_bar=setInterval(updateBar,3000);
 }
 
 // === SECTION C: ESG ===
@@ -183,6 +192,12 @@ function initSectionC(){
   let idx=0;
   const feed=document.getElementById('s-esg-feed');
   if(feed)feed.innerHTML='';
+
+  // Pre-compute global max for stable axes
+  const esgRevMax=d3.max(D.ESG_DAILY,r=>r.rev)*1.15;
+  const allCoRevMap={};
+  D.ESG_RECORDS.forEach(r=>{allCoRevMap[r.company]=(allCoRevMap[r.company]||0)+r.amount;});
+  const esgHBarMax=d3.max(Object.values(allCoRevMap))*1.15;
 
   function addTick(){
     const rows=D.ESG_RECORDS;
@@ -203,7 +218,7 @@ function initSectionC(){
   addTick();
   pbIv.C=setInterval(addTick,1000);
 
-  // Animated Charts - sliding window
+  // Animated Charts - sliding window, fixed axes
   let dayOffset=0;
   function updateCharts(){
     const windowSize=30;
@@ -212,7 +227,6 @@ function initSectionC(){
     for(let i=0;i<windowSize;i++){
       sliceData.push(D.ESG_DAILY[(startIdx+i)%D.ESG_DAILY.length]);
     }
-
     const coRevMap={};
     const recordWindow=Math.floor(D.ESG_RECORDS.length*windowSize/D.ESG_DAILY.length);
     for(let i=0;i<recordWindow;i++){
@@ -220,27 +234,28 @@ function initSectionC(){
       coRevMap[r.company]=(coRevMap[r.company]||0)+r.amount;
     }
     const coRev=Object.entries(coRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,10);
-    drawHBar('#s-esg-chart1',coRev,'#EF9F27');
-    drawLine('#s-esg-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'$','#EF9F27');
+    drawHBar('#s-esg-chart1',coRev,'#EF9F27',esgHBarMax);
+    drawLine('#s-esg-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'$','#EF9F27',esgRevMax);
     dayOffset++;
   }
   updateCharts();
   pbIv.C_chart=setInterval(updateCharts,2000);
 
-  // Animated Pie Chart
-  let pieIdx=0;
-  const pieData=[
+  // Proportion bar
+  let barIdx=0;
+  const barData=[
     [{label:'CCER履约',v:0.45,color:'#EF9F27'},{label:'CORSIA',v:0.32,color:'#F0997B'},{label:'ESG自愿',v:0.23,color:'#5DCAA5'}],
     [{label:'CCER履约',v:0.48,color:'#EF9F27'},{label:'CORSIA',v:0.30,color:'#F0997B'},{label:'ESG自愿',v:0.22,color:'#5DCAA5'}],
     [{label:'CCER履约',v:0.42,color:'#EF9F27'},{label:'CORSIA',v:0.35,color:'#F0997B'},{label:'ESG自愿',v:0.23,color:'#5DCAA5'}],
   ];
-  function updatePie(){
-    drawPie('#s-esg-chart3',pieData[pieIdx%pieData.length]);
-    pieIdx++;
+  function updateBar(){
+    drawProportionBar('#s-esg-chart3',barData[barIdx%barData.length]);
+    barIdx++;
   }
-  updatePie();
-  pbIv.C_pie=setInterval(updatePie,3000);
+  updateBar();
+  pbIv.C_bar=setInterval(updateBar,3000);
 }
+
 // === SECTION D: FUND DETAIL ===
 function initSectionD(){
   if(sectionsInitialized.D)return;
@@ -255,7 +270,8 @@ function initSectionD(){
   set('kpi-out',fK(tot.out));
   set('kpi-net',(tot.in-tot.out>=0?'+':'')+fK(tot.in-tot.out));
 
-  // Animated Charts - sliding window
+  const fundBalMax=d3.max(D.FUND_DAILY,r=>r.balance)*1.15;
+
   let dayOffset=0;
   function updateCharts(){
     const windowSize=30;
@@ -269,7 +285,7 @@ function initSectionD(){
       {key:'inflow',label:'流入',color:'#5DCAA5'},
       {key:'outflow',label:'支出',color:'#EF9F27'}
     ]);
-    drawLine('#s-fund-chart3',sliceData.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB');
+    drawLine('#s-fund-chart3',sliceData.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB',fundBalMax);
     drawDualLine('#s-fund-chart4',
       sliceData.map(r=>({x:r.date,y1:+(r.outflow/r.inflow*100).toFixed(1),y2:+(D.ALLOC_SITES.filter(s=>s.verif>=60).length/D.ALLOC_SITES.length*100).toFixed(1)})),
       '拨付率%','核查率%');
@@ -278,6 +294,7 @@ function initSectionD(){
   updateCharts();
   pbIv.D_chart=setInterval(updateCharts,2000);
 }
+
 // === SECTION E: ALLOCATION ===
 function initSectionE(){
   if(sectionsInitialized.E)return;
@@ -311,13 +328,31 @@ function initSectionE(){
     if(bar)setTimeout(()=>{bar.style.width=item.v+'%';},300);
   });
 }
+
+// === SECTION AI: SENSITIVITY (iframe embed) ===
+function initSectionAI(){
+  if(sectionsInitialized.AI)return;
+  sectionsInitialized.AI=true;
+  // iframe already in HTML, nothing else needed
+}
+
 // === D3 CHART RENDERERS ===
+
+// Shared SVG creator — always fills container via CSS absolute positioning
+function makeSvg(sel){
+  const svg=d3.select(sel).append('svg')
+    .style('position','absolute').style('inset','0')
+    .attr('width','100%').attr('height','100%');
+  return svg;
+}
+
+// Line chart — data values can vary freely, box size never changes
 function drawLine(sel,data,unit,color){
   clearSvg(sel);
   const {w,h}=dims(sel);
   const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const svg=makeSvg(sel);
   const defs=svg.append('defs');
   const gradId='grad_'+sel.replace(/[^a-zA-Z0-9]/g,'_');
   const grad=defs.append('linearGradient').attr('id',gradId).attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
@@ -325,7 +360,8 @@ function drawLine(sel,data,unit,color){
   grad.append('stop').attr('offset','100%').attr('stop-color',color).attr('stop-opacity',0.02);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const x=d3.scalePoint().domain(data.map(d=>d.x)).range([0,iw]);
-  const y=d3.scaleLinear().domain([0,d3.max(data,d=>d.y)*1.12]).range([ih,0]);
+  // Y axis always auto-fits current data — tick values change, box stays same
+  const y=d3.scaleLinear().domain([0,d3.max(data,d=>d.y)*1.12||1]).range([ih,0]);
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0))
     .select('.domain').remove();
@@ -339,89 +375,94 @@ function drawLine(sel,data,unit,color){
   g.selectAll('.dot').data(data).join('circle').attr('class','dot')
     .attr('cx',d=>x(d.x)).attr('cy',d=>y(d.y)).attr('r',3)
     .attr('fill',color).attr('opacity',.8);
+  if(unit){g.append('text').attr('x',4).attr('y',-2).attr('fill',color).attr('font-size',9).attr('opacity',.6).text(unit);}
 }
 
-function drawBarLine(sel,data,unit,color){
-  clearSvg(sel);
-  const {w,h}=dims(sel);
-  const mg={t:10,r:14,b:28,l:48};
-  const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
-  const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
-  const x=d3.scaleBand().domain(data.map(d=>d.x)).range([0,iw]).padding(.25);
-  const y=d3.scaleLinear().domain([0,d3.max(data,d=>d.y)*1.12]).range([ih,0]);
-  g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
-    .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0))
-    .select('.domain').remove();
-  g.append('g').attr('class','axis')
-    .call(d3.axisLeft(y).ticks(4).tickFormat(v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v))
-    .selectAll('text').style('text-anchor','end').attr('dx','-3px');
-  g.selectAll('.bar').data(data).join('rect').attr('class','bar')
-    .attr('x',d=>x(d.x)).attr('y',d=>y(d.y))
-    .attr('width',x.bandwidth()).attr('height',d=>ih-y(d.y))
-    .attr('fill',color).attr('rx',2).attr('opacity',.82);
-}
+// Horizontal bar ranking — bar widths scale relative to current top item (self-consistent each frame)
 function drawHBar(sel,data,color){
   clearSvg(sel);
   const {w,h}=dims(sel);
   const mg={t:4,r:14,b:4,l:72};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const svg=makeSvg(sel);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const y=d3.scaleBand().domain(data.map(d=>d.label)).range([0,ih]).padding(.28);
-  const x=d3.scaleLinear().domain([0,d3.max(data,d=>d.v)*1.1]).range([0,iw]);
+  // Scale to current max — numbers on invisible right axis would change, bar lengths stay proportional
+  const x=d3.scaleLinear().domain([0,d3.max(data,d=>d.v)*1.1||1]).range([0,iw]);
   g.append('g').attr('class','axis').call(d3.axisLeft(y).tickSize(0)).select('.domain').remove();
+  g.selectAll('.hbar-bg').data(data).join('rect').attr('class','hbar-bg')
+    .attr('y',d=>y(d.label)).attr('x',0)
+    .attr('height',y.bandwidth()).attr('width',iw)
+    .attr('fill','rgba(255,255,255,0.04)').attr('rx',2);
   g.selectAll('.hbar').data(data).join('rect').attr('class','hbar')
     .attr('y',d=>y(d.label)).attr('x',0)
     .attr('height',y.bandwidth()).attr('width',d=>x(d.v))
     .attr('fill',color).attr('rx',2).attr('opacity',.82);
 }
-function drawPie(sel,data){
-  clearSvg(sel);
-  const {w,h}=dims(sel);
-  const r=Math.min(w*0.28,h*0.36);
-  const cx=w/2,cy=h*0.40;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
-  const g=svg.append('g').attr('transform',`translate(${cx},${cy})`);
-  const pie=d3.pie().value(d=>d.v).sort(null);
-  const arc=d3.arc().innerRadius(r*0.52).outerRadius(r);
-  const paths=g.selectAll('path').data(pie(data)).join('path');
-  paths.attr('d',arc).attr('fill',d=>d.data.color).attr('stroke','rgba(0,0,0,.3)').attr('stroke-width',1);
-  paths.each(function(d){this._current=d;});
-  // Legend: horizontal row below pie
-  const lgY=cy+r+18;
-  const itemW=w/data.length;
-  const lg=svg.append('g').attr('transform',`translate(0,${lgY})`);
+
+// Proportion bar — fixed total width, only proportions change, with animated transitions
+function drawProportionBar(sel,data){
+  const el=document.querySelector(sel);
+  if(!el)return;
+
+  // Check if bar already exists (update vs create)
+  let container=el.querySelector('.prop-bar-wrap');
+  if(!container){
+    container=document.createElement('div');
+    container.className='prop-bar-wrap';
+    container.style.cssText='display:flex;flex-direction:column;justify-content:center;align-items:stretch;height:100%;padding:12px 16px;box-sizing:border-box;gap:10px;';
+    el.appendChild(container);
+  }
+
+  // Build/update segments
+  let barRow=container.querySelector('.prop-bar-row');
+  if(!barRow){
+    barRow=document.createElement('div');
+    barRow.className='prop-bar-row';
+    barRow.style.cssText='display:flex;width:100%;height:32px;border-radius:6px;overflow:hidden;';
+    container.appendChild(barRow);
+  }
+
+  // Update segments — create if missing, animate width
+  const existing=barRow.querySelectorAll('.prop-seg');
   data.forEach((d,i)=>{
-    const row=lg.append('g').attr('transform',`translate(${itemW*i+itemW/2-30},0)`);
-    row.append('circle').attr('r',5).attr('cy',0).attr('fill',d.color);
-    row.append('text').attr('x',10).attr('y',4).attr('fill','rgba(234,243,222,.7)').attr('font-size',10).text(`${d.label} ${(d.v*100).toFixed(0)}%`);
+    let seg=existing[i];
+    if(!seg){
+      seg=document.createElement('div');
+      seg.className='prop-seg';
+      seg.style.cssText=`background:${d.color};height:100%;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);`;
+      barRow.appendChild(seg);
+    }
+    seg.style.width=(d.v*100)+'%';
+    seg.style.background=d.color;
   });
-  // Store update function for animation
-  svg.node()._update=function(newData){
-    const newPie=d3.pie().value(d=>d.v).sort(null);
-    g.selectAll('path').data(newPie(newData))
-      .transition().duration(800)
-      .attrTween('d',function(d){
-        const interp=d3.interpolate(this._current||d,d);
-        this._current=interp(1);
-        return t=>arc(interp(t));
-      });
-    lg.selectAll('g').each(function(d,i){
-      d3.select(this).select('text').transition().duration(800)
-        .text(`${newData[i].label} ${(newData[i].v*100).toFixed(0)}%`);
-    });
-  };
+
+  // Legend row
+  let legend=container.querySelector('.prop-legend');
+  if(!legend){
+    legend=document.createElement('div');
+    legend.className='prop-legend';
+    legend.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;';
+    container.appendChild(legend);
+  }
+  legend.innerHTML='';
+  data.forEach(d=>{
+    const item=document.createElement('div');
+    item.style.cssText='display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(234,243,222,0.75);';
+    item.innerHTML=`<span style="width:10px;height:10px;border-radius:2px;background:${d.color};display:inline-block;flex-shrink:0;"></span>${d.label} <strong style="color:${d.color}">${(d.v*100).toFixed(0)}%</strong>`;
+    legend.appendChild(item);
+  });
 }
+
 function drawWaterfall(sel,data){
   clearSvg(sel);
   const {w,h}=dims(sel);
   const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const svg=makeSvg(sel);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const ext=d3.extent(data,d=>d.y);
-  const ymax=Math.max(Math.abs(ext[0]),Math.abs(ext[1]))*1.15;
+  const ymax=Math.max(Math.abs(ext[0]),Math.abs(ext[1]))*1.15||1;
   const x=d3.scaleBand().domain(data.map(d=>d.x)).range([0,iw]).padding(.2);
   const y=d3.scaleLinear().domain([-ymax,ymax]).range([ih,0]);
   g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(0)).attr('y2',y(0)).attr('stroke','rgba(255,255,255,.15)');
@@ -435,15 +476,16 @@ function drawWaterfall(sel,data){
     .attr('width',x.bandwidth()).attr('height',d=>Math.abs(y(d.y)-y(0)))
     .attr('fill',d=>d.y>=0?'#5DCAA5':'#EF9F27').attr('rx',2).attr('opacity',.85);
 }
+
 function drawStackedArea(sel,data,keys){
   clearSvg(sel);
   const {w,h}=dims(sel);
   const mg={t:10,r:14,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const svg=makeSvg(sel);
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const x=d3.scalePoint().domain(data.map(d=>d.date)).range([0,iw]);
-  const ymax=d3.max(data,d=>keys.reduce((s,k)=>s+d[k.key],0))*1.12;
+  const ymax=d3.max(data,d=>keys.reduce((s,k)=>s+d[k.key],0))*1.12||1;
   const y=d3.scaleLinear().domain([0,ymax]).range([ih,0]);
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0)).select('.domain').remove();
@@ -458,12 +500,13 @@ function drawStackedArea(sel,data,keys){
     base=data.map((d,i)=>base[i]+d[k.key]);
   });
 }
+
 function drawDualLine(sel,data,l1,l2){
   clearSvg(sel);
   const {w,h}=dims(sel);
   const mg={t:10,r:44,b:28,l:48};
   const iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
-  const svg=d3.select(sel).append('svg').attr('width',w).attr('height',h);
+  const svg=makeSvg(sel);
   const defs=svg.append('defs');
   const gradId1='grad_dual1_'+sel.replace(/[^a-zA-Z0-9]/g,'_');
   const gradId2='grad_dual2_'+sel.replace(/[^a-zA-Z0-9]/g,'_');
@@ -476,7 +519,7 @@ function drawDualLine(sel,data,l1,l2){
   makeGrad(gradId2,'#EF9F27');
   const g=svg.append('g').attr('transform',`translate(${mg.l},${mg.t})`);
   const x=d3.scalePoint().domain(data.map(d=>d.x)).range([0,iw]);
-  const y1=d3.scaleLinear().domain([0,d3.max(data,d=>d.y1)*1.2]).range([ih,0]);
+  const y1=d3.scaleLinear().domain([0,d3.max(data,d=>d.y1)*1.2||1]).range([ih,0]);
   const y2=d3.scaleLinear().domain([0,100]).range([ih,0]);
   g.append('g').attr('class','axis').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(x.domain().filter((_,i)=>i%6===0)).tickSize(0)).select('.domain').remove();
@@ -495,6 +538,7 @@ function drawDualLine(sel,data,l1,l2){
   g.append('text').attr('x',4).attr('y',-2).attr('fill','#5DCAA5').attr('font-size',9).text(l1);
   g.append('text').attr('x',iw-4).attr('y',-2).attr('fill','#EF9F27').attr('font-size',9).attr('text-anchor','end').text(l2);
 }
+
 function drawGeo(sel,sites){
   const el=document.querySelector(sel);
   if(!el)return;
@@ -510,6 +554,7 @@ function drawGeo(sel,sites){
     drawGeoBubbles(svg,proj,sites);
   }).catch(()=>drawGeoBubbles(svg,proj,sites));
 }
+
 function drawGeoBubbles(svg,proj,sites){
   const phaseColor={'pre':'#85B7EB','mid':'#EF9F27','final':'#5DCAA5'};
   const maxAmt=d3.max(sites,s=>s.score*50000);
@@ -528,6 +573,3 @@ function drawGeoBubbles(svg,proj,sites){
     .on('mouseleave',()=>tip.style('display','none'));
 }
 })();
-
-
-
