@@ -8,10 +8,14 @@ const sectionsInitialized={};
 
 function showSection(id){
   document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
+  // Hide the scroll-based sections so they don't show behind fixed panels
+  document.getElementById('s-map').style.display='none';
+  document.getElementById('s-flow').style.display='none';
   const el=document.getElementById(id);
   if(el){
     el.classList.add('active');
     activeSection=id;
+    document.body.classList.add('dashboard-open');
     if(id==='s-carbon')initSectionA();
     else if(id==='s-tax')initSectionB();
     else if(id==='s-esg')initSectionC();
@@ -21,6 +25,14 @@ function showSection(id){
   }
 }
 window.showSection=showSection;
+
+function hideSection(){
+  document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-map').style.display='';
+  document.getElementById('s-flow').style.display='';
+  document.body.classList.remove('dashboard-open');
+}
+window.hideSection=hideSection;
 
 // === SECTION INITIALIZATION ===
 const pbIv={};
@@ -140,6 +152,8 @@ function initSectionB(){
     idx++;
     const fill=document.getElementById('s-tax-pf');
     if(fill)fill.style.width=(idx%rows.length/rows.length*100)+'%';
+    const lbl=document.getElementById('s-tax-plbl');
+    if(lbl){const cur=rows[idx%rows.length]||rows[0];lbl.textContent=cur.date;}
   }
   addTick();
   pbIv.B=setInterval(addTick,800);
@@ -214,6 +228,8 @@ function initSectionC(){
     idx++;
     const fill=document.getElementById('s-esg-pf');
     if(fill)fill.style.width=(idx%rows.length/rows.length*100)+'%';
+    const lbl=document.getElementById('s-esg-plbl');
+    if(lbl){const cur=rows[idx%rows.length]||rows[0];lbl.textContent=cur.date;}
   }
   addTick();
   pbIv.C=setInterval(addTick,1000);
@@ -496,7 +512,9 @@ function drawStackedArea(sel,data,keys){
   keys.forEach(k=>{
     const areaData=data.map((d,i)=>({x:d.date,y0:base[i],y1:base[i]+d[k.key]}));
     const area=d3.area().x(d=>x(d.x)).y0(d=>y(d.y0)).y1(d=>y(d.y1)).curve(d3.curveMonotoneX);
-    g.append('path').datum(areaData).attr('d',area).attr('fill',k.color).attr('opacity',.6);
+    const line=d3.line().x(d=>x(d.x)).y(d=>y(d.y1)).curve(d3.curveMonotoneX);
+    g.append('path').datum(areaData).attr('d',area).attr('fill',k.color).attr('opacity',.18);
+    g.append('path').datum(areaData).attr('d',line).attr('fill','none').attr('stroke',k.color).attr('stroke-width',1.8).attr('opacity',.75);
     base=data.map((d,i)=>base[i]+d[k.key]);
   });
 }

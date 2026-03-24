@@ -17,7 +17,7 @@
 
 <!-- ===== NAV ===== -->
 <nav id="topnav">
-  <div class="nav-brand" onclick="scrollTo(0,0)">HCCS</div>
+  <div class="nav-brand" onclick="navTo('s-map')">HCCS</div>
   <div class="nav-links">
     <button class="nav-link active" onclick="navTo('s-map')">全球遗产</button>
     <button class="nav-link" onclick="navTo('s-flow')">资金流向</button>
@@ -167,7 +167,7 @@
       <div class="section-ticker-header">景区收入记录</div>
       <div class="ticker-feed"><div class="ticker-list" id="s-tax-feed"></div></div>
       <div class="section-progress">
-        <div class="progress-label"><span>景区碳税</span><span>实时更新</span></div>
+        <div class="progress-label"><span id="s-tax-plbl">--</span><span>播放中</span></div>
         <div class="progress-track"><div class="progress-fill" id="s-tax-pf" style="width:0%"></div></div>
       </div>
     </div>
@@ -192,7 +192,7 @@
       <div class="section-ticker-header">企业认购记录</div>
       <div class="ticker-feed"><div class="ticker-list" id="s-esg-feed"></div></div>
       <div class="section-progress">
-        <div class="progress-label"><span>ESG认购</span><span>实时更新</span></div>
+        <div class="progress-label"><span id="s-esg-plbl">--</span><span>播放中</span></div>
         <div class="progress-track"><div class="progress-fill" id="s-esg-pf" style="width:0%"></div></div>
       </div>
     </div>
@@ -267,15 +267,7 @@
 
 <!-- ===== SECTION F: AI SENSITIVITY ===== -->
 <section class="full-section dashboard-section" id="s-ai">
-  <div class="section-header">
-    <div class="badge"><div class="dot-pulse"></div>LIVE</div>
-    <div class="section-title">AI权重灵敏度分析</div>
-    <div style="display:flex;gap:8px;margin-left:auto;">
-      <button onclick="navTo('s-allocation')" style="padding:5px 14px;border-radius:6px;background:rgba(255,255,255,0.07);color:var(--text2);font-size:11px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;">← 分配公式</button>
-      <button onclick="navTo('s-flow')" style="padding:5px 14px;border-radius:6px;background:rgba(255,255,255,0.07);color:var(--text2);font-size:11px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;">← 核查与运营</button>
-    </div>
-  </div>
-  <iframe src="sensitivity.html" style="flex:1;border:none;width:100%;min-height:0;"></iframe>
+  <iframe src="sensitivity.html" style="flex:1;border:none;width:100%;min-height:0;height:100%;"></iframe>
 </section>
 
 <!-- ===== SCRIPTS ===== -->
@@ -351,20 +343,15 @@ function drawSparkline(id,vals,color){
 }
 
 function navTo(id){
-  // Dashboard sections use showSection
   if(id.startsWith('s-') && !['s-map','s-flow'].includes(id)){
-    if(window.showSection){
-      window.showSection(id);
-    }
+    if(window.showSection) window.showSection(id);
   } else {
-    // Regular sections use scroll - hide all dashboard sections first
-    document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
+    if(window.hideSection) window.hideSection();
     const el=document.getElementById(id);
     if(el)el.scrollIntoView({behavior:'smooth'});
   }
-  // Update active nav button
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
-  const targetBtn=Array.from(document.querySelectorAll('.nav-link')).find(b=>b.onclick&&b.onclick.toString().includes(id));
+  const targetBtn=Array.from(document.querySelectorAll('.nav-link')).find(b=>b.onclick&&b.onclick.toString().includes("'"+id+"'"));
   if(targetBtn)targetBtn.classList.add('active');
 }
 window.navTo=navTo;

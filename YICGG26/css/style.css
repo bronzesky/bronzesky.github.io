@@ -74,6 +74,12 @@ nav#topnav{
   border-left:1px solid var(--teal-border);
   background:rgba(8,18,12,0.97);
 }
+/* Left edge drag handle hint */
+#hani-panel::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:8px;
+  cursor:ew-resize;z-index:10;
+  background:linear-gradient(90deg,rgba(93,202,165,0.15),transparent);
+}
 #hani-panel.open{transform:translateX(0);}
 #hani-close{
   position:absolute;top:10px;right:14px;z-index:10;
@@ -159,6 +165,8 @@ nav#topnav{
 .dashboard-section.active{
   display:flex;
 }
+/* When any dashboard is open, lock body scroll so map doesn't peek through */
+body.dashboard-open{overflow:hidden;}
 .section-header{
   display:flex;align-items:center;gap:16px;
   padding:16px 28px 14px;
@@ -170,12 +178,12 @@ nav#topnav{
 
 /* Section left ticker pane */
 .section-ticker{
-  width:340px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);
+  width:300px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);
   display:flex;flex-direction:column;overflow:hidden;
 }
 .section-ticker-header{padding:14px 18px 10px;font-size:11px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;flex-shrink:0;}
 .ticker-feed{flex:1;overflow:hidden;position:relative;}
-.ticker-list{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:2px;padding:0 8px 8px;}
+.ticker-list{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;gap:2px;padding:8px 8px 0;}
 .ticker-row{
   padding:8px 10px;border-radius:7px;
   background:var(--card-bg);border:1px solid var(--card-border);
@@ -188,7 +196,7 @@ nav#topnav{
 .ticker-row .t-val{color:var(--amber);font-weight:600;}
 /* Section right charts pane */
 .section-charts{flex:1;display:flex;flex-direction:column;gap:0;overflow:hidden;}
-.section-charts-top{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 18px;flex:1;min-height:0;}
+.section-charts-top{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 160px;gap:10px;padding:10px 14px;flex:1;min-height:0;}
 .chart-box{
   background:var(--card-bg);border:1px solid var(--card-border);
   border-radius:12px;padding:14px;display:flex;flex-direction:column;overflow:hidden;
