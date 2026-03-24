@@ -7,10 +7,9 @@
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <style>
-/* ── Page shell ── */
+/* ── Page shell — no nav when embedded in iframe ── */
 body { background: var(--bg); }
 .page-body {
-  padding: var(--nav-h) 0 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -280,6 +279,8 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   z-index: 500;
   backdrop-filter: blur(10px);
   transition: opacity .2s, transform .2s;
+  cursor: grab;
+  user-select: none;
 }
 .detail-overlay.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
 .detail-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
@@ -299,16 +300,6 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav id="topnav">
-  <div class="nav-brand" onclick="window.location.href="index.html"">HCCS</div>
-  <div class="nav-links">
-    <button class="nav-link" onclick="window.location.href="index.html"">全球遗产</button>
-    <button class="nav-link" onclick="window.location.href="index.html"s-flow'">资金流向</button>
-    <button class="nav-link active">权重灵敏度分析</button>
-  </div>
-</nav>
 
 <div class="page-body">
 
@@ -400,8 +391,6 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
         </div>
       </div>
 
-      <!-- Back link -->
-      <button onclick="window.location.href="index.html"" style="margin-top:auto;padding:10px;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);color:var(--text2);font-size:12px;cursor:pointer;transition:color .18s,border-color .18s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--teal-border)'" onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--card-border)'">← 返回 HCCS 主控制台</button>
     </div>
 
     <!-- RIGHT: charts + table -->
@@ -706,6 +695,38 @@ window.addEventListener('resize', () => {
   document.querySelector('#bar-svg').innerHTML = '';
   update();
 });
+
+// ── DRAGGABLE DETAIL PANEL ────────────────────────────────────────────────
+(function(){
+  const panel = document.getElementById('detail-panel');
+  let dragging = false, ox = 0, oy = 0;
+  panel.addEventListener('mousedown', function(e){
+    // Don't drag if clicking on interactive elements
+    if(e.target.closest('input,button,select'))return;
+    dragging = true;
+    const rect = panel.getBoundingClientRect();
+    ox = e.clientX - rect.left;
+    oy = e.clientY - rect.top;
+    panel.style.cursor = 'grabbing';
+    panel.style.transition = 'opacity .2s';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging)return;
+    let x = e.clientX - ox;
+    let y = e.clientY - oy;
+    x = Math.max(0, Math.min(window.innerWidth - panel.offsetWidth, x));
+    y = Math.max(0, Math.min(window.innerHeight - panel.offsetHeight, y));
+    panel.style.left = x + 'px';
+    panel.style.top = y + 'px';
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', function(){
+    dragging = false;
+    panel.style.cursor = 'grab';
+  });
+})();
 </script>
 </body>
 </html>

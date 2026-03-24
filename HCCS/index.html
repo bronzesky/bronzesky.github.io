@@ -17,15 +17,16 @@
 
 <!-- ===== NAV ===== -->
 <nav id="topnav">
-  <div class="nav-brand" onclick="scrollTo(0,0)">HCCS</div>
+  <div class="nav-brand" onclick="navTo('s-map')">HCCS</div>
   <div class="nav-links">
     <button class="nav-link active" onclick="navTo('s-map')">全球遗产</button>
     <button class="nav-link" onclick="navTo('s-flow')">资金流向</button>
-    <button class="nav-link" onclick="window.openOverlay('A')">碳汇交易</button>
-    <button class="nav-link" onclick="window.openOverlay('B')">碳税收入</button>
-    <button class="nav-link" onclick="window.openOverlay('C')">ESG贡献</button>
-    <button class="nav-link" onclick="window.openOverlay('D')">基金详情</button>
-    <button class="nav-link" onclick="window.openOverlay('E')">分配公式</button>
+    <button class="nav-link" onclick="navTo('s-carbon')">碳汇交易</button>
+    <button class="nav-link" onclick="navTo('s-tax')">碳税收入</button>
+    <button class="nav-link" onclick="navTo('s-esg')">ESG贡献</button>
+    <button class="nav-link" onclick="navTo('s-fund')">基金详情</button>
+    <button class="nav-link" onclick="navTo('s-allocation')">分配公式</button>
+    <button class="nav-link" onclick="navTo('s-ai')">AI灵敏度</button>
   </div>
 </nav>
 
@@ -70,21 +71,21 @@
     <!-- Left: income sources -->
     <div class="flow-col">
       <div class="flow-col-label">资金来源</div>
-      <div class="income-card" id="card-carbon" onclick="window.openOverlay('A')">
+      <div class="income-card" id="card-carbon" onclick="navTo('s-carbon')">
         <div class="card-icon">🌿</div>
         <div class="card-title">生态碳汇收入</div>
         <div class="card-val" id="cv-carbon">--</div>
         <div class="card-sub">过去30天累计</div>
         <div class="sparkline-wrap"><canvas id="sp-carbon"></canvas></div>
       </div>
-      <div class="income-card" id="card-tax" onclick="window.openOverlay('B')">
+      <div class="income-card" id="card-tax" onclick="navTo('s-tax')">
         <div class="card-icon">🎫</div>
         <div class="card-title">旅游碳税收入</div>
         <div class="card-val" id="cv-tax">--</div>
         <div class="card-sub">过去30天累计</div>
         <div class="sparkline-wrap"><canvas id="sp-tax"></canvas></div>
       </div>
-      <div class="income-card" id="card-esg" onclick="window.openOverlay('C')">
+      <div class="income-card" id="card-esg" onclick="navTo('s-esg')">
         <div class="card-icon">🏢</div>
         <div class="card-title">企业ESG认购</div>
         <div class="card-val" id="cv-esg">--</div>
@@ -95,7 +96,7 @@
     <!-- Center: HCCA node + SVG -->
     <div class="flow-col" id="flow-svg-wrap">
       <svg id="flow-svg"></svg>
-      <div class="hcca-node" id="hcca-node" onclick="window.openOverlay('D')">
+      <div class="hcca-node" id="hcca-node" onclick="navTo('s-fund')">
         <div class="hcca-pulse"></div>
         <div class="hcca-node-label">HCCA基金</div>
         <div class="hcca-node-val" id="hcca-bal">--</div>
@@ -105,7 +106,7 @@
     <!-- Right: expenditure -->
     <div class="flow-col">
       <div class="flow-col-label">资金分配</div>
-      <div class="expense-card" id="card-alloc" onclick="window.openOverlay('E')">
+      <div class="expense-card" id="card-alloc" onclick="navTo('s-allocation')">
         <div class="card-icon">🏛️</div>
         <div class="card-title">遗址保护拨付</div>
         <div class="card-val" id="cv-alloc">--</div>
@@ -119,98 +120,97 @@
         <div style="margin-top:10px;font-size:11px;color:var(--text3)">
           <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span>UNESCO合规审查</span><span style="color:var(--teal)">87%</span></div>
           <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px"><div style="width:87%;height:100%;background:var(--teal);border-radius:2px"></div></div>
+          <div style="display:flex;justify-content:space-between;margin:6px 0 4px"><span>ACHA技术质量</span><span style="color:var(--teal)">74%</span></div>
+          <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px"><div style="width:74%;height:100%;background:var(--teal);border-radius:2px"></div></div>
           <div style="display:flex;justify-content:space-between;margin:6px 0 4px"><span>AI遥感核验</span><span style="color:var(--amber)">61%</span></div>
           <div style="height:3px;background:rgba(255,255,255,.08);border-radius:2px"><div style="width:61%;height:100%;background:var(--amber);border-radius:2px"></div></div>
         </div>
+        <button onclick="navTo('s-ai')" style="margin-top:12px;width:100%;padding:6px 0;border-radius:6px;background:rgba(93,202,165,0.12);color:var(--teal);font-weight:600;font-size:11px;border:1px solid var(--teal-border);cursor:pointer;letter-spacing:.3px;">⚖ 核查费用 AI灵敏度 →</button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== OVERLAY A: CARBON TRADING ===== -->
-<div class="overlay" id="ov-A">
-  <div class="ov-header">
+<!-- ===== SECTION 3: CARBON TRADING ===== -->
+<section class="full-section dashboard-section" id="s-carbon">
+  <div class="section-header">
     <div class="badge"><div class="dot-pulse"></div>LIVE</div>
-    <div class="ov-title">生态碳汇交易大屏</div>
-    <button class="ov-close" onclick="window.closeOverlay('A')">✕</button>
+    <div class="section-title">生态碳汇交易大屏</div>
   </div>
-  <div class="ov-body">
-    <div class="ov-ticker">
-      <div class="ov-ticker-header">实时交易记录</div>
-      <div class="ticker-feed"><div class="ticker-list" id="ov-a-feed"></div></div>
-      <div class="ov-progress">
-        <div class="progress-label"><span id="ov-a-plbl">--</span><span>播放中</span></div>
-        <div class="progress-track"><div class="progress-fill" id="ov-a-pf" style="width:0%"></div></div>
+  <div class="section-body">
+    <div class="section-ticker">
+      <div class="section-ticker-header">实时交易记录</div>
+      <div class="ticker-feed"><div class="ticker-list" id="s-carbon-feed"></div></div>
+      <div class="section-progress">
+        <div class="progress-label"><span id="s-carbon-plbl">--</span><span>播放中</span></div>
+        <div class="progress-track"><div class="progress-fill" id="s-carbon-pf" style="width:0%"></div></div>
       </div>
     </div>
-    <div class="ov-charts">
-      <div class="ov-charts-top">
-        <div class="chart-box"><div class="chart-box-title">日成交量 (tCO₂)</div><div id="ov-a-chart1" style="flex:1"></div></div>
-        <div class="chart-box"><div class="chart-box-title">日收入 (¥)</div><div id="ov-a-chart2" style="flex:1"></div></div>
-        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">买方类型分布</div><div id="ov-a-chart3" style="flex:1"></div></div>
+    <div class="section-charts">
+      <div class="section-charts-top">
+        <div class="chart-box"><div class="chart-box-title">日成交量 (tCO₂)</div><div id="s-carbon-chart1" style="flex:1"></div></div>
+        <div class="chart-box"><div class="chart-box-title">日收入 (¥)</div><div id="s-carbon-chart2" style="flex:1"></div></div>
+        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">买方类型分布</div><div id="s-carbon-chart3" style="flex:1"></div></div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- ===== OVERLAY B: TOURISM TAX ===== -->
-<div class="overlay" id="ov-B">
-  <div class="ov-header">
+<!-- ===== SECTION 4: TOURISM TAX ===== -->
+<section class="full-section dashboard-section" id="s-tax">
+  <div class="section-header">
     <div class="badge"><div class="dot-pulse"></div>LIVE</div>
-    <div class="ov-title">旅游碳税收入大屏</div>
-    <button class="ov-close" onclick="window.closeOverlay('B')">✕</button>
+    <div class="section-title">旅游碳税收入大屏</div>
   </div>
-  <div class="ov-body">
-    <div class="ov-ticker">
-      <div class="ov-ticker-header">景区收入记录</div>
-      <div class="ticker-feed"><div class="ticker-list" id="ov-b-feed"></div></div>
-      <div class="ov-progress">
-        <div class="progress-label"><span>景区碳税</span><span>实时更新</span></div>
-        <div class="progress-track"><div class="progress-fill" id="ov-b-pf" style="width:0%"></div></div>
+  <div class="section-body">
+    <div class="section-ticker">
+      <div class="section-ticker-header">景区收入记录</div>
+      <div class="ticker-feed"><div class="ticker-list" id="s-tax-feed"></div></div>
+      <div class="section-progress">
+        <div class="progress-label"><span id="s-tax-plbl">--</span><span>播放中</span></div>
+        <div class="progress-track"><div class="progress-fill" id="s-tax-pf" style="width:0%"></div></div>
       </div>
     </div>
-    <div class="ov-charts">
-      <div class="ov-charts-top">
-        <div class="chart-box"><div class="chart-box-title">景区收入排名 (前15)</div><div id="ov-b-chart1" style="flex:1"></div></div>
-        <div class="chart-box"><div class="chart-box-title">日收入趋势 (¥)</div><div id="ov-b-chart2" style="flex:1"></div></div>
-        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">遗址类型分布</div><div id="ov-b-chart3" style="flex:1"></div></div>
+    <div class="section-charts">
+      <div class="section-charts-top">
+        <div class="chart-box"><div class="chart-box-title">景区收入排名 (前15)</div><div id="s-tax-chart1" style="flex:1"></div></div>
+        <div class="chart-box"><div class="chart-box-title">日收入趋势 (¥)</div><div id="s-tax-chart2" style="flex:1"></div></div>
+        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">遗址类型分布</div><div id="s-tax-chart3" style="flex:1"></div></div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- ===== OVERLAY C: ESG ===== -->
-<div class="overlay" id="ov-C">
-  <div class="ov-header">
+<!-- ===== SECTION 5: ESG ===== -->
+<section class="full-section dashboard-section" id="s-esg">
+  <div class="section-header">
     <div class="badge"><div class="dot-pulse"></div>LIVE</div>
-    <div class="ov-title">企业ESG认购大屏</div>
-    <button class="ov-close" onclick="window.closeOverlay('C')">✕</button>
+    <div class="section-title">企业ESG认购大屏</div>
   </div>
-  <div class="ov-body">
-    <div class="ov-ticker">
-      <div class="ov-ticker-header">企业认购记录</div>
-      <div class="ticker-feed"><div class="ticker-list" id="ov-c-feed"></div></div>
-      <div class="ov-progress">
-        <div class="progress-label"><span>ESG认购</span><span>实时更新</span></div>
-        <div class="progress-track"><div class="progress-fill" id="ov-c-pf" style="width:0%"></div></div>
+  <div class="section-body">
+    <div class="section-ticker">
+      <div class="section-ticker-header">企业认购记录</div>
+      <div class="ticker-feed"><div class="ticker-list" id="s-esg-feed"></div></div>
+      <div class="section-progress">
+        <div class="progress-label"><span id="s-esg-plbl">--</span><span>播放中</span></div>
+        <div class="progress-track"><div class="progress-fill" id="s-esg-pf" style="width:0%"></div></div>
       </div>
     </div>
-    <div class="ov-charts">
-      <div class="ov-charts-top">
-        <div class="chart-box"><div class="chart-box-title">企业认购排名 (前10)</div><div id="ov-c-chart1" style="flex:1"></div></div>
-        <div class="chart-box"><div class="chart-box-title">月度认购趋势 ($)</div><div id="ov-c-chart2" style="flex:1"></div></div>
-        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">认购类型分布</div><div id="ov-c-chart3" style="flex:1"></div></div>
+    <div class="section-charts">
+      <div class="section-charts-top">
+        <div class="chart-box"><div class="chart-box-title">企业认购排名 (前10)</div><div id="s-esg-chart1" style="flex:1"></div></div>
+        <div class="chart-box"><div class="chart-box-title">月度认购趋势 ($)</div><div id="s-esg-chart2" style="flex:1"></div></div>
+        <div class="chart-box" style="grid-column:span 2"><div class="chart-box-title">认购类型分布</div><div id="s-esg-chart3" style="flex:1"></div></div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- ===== OVERLAY D: FUND DETAIL ===== -->
-<div class="overlay" id="ov-D">
-  <div class="ov-header">
+<!-- ===== SECTION D: FUND DETAIL ===== -->
+<section class="full-section dashboard-section" id="s-fund">
+  <div class="section-header">
     <div class="badge"><div class="dot-pulse"></div>LIVE</div>
-    <div class="ov-title">HCCA基金详情</div>
-    <button class="ov-close" onclick="window.closeOverlay('D')">✕</button>
+    <div class="section-title">HCCA基金详情</div>
   </div>
   <div class="kpi-row">
     <div class="kpi-card"><div class="kpi-val" id="kpi-bal">--</div><div class="kpi-label">基金余额</div></div>
@@ -218,32 +218,31 @@
     <div class="kpi-card"><div class="kpi-val" id="kpi-out">--</div><div class="kpi-label">30天支出</div></div>
     <div class="kpi-card"><div class="kpi-val" id="kpi-net">--</div><div class="kpi-label">净增长</div></div>
   </div>
-  <div class="ov-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 18px;">
-    <div class="chart-box"><div class="chart-box-title">每日净流入瀑布图</div><div id="ov-d-chart1" style="flex:1"></div></div>
-    <div class="chart-box"><div class="chart-box-title">资金来源堆叠面积</div><div id="ov-d-chart2" style="flex:1"></div></div>
-    <div class="chart-box"><div class="chart-box-title">基金余额曲线</div><div id="ov-d-chart3" style="flex:1"></div></div>
-    <div class="chart-box"><div class="chart-box-title">拨付率 vs 核查率</div><div id="ov-d-chart4" style="flex:1"></div></div>
+  <div class="section-body" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;padding:14px 18px;">
+    <div class="chart-box"><div class="chart-box-title">每日净流入瀑布图</div><div id="s-fund-chart1" style="flex:1"></div></div>
+    <div class="chart-box"><div class="chart-box-title">资金来源堆叠面积</div><div id="s-fund-chart2" style="flex:1"></div></div>
+    <div class="chart-box"><div class="chart-box-title">基金余额曲线</div><div id="s-fund-chart3" style="flex:1"></div></div>
+    <div class="chart-box"><div class="chart-box-title">拨付率 vs 核查率</div><div id="s-fund-chart4" style="flex:1"></div></div>
   </div>
-</div>
+</section>
 
-<!-- ===== OVERLAY E: ALLOCATION ===== -->
-<div class="overlay" id="ov-E">
-  <div class="ov-header">
+<!-- ===== SECTION E: ALLOCATION ===== -->
+<section class="full-section dashboard-section" id="s-allocation">
+  <div class="section-header">
     <div class="badge"><div class="dot-pulse"></div>LIVE</div>
-    <div class="ov-title">遗址保护拨付分配大屏</div>
-    <button class="ov-close" onclick="window.closeOverlay('E')">✕</button>
+    <div class="section-title">遗址保护拨付分配大屏</div>
   </div>
   <div class="formula-bar">
     <div class="formula-item"><strong>优先权得分</strong> = 遗址评分(70%) × 国家系数(30%)</div>
     <div class="formula-item"><strong>遗址评分</strong> = 濒危度 × 稀缺性 × 保护缺口</div>
     <div class="formula-item"><strong>拨付节奏</strong>：30% 预拨 | 40% 中期核查 | 30% 尾款</div>
-    <button onclick="window.open('sensitivity.html','_blank')" style="margin-left:auto;padding:6px 16px;border-radius:6px;background:var(--teal);color:#061208;font-weight:700;font-size:12px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:.4px;">⚖ AI权重灵敏度分析 →</button>
+    <button onclick="navTo('s-ai')" style="margin-left:auto;padding:6px 16px;border-radius:6px;background:var(--teal);color:#061208;font-weight:700;font-size:12px;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:.4px;">⚖ 分配公式 AI灵敏度 →</button>
   </div>
   <div class="alloc-body">
-    <div class="alloc-map" id="ov-e-map"></div>
+    <div class="alloc-map" id="s-allocation-map"></div>
     <div class="alloc-list">
       <div class="alloc-list-header">拨付明细 · 25个遗址</div>
-      <div class="alloc-scroll" id="ov-e-list"></div>
+      <div class="alloc-scroll" id="s-allocation-list"></div>
       <div class="verify-panel">
         <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">三层核查状态</div>
         <div class="verify-item">
@@ -264,7 +263,12 @@
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- ===== SECTION F: AI SENSITIVITY ===== -->
+<section class="full-section dashboard-section" id="s-ai">
+  <iframe src="sensitivity.html" style="flex:1;border:none;width:100%;min-height:0;height:100%;"></iframe>
+</section>
 
 <!-- ===== SCRIPTS ===== -->
 <script src="js/data-gen.js"></script>
@@ -339,10 +343,16 @@ function drawSparkline(id,vals,color){
 }
 
 function navTo(id){
-  const el=document.getElementById(id);
-  if(el)el.scrollIntoView({behavior:'smooth'});
+  if(id.startsWith('s-') && !['s-map','s-flow'].includes(id)){
+    if(window.showSection) window.showSection(id);
+  } else {
+    if(window.hideSection) window.hideSection();
+    const el=document.getElementById(id);
+    if(el)el.scrollIntoView({behavior:'smooth'});
+  }
   document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
+  const targetBtn=Array.from(document.querySelectorAll('.nav-link')).find(b=>b.onclick&&b.onclick.toString().includes("'"+id+"'"));
+  if(targetBtn)targetBtn.classList.add('active');
 }
 window.navTo=navTo;
 

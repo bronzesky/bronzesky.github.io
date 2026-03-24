@@ -30,7 +30,7 @@ window.initMap=function(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     maxZoom:18,subdomains:'abcd'
   }).addTo(map);
-  map.setView([20,10],2);
+  map.setView([20,10],2.5);
 
   // Heatmap
   if(L.heatLayer){
@@ -85,5 +85,27 @@ window.initMap=function(){
   }
 
   document.getElementById('hani-close').addEventListener('click',closeHani);
+
+  // Make hani-panel draggable
+  (function(){
+    const panel=document.getElementById('hani-panel');
+    let dragging=false,startX=0,startW=0;
+    // Drag handle on left edge
+    panel.addEventListener('mousedown',function(e){
+      if(e.clientX-panel.getBoundingClientRect().left>16)return;
+      dragging=true;startX=e.clientX;startW=panel.offsetWidth;
+      document.body.style.userSelect='none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove',function(e){
+      if(!dragging)return;
+      const dx=startX-e.clientX;
+      const newW=Math.max(300,Math.min(window.innerWidth*0.9,startW+dx));
+      panel.style.width=newW+'px';
+    });
+    document.addEventListener('mouseup',function(){
+      dragging=false;document.body.style.userSelect='';
+    });
+  })();
 };
 })();
