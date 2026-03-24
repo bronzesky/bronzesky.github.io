@@ -8,6 +8,7 @@
   --teal-border: rgba(93,202,165,0.28);
   --text: #EAF3DE;
   --text2: rgba(234,243,222,0.58);
+  
   --text3: rgba(234,243,222,0.32);
   --card-bg: rgba(255,255,255,0.04);
   --card-border: rgba(255,255,255,0.08);
@@ -149,19 +150,14 @@ nav#topnav{
 
 /* === DASHBOARD SECTIONS === */
 .dashboard-section{
-  position:fixed;
-  inset:0;
-  top:var(--nav-h);
   background:var(--bg);
-  display:none;
-  flex-direction:column;
-  opacity:0;
-  transition:opacity .3s ease;
-  z-index:100;
+  display:none;flex-direction:column;
+  position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
+  overflow:hidden;z-index:10;
+  padding-top:0;min-height:0;
 }
 .dashboard-section.active{
   display:flex;
-  opacity:1;
 }
 .section-header{
   display:flex;align-items:center;gap:16px;
@@ -170,14 +166,7 @@ nav#topnav{
   flex-shrink:0;
 }
 .section-title{font-size:18px;font-weight:700;color:var(--text);flex:1;}
-.section-body{
-  flex:1;
-  display:flex;
-  gap:0;
-  overflow:hidden;
-  min-height:0;
-  height:calc(100vh - var(--nav-h) - 60px);
-}
+.section-body{flex:1;display:flex;gap:0;overflow:hidden;min-height:0;}
 
 /* Section left ticker pane */
 .section-ticker{
