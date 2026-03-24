@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HCCS — AI权重灵敏度分析</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<style>
+/* ── Page shell ── */
+body { background: var(--bg); }
+.page-body {
+  padding: var(--nav-h) 0 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Page header strip ── */
+.page-header {
+  padding: 28px 48px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: flex-end;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.page-header-left { flex: 1; min-width: 260px; }
+.page-eyebrow {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.page-desc {
+  font-size: 12.5px;
+  color: var(--text2);
+  margin-top: 5px;
+  max-width: 600px;
+  line-height: 1.7;
+}
+.page-formula {
+  background: var(--card-bg);
+  border: 1px solid var(--teal-border);
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 2;
+  flex-shrink: 0;
+}
+.page-formula .f-key { color: var(--teal); font-weight: 600; }
+.page-formula .f-w   { color: var(--amber); }
+
+/* ── Main grid ── */
+.sens-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Left control panel ── */
+.ctrl-panel {
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 20px 22px;
+  gap: 16px;
+  background: var(--bg2);
+}
+.ctrl-section-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.ctrl-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+/* ── Sliders ── */
+.slider-group { margin-bottom: 14px; }
+.slider-group:last-child { margin-bottom: 0; }
+.slider-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+}
+.slider-lbl {
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+}
+.slider-lbl .en {
+  font-size: 10px;
+  color: var(--text3);
+  margin-left: 5px;
+}
+.slider-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--teal);
+  min-width: 42px;
+  text-align: right;
+}
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 8px rgba(93,202,165,0.5);
+  cursor: pointer;
+  transition: box-shadow .18s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px rgba(93,202,165,0.8);
+}
+.w-hint {
+  font-size: 10.5px;
+  color: var(--text3);
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.w-hint span { color: var(--teal); }
+
+/* Alpha row pills */
+.alpha-pills {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.alpha-pill {
+  flex: 1;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.alpha-pill.site { background: var(--teal-dim); color: var(--teal); border: 1px solid var(--teal-border); }
+.alpha-pill.nat  { background: rgba(239,159,39,0.1); color: var(--amber); border: 1px solid rgba(239,159,39,0.25); }
+
+/* Stats in ctrl */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 12px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-row-lbl { color: var(--text2); }
+.stat-row-val { color: var(--text); font-weight: 600; }
+.stat-row-val.teal { color: var(--teal); }
+
+/* ── Right panel ── */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Bar chart section */
+.chart-section {
+  flex: 0 0 260px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 16px 22px 14px;
+  display: flex;
+  flex-direction: column;
+}
+.section-lbl {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+#bar-wrap { flex: 1; overflow: hidden; }
+#bar-svg  { width: 100%; }
+
+/* Table section */
+.table-section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+table.result-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+table.result-tbl thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg3);
+}
+table.result-tbl th {
+  padding: 9px 14px;
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  white-space: nowrap;
+  font-weight: 500;
+}
+table.result-tbl td {
+  padding: 9px 14px;
+  color: var(--text2);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+table.result-tbl tr:hover td { background: rgba(255,255,255,0.03); }
+table.result-tbl tr.sel td   { background: var(--teal-dim); }
+table.result-tbl tr.sel .td-name { color: var(--teal); }
+.td-rank { color: var(--text3); font-weight: 700; width: 32px; }
+.td-name { color: var(--text); font-weight: 500; }
+.td-num  { font-variant-numeric: tabular-nums; }
+.td-score { color: var(--teal); font-weight: 700; }
+.td-alloc { color: var(--amber); font-weight: 700; }
+.rank-medal { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; font-size: 10px; font-weight: 700; }
+.rm-1 { background: rgba(255,215,0,.18); color: #ffd700; }
+.rm-2 { background: rgba(192,192,192,.18); color: #c0c0c0; }
+.rm-3 { background: rgba(205,127,50,.18); color: #cd7f32; }
+
+/* Mini bar in table */
+.mini-bar-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.mini-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--teal), rgba(93,202,165,.4));
+  transition: width .35s cubic-bezier(.4,0,.2,1);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ── Radar detail panel ── */
+.detail-overlay {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 260px;
+  background: rgba(17,24,32,0.97);
+  border: 1px solid var(--teal-border);
+  border-radius: 14px;
+  padding: 16px;
+  z-index: 500;
+  backdrop-filter: blur(10px);
+  transition: opacity .2s, transform .2s;
+}
+.detail-overlay.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+.detail-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.detail-country { font-size: 11px; color: var(--text3); margin-bottom: 10px; }
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-row .dl { color: var(--text2); }
+.detail-row .dv { color: var(--teal); font-weight: 600; }
+.detail-row .dv.amber { color: var(--amber); }
+#radar-svg-wrap { margin: 10px auto 4px; display: block; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="topnav">
+  <div class="nav-brand" onclick="window.location.href="index.html"">HCCS</div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href="index.html"">全球遗产</button>
+    <button class="nav-link" onclick="window.location.href="index.html"s-flow'">资金流向</button>
+    <button class="nav-link active">权重灵敏度分析</button>
+  </div>
+</nav>
+
+<div class="page-body">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-eyebrow">HCCS · B轨分配算法</div>
+      <div class="page-title">AI 权重灵敏度分析</div>
+      <div class="page-desc">实时调整三维度权重与遗址/国家积分占比，观察 HCCA 基金分配排名的变动，验证算法稳健性。</div>
+    </div>
+    <div class="page-formula">
+      <div><span class="f-key">Priority</span> = <span class="f-w">α</span> × (<span class="f-w">w₁</span>·濒危度 + <span class="f-w">w₂</span>·稀缺性 + <span class="f-w">w₃</span>·保护缺口)</div>
+      <div style="padding-left:68px">+ <span class="f-w">(1−α)</span> × 国家积分系数</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px">w₁+w₂+w₃ = 1 &nbsp;·&nbsp; 默认：α=70%，w₁=40%，w₂=35%，w₃=25%</div>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="sens-grid">
+
+    <!-- LEFT: controls -->
+    <div class="ctrl-panel">
+
+      <!-- Alpha -->
+      <div class="ctrl-card">
+        <div class="ctrl-section-title">外层权重</div>
+        <div class="slider-group">
+          <div class="slider-row">
+            <span class="slider-lbl">遗址评分占比 α <span class="en">Site Weight</span></span>
+            <span class="slider-val" id="v-alpha">70%</span>
+          </div>
+          <input type="range" id="s-alpha" min="40" max="90" value="70" step="1">
+          <div class="alpha-pills">
+            <div class="alpha-pill site">遗址评分 <span id="p-site">70%</span></div>
+            <div class="alpha-pill nat">国家积分 <span id="p-nat">30%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dimension weights -->
+      <div class="ctrl-card">
+        <div class="ctrl-section-title">遗址评分维度权重</div>
+        <div class="slider-group">
+          <div class="slider-row">
+            <span class="slider-lbl">濒危度 <span class="en">Endangerment</span></span>
+            <span class="slider-val" id="v-w1">40%</span>
+          </div>
+          <input type="range" id="s-w1" min="5" max="80" value="40" step="1">
+        </div>
+        <div class="slider-group">
+          <div class="slider-row">
+            <span class="slider-lbl">稀缺性 <span class="en">Scarcity</span></span>
+            <span class="slider-val" id="v-w2">35%</span>
+          </div>
+          <input type="range" id="s-w2" min="5" max="80" value="35" step="1">
+        </div>
+        <div class="slider-group">
+          <div class="slider-row">
+            <span class="slider-lbl">保护缺口 <span class="en">Protection Gap</span></span>
+            <span class="slider-val" id="v-w3">25%</span>
+          </div>
+          <input type="range" id="s-w3" min="5" max="80" value="25" step="1">
+        </div>
+        <div class="w-hint">三维度权重自动归一化，合计恒为 <span>100%</span></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="ctrl-card">
+        <div class="ctrl-section-title">模拟参数</div>
+        <div class="stat-row">
+          <span class="stat-row-lbl">HCCA 本期预算</span>
+          <span class="stat-row-val teal">¥ 50,000,000</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-lbl">参与遗产地</span>
+          <span class="stat-row-val" id="st-count">10 个</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-lbl">最高分配金额</span>
+          <span class="stat-row-val teal" id="st-max">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-lbl">最低分配金额</span>
+          <span class="stat-row-val" id="st-min">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-row-lbl">参数更新时间</span>
+          <span class="stat-row-val" id="st-time">—</span>
+        </div>
+      </div>
+
+      <!-- Back link -->
+      <button onclick="window.location.href="index.html"" style="margin-top:auto;padding:10px;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);color:var(--text2);font-size:12px;cursor:pointer;transition:color .18s,border-color .18s;" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--teal-border)'" onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--card-border)'">← 返回 HCCS 主控制台</button>
+    </div>
+
+    <!-- RIGHT: charts + table -->
+    <div class="right-panel">
+      <!-- Bar chart -->
+      <div class="chart-section">
+        <div class="section-lbl">分配金额排名（按优先权得分）</div>
+        <div id="bar-wrap"><svg id="bar-svg"></svg></div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-section">
+        <table class="result-tbl">
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>遗产地</th>
+              <th>国家</th>
+              <th>濒危度</th>
+              <th>稀缺性</th>
+              <th>保护缺口</th>
+              <th>遗址评分</th>
+              <th>国家积分</th>
+              <th>优先权得分</th>
+              <th>分配金额</th>
+            </tr>
+          </thead>
+          <tbody id="result-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail overlay (radar + stats) -->
+<div class="detail-overlay hidden" id="detail-panel">
+  <div class="detail-name" id="d-name">—</div>
+  <div class="detail-country" id="d-country">—</div>
+  <svg id="radar-svg-wrap" width="160" height="140"></svg>
+  <div class="detail-row"><span class="dl">濒危度</span><span class="dv" id="d-e">—</span></div>
+  <div class="detail-row"><span class="dl">稀缺性</span><span class="dv" id="d-s">—</span></div>
+  <div class="detail-row"><span class="dl">保护缺口</span><span class="dv" id="d-p">—</span></div>
+  <div class="detail-row"><span class="dl">国家积分系数</span><span class="dv" id="d-n">—</span></div>
+  <div class="detail-row"><span class="dl">优先权得分</span><span class="dv" id="d-score">—</span></div>
+  <div class="detail-row"><span class="dl">本期分配</span><span class="dv amber" id="d-alloc">—</span></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const SITES = [
+  { id:0, name:'哈尼梯田',          country:'中国',     flag:'🇨🇳', year:2013, e:72, s:85, p:68, n:0.78 },
+  { id:1, name:'利比亚古城加大麦斯', country:'利比亚',   flag:'🇱🇾', year:1982, e:95, s:90, p:95, n:0.31 },
+  { id:2, name:'廷巴克图古城',       country:'马里',     flag:'🇲🇱', year:1988, e:88, s:92, p:90, n:0.28 },
+  { id:3, name:'凡尔赛宫与花园',     country:'法国',     flag:'🇫🇷', year:1979, e:20, s:55, p:18, n:0.95 },
+  { id:4, name:'丽江古城',           country:'中国',     flag:'🇨🇳', year:1997, e:55, s:70, p:52, n:0.75 },
+  { id:5, name:'巴格哈清真寺城',     country:'孟加拉',   flag:'🇧🇩', year:1985, e:78, s:80, p:82, n:0.40 },
+  { id:6, name:'昌昌城遗址',         country:'秘鲁',     flag:'🇵🇪', year:1986, e:65, s:75, p:70, n:0.55 },
+  { id:7, name:'加拉帕戈斯群岛',     country:'厄瓜多尔', flag:'🇪🇨', year:1978, e:60, s:95, p:65, n:0.60 },
+  { id:8, name:'故宫',               country:'中国',     flag:'🇨🇳', year:1987, e:30, s:80, p:25, n:0.85 },
+  { id:9, name:'斯塔里格勒旧桥区',   country:'波黑',     flag:'🇧🇦', year:2005, e:70, s:72, p:75, n:0.45 },
+];
+
+const BUDGET = 50_000_000;
+let alpha = 0.70, w1 = 0.40, w2 = 0.35, w3 = 0.25;
+let selId = 0;
+let barReady = false;
+
+// ── COMPUTE ───────────────────────────────────────────────────────────────
+function compute() {
+  return SITES.map(s => {
+    const siteScore = (w1*s.e + w2*s.s + w3*s.p) / 100;
+    const priority  = alpha * siteScore + (1-alpha) * s.n;
+    return { ...s, siteScore: +(siteScore*100).toFixed(1), priority: +priority.toFixed(4) };
+  }).sort((a, b) => b.priority - a.priority);
+}
+
+function withAlloc(sorted) {
+  const total = sorted.reduce((s,r) => s + r.priority, 0);
+  return sorted.map((r,i) => ({ ...r, rank: i+1, alloc: Math.round(r.priority/total*BUDGET) }));
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────────────────
+function renderTable(rows) {
+  const tbody = document.getElementById('result-tbody');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.id === selId) tr.classList.add('sel');
+
+    let rankCell;
+    if (r.rank <= 3) {
+      rankCell = `<span class="rank-medal rm-${r.rank}">${r.rank}</span>`;
+    } else {
+      rankCell = `<span class="td-rank">${r.rank}</span>`;
+    }
+
+    const barW = Math.round((r.alloc / BUDGET) * 80);
+    tr.innerHTML = `
+      <td>${rankCell}</td>
+      <td class="td-name">${r.flag} ${r.name}</td>
+      <td class="td-num">${r.country}</td>
+      <td class="td-num">${r.e}</td>
+      <td class="td-num">${r.s}</td>
+      <td class="td-num">${r.p}</td>
+      <td class="td-score">${r.siteScore}</td>
+      <td class="td-num">${(r.n*100).toFixed(0)}%</td>
+      <td class="td-score">
+        <span class="mini-bar-wrap">
+          ${(r.priority*100).toFixed(2)}
+          <span class="mini-bar" style="width:${barW}px"></span>
+        </span>
+      </td>
+      <td class="td-alloc">¥${(r.alloc/1e6).toFixed(2)}M</td>
+    `;
+    tr.addEventListener('click', () => { selId = r.id; update(); });
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('st-max').textContent = `¥${(rows[0].alloc/1e6).toFixed(2)}M`;
+  document.getElementById('st-min').textContent = `¥${(rows[rows.length-1].alloc/1e6).toFixed(2)}M`;
+  document.getElementById('st-time').textContent = new Date().toLocaleTimeString('zh-CN');
+}
+
+// ── D3 BAR CHART ──────────────────────────────────────────────────────────
+function renderBar(rows) {
+  const wrap = document.getElementById('bar-wrap');
+  const W = wrap.clientWidth;
+  const H = 220;
+  const mL = 120, mR = 70, mT = 6, mB = 6;
+  const iW = W - mL - mR;
+  const iH = H - mT - mB;
+
+  const svg = d3.select('#bar-svg')
+    .attr('viewBox', `0 0 ${W} ${H}`)
+    .attr('height', H);
+
+  if (!barReady) {
+    svg.append('g').attr('class','bg').attr('transform',`translate(${mL},${mT})`);
+    svg.append('g').attr('class','bars').attr('transform',`translate(${mL},${mT})`);
+    svg.append('g').attr('class','llabs').attr('transform',`translate(${mL},${mT})`);
+    svg.append('g').attr('class','vlabs').attr('transform',`translate(${mL},${mT})`);
+    barReady = true;
+  }
+
+  const yBand = d3.scaleBand().domain(rows.map(r=>r.id)).range([0,iH]).padding(0.28);
+  const xScale = d3.scaleLinear().domain([0, rows[0].alloc]).range([0, iW]);
+  const colorFn = (i) => d3.interpolate('#5DCAA550','#5DCAA5CC')(1 - i/(rows.length-1));
+
+  // bg grid
+  const bgG = svg.select('.bg');
+  bgG.selectAll('line').remove();
+  [0.25,0.5,0.75,1].forEach(f => {
+    bgG.append('line')
+      .attr('x1', xScale(rows[0].alloc*f)).attr('x2', xScale(rows[0].alloc*f))
+      .attr('y1', 0).attr('y2', iH)
+      .attr('stroke','rgba(255,255,255,0.04)').attr('stroke-dasharray','3,3');
+  });
+
+  // bars
+  svg.select('.bars').selectAll('rect')
+    .data(rows, d=>d.id)
+    .join(
+      e => e.append('rect')
+        .attr('x',0).attr('y',d=>yBand(d.id))
+        .attr('height',yBand.bandwidth()).attr('width',0).attr('rx',3)
+        .attr('fill',(d,i)=>colorFn(i))
+        .call(e2 => e2.transition().duration(450).attr('width',d=>xScale(d.alloc))),
+      u => u.transition().duration(320)
+        .attr('y',d=>yBand(d.id))
+        .attr('width',d=>xScale(d.alloc))
+        .attr('fill',(d,i)=>colorFn(i))
+    );
+
+  // left labels
+  svg.select('.llabs').selectAll('text.ll')
+    .data(rows, d=>d.id)
+    .join(e=>e.append('text').attr('class','ll'), u=>u)
+    .transition().duration(320)
+    .attr('x',-8).attr('y',d=>yBand(d.id)+yBand.bandwidth()/2+4)
+    .attr('text-anchor','end')
+    .attr('fill',d=>d.id===selId?'#5DCAA5':'rgba(234,243,222,0.58)')
+    .attr('font-size',11).attr('font-family','Helvetica Neue,Arial,sans-serif')
+    .text(d=>d.name);
+
+  // right value labels
+  svg.select('.vlabs').selectAll('text.vl')
+    .data(rows, d=>d.id)
+    .join(e=>e.append('text').attr('class','vl'), u=>u)
+    .transition().duration(320)
+    .attr('x',d=>xScale(d.alloc)+6).attr('y',d=>yBand(d.id)+yBand.bandwidth()/2+4)
+    .attr('fill','rgba(234,243,222,0.7)').attr('font-size',10.5)
+    .attr('font-family','Helvetica Neue,Arial,sans-serif')
+    .text(d=>`¥${(d.alloc/1e6).toFixed(2)}M`);
+}
+
+// ── D3 RADAR ──────────────────────────────────────────────────────────────
+function renderRadar(site) {
+  const W=160, H=140, cx=80, cy=76, R=52;
+  const dims = ['濒危度','稀缺性','保护缺口'];
+  const vals = [site.e/100, site.s/100, site.p/100];
+  const angles = dims.map((_,i) => i/dims.length * 2*Math.PI - Math.PI/2);
+
+  const svg = d3.select('#radar-svg-wrap');
+  svg.selectAll('*').remove();
+
+  // grid
+  [0.25,0.5,0.75,1].forEach(r => {
+    svg.append('circle').attr('cx',cx).attr('cy',cy).attr('r',R*r)
+      .attr('fill','none').attr('stroke','rgba(93,202,165,0.12)').attr('stroke-dasharray','3,3');
+  });
+  // axes
+  angles.forEach((a,i) => {
+    svg.append('line').attr('x1',cx).attr('y1',cy)
+      .attr('x2',cx+R*Math.cos(a)).attr('y2',cy+R*Math.sin(a))
+      .attr('stroke','rgba(93,202,165,0.2)');
+    svg.append('text')
+      .attr('x',cx+(R+13)*Math.cos(a)).attr('y',cy+(R+13)*Math.sin(a)+3)
+      .attr('text-anchor','middle').attr('fill','rgba(234,243,222,0.45)')
+      .attr('font-size',9).text(dims[i]);
+  });
+  // polygon
+  const pts = angles.map((a,i)=>[cx+R*vals[i]*Math.cos(a), cy+R*vals[i]*Math.sin(a)]);
+  svg.append('polygon').attr('points',pts.map(p=>p.join(',')).join(' '))
+    .attr('fill','rgba(93,202,165,0.15)').attr('stroke','#5DCAA5').attr('stroke-width',1.5);
+  pts.forEach(([x,y]) => {
+    svg.append('circle').attr('cx',x).attr('cy',y).attr('r',3).attr('fill','#5DCAA5');
+  });
+}
+
+// ── UPDATE DETAIL PANEL ───────────────────────────────────────────────────
+function updateDetail(site, rows) {
+  const r = rows.find(x=>x.id===site.id);
+  document.getElementById('d-name').textContent = `${site.flag} ${site.name}`;
+  document.getElementById('d-country').textContent = `${site.country} · UNESCO ${site.year}`;
+  document.getElementById('d-e').textContent = site.e;
+  document.getElementById('d-s').textContent = site.s;
+  document.getElementById('d-p').textContent = site.p;
+  document.getElementById('d-n').textContent = site.n;
+  if (r) {
+    document.getElementById('d-score').textContent = (r.priority*100).toFixed(2);
+    document.getElementById('d-alloc').textContent = `¥${(r.alloc/1e6).toFixed(2)}M`;
+  }
+  renderRadar(site);
+  document.getElementById('detail-panel').classList.remove('hidden');
+}
+
+// ── MASTER UPDATE ─────────────────────────────────────────────────────────
+function update() {
+  const rows = withAlloc(compute());
+  renderTable(rows);
+  renderBar(rows);
+  const sel = SITES.find(s=>s.id===selId);
+  updateDetail(sel, rows);
+}
+
+// ── SLIDER LOGIC ──────────────────────────────────────────────────────────
+document.getElementById('s-alpha').addEventListener('input', e => {
+  alpha = parseInt(e.target.value)/100;
+  document.getElementById('v-alpha').textContent = `${Math.round(alpha*100)}%`;
+  document.getElementById('p-site').textContent  = `${Math.round(alpha*100)}%`;
+  document.getElementById('p-nat').textContent   = `${Math.round((1-alpha)*100)}%`;
+  update();
+});
+
+function normalize(changed, newVal) {
+  const clamped = Math.max(0.05, Math.min(0.90, newVal));
+  const others = ['w1','w2','w3'].filter(k=>k!==changed);
+  const state = {w1,w2,w3};
+  state[changed] = clamped;
+  const sumOthers = others.reduce((s,k)=>s+state[k],0);
+  const ratio = (1-clamped) / (sumOthers||0.001);
+  others.forEach(k => { state[k] = Math.max(0.05, state[k]*ratio); });
+  const total = state.w1+state.w2+state.w3;
+  w1=state.w1/total; w2=state.w2/total; w3=state.w3/total;
+  syncBadges();
+}
+
+function syncBadges() {
+  document.getElementById('v-w1').textContent = `${Math.round(w1*100)}%`;
+  document.getElementById('v-w2').textContent = `${Math.round(w2*100)}%`;
+  document.getElementById('v-w3').textContent = `${Math.round(w3*100)}%`;
+  document.getElementById('s-w1').value = Math.round(w1*100);
+  document.getElementById('s-w2').value = Math.round(w2*100);
+  document.getElementById('s-w3').value = Math.round(w3*100);
+}
+
+document.getElementById('s-w1').addEventListener('input', e => {
+  normalize('w1', parseInt(e.target.value)/100); update();
+});
+document.getElementById('s-w2').addEventListener('input', e => {
+  normalize('w2', parseInt(e.target.value)/100); update();
+});
+document.getElementById('s-w3').addEventListener('input', e => {
+  normalize('w3', parseInt(e.target.value)/100); update();
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────
+document.getElementById('st-count').textContent = `${SITES.length} 个`;
+update();
+window.addEventListener('resize', () => {
+  barReady = false;
+  document.querySelector('#bar-svg').innerHTML = '';
+  update();
+});
+</script>
+</body>
+</html>
