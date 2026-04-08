@@ -1246,6 +1246,12 @@ ZONE_IDS.forEach(zone => {
   const g = document.getElementById(zone);
   if (!g) return;
   g.style.cursor = "pointer";
+  const bb = g.getBBox();
+  const hitRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  hitRect.setAttribute("x", bb.x); hitRect.setAttribute("y", bb.y);
+  hitRect.setAttribute("width", bb.width); hitRect.setAttribute("height", bb.height);
+  hitRect.setAttribute("fill", "transparent");
+  g.appendChild(hitRect);
   g.addEventListener("mouseenter", e => {
     if (!activeZone) setFilter(zone);
     showTooltip(zone, e);
@@ -1264,7 +1270,8 @@ ZONE_IDS.forEach(zone => {
 });
 
 // Click outside SVG groups resets
-document.getElementById("main-svg").addEventListener("click", () => {
+document.getElementById("main-svg").addEventListener("click", e => {
+  if (ZONE_IDS.some(z => document.getElementById(z).contains(e.target))) return;
   activeZone = null;
   setFilter(null);
   updatePanel();
