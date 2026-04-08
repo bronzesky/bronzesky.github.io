@@ -346,27 +346,29 @@ body.dashboard-open{overflow:hidden;}
 }
 
 @media (max-width: 768px) {
-  /* --- Nav: hamburger left, HCCS right, links dropdown --- */
+  /* --- Nav: MS Learn style — hamburger left, brand right, full-width dropdown --- */
   nav#topnav{
-    flex-wrap:wrap; height:auto; padding:0 16px;
+    flex-wrap:wrap; height:auto; padding:0 12px;
   }
-  #nav-toggle{ display:flex; align-items:center; order:0; }
-  .nav-brand{ padding:13px 0; font-size:13px; order:1; margin-right:0; margin-left:auto; }
+  #nav-toggle{
+    display:flex; align-items:center; order:0;
+    padding:14px 10px; font-size:20px;
+  }
+  .nav-brand{ padding:14px 0; font-size:14px; font-weight:700; order:1; margin-left:12px; margin-right:auto; }
   .nav-links{
     display:none; flex-direction:column; width:100%; order:2;
-    border-top:1px solid rgba(255,255,255,0.07);
-    padding:6px 0 10px; gap:0;
-    background:rgba(13,17,23,0.97);
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding:4px 0 8px; gap:0;
+    background:rgba(13,17,23,0.98);
   }
   nav#topnav.nav-open .nav-links{ display:flex; }
   .nav-link{
-    padding:12px 16px; font-size:13px; text-align:left; border-radius:0;
-    border-bottom:1px solid rgba(255,255,255,0.04);
-    transition:background .15s, color .15s;
+    padding:13px 16px; font-size:13.5px; text-align:left; border-radius:0;
+    border-left:3px solid transparent;
+    transition:background .12s, border-color .12s, color .12s;
   }
-  .nav-link:hover,.nav-link.active{
-    background:rgba(93,202,165,0.12); color:var(--teal);
-  }
+  .nav-link:hover{ background:rgba(255,255,255,0.05); color:var(--text); border-left-color:rgba(93,202,165,0.4); }
+  .nav-link.active{ background:rgba(93,202,165,0.08); color:var(--teal); border-left-color:var(--teal); }
 
   /* --- Full sections --- */
   .full-section{ min-height:unset; }
@@ -440,39 +442,47 @@ body.dashboard-open{overflow:hidden;}
   .sparkline-wrap{ margin-top:6px; height:24px; }
   .sparkline-wrap canvas{ height:24px; }
 
-  /* --- Dashboard sections: scrollable --- */
+  /* --- Dashboard sections: static flow, height = content --- */
   .dashboard-section{
-    overflow-y:auto;
-    overflow-x:hidden;
+    position:static !important;
+    display:none;
+    height:auto !important;
+    overflow:visible !important;
     padding-bottom:0;
   }
+  .dashboard-section.active{
+    display:block !important;
+  }
+  body.dashboard-open{ overflow:auto !important; }
   .section-header{ padding:12px 14px; flex-shrink:0; gap:10px; }
   .section-title{ font-size:15px; }
 
-  /* section-body: stack ticker above charts */
+  /* section-body: stack ticker above charts, height = content */
   .section-body{
     flex-direction:column;
     overflow:visible;
     min-height:unset;
     flex:none;
+    height:auto;
   }
   .section-ticker{
     width:100%; flex-shrink:0;
     border-right:none;
     border-bottom:1px solid rgba(255,255,255,0.07);
-    height:200px;
+    height:auto; max-height:220px; overflow-y:auto;
   }
   .section-ticker-header{ padding:12px 14px 8px; font-size:12px; }
+  .ticker-feed{ max-height:160px; overflow-y:auto; }
   .ticker-row{ padding:9px 10px; }
   .ticker-row .t-main{ font-size:12px; }
   .section-charts{ flex:none; }
   .section-charts-top{
     grid-template-columns:1fr;
-    grid-template-rows:repeat(4, 210px);
-    padding:12px 12px;
+    grid-template-rows:unset;
+    padding:12px;
     gap:10px;
   }
-  .section-charts-top > .chart-box{ grid-column:1 !important; }
+  .section-charts-top > .chart-box{ grid-column:1 !important; height:200px; }
   .chart-box{ padding:12px 12px 10px; }
   .chart-box-title{ font-size:11.5px; letter-spacing:0.5px; margin-bottom:8px; }
 
@@ -482,23 +492,24 @@ body.dashboard-open{overflow:hidden;}
   .kpi-val{ font-size:20px; }
   .kpi-label{ font-size:11px; margin-top:5px; }
   #s-fund .section-body{
-    display:grid !important;
-    grid-template-columns:1fr !important;
-    grid-template-rows:repeat(4, 210px) !important;
+    display:flex !important;
+    flex-direction:column !important;
     gap:10px; padding:12px !important;
-    overflow:visible; flex:none;
+    overflow:visible; flex:none; height:auto !important;
   }
+  #s-fund .section-body .chart-box{ height:200px; }
 
   /* --- Allocation --- */
   .formula-bar{ padding:8px 12px; gap:6px; flex-wrap:wrap; }
   .formula-item{ font-size:11px; line-height:1.5; }
-  .alloc-body{ flex-direction:column; overflow:visible; flex:none; }
-  .alloc-map{ flex:none; height:200px; width:100%; }
+  .alloc-body{ flex-direction:column; overflow:visible; flex:none; height:auto; }
+  .alloc-map{ flex:none; height:55vw; width:100%; }
   .alloc-list{
     width:100%; border-left:none;
     border-top:1px solid rgba(255,255,255,0.07);
-    height:auto; max-height:320px; overflow-y:auto;
+    height:auto; overflow-y:visible;
   }
+  .alloc-scroll{ overflow-y:visible; height:auto; }
   .alloc-item{ padding:9px 14px; }
   .alloc-item .ai-name{ font-size:12px; }
 

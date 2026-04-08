@@ -329,8 +329,8 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   .table-section { overflow-x: hidden; overflow-y: visible; }
   table.result-tbl { width: 100%; min-width: unset; font-size: 11px; }
   table.result-tbl th,
-  table.result-tbl td { padding: 7px 8px; }
-  /* Hide Endangerment/Scarcity/Protection Gap individual cols — shown in radar */
+  table.result-tbl td { padding: 7px 6px; white-space: normal; }
+  /* Hide individual score cols — shown in radar */
   table.result-tbl th:nth-child(4),
   table.result-tbl td:nth-child(4),
   table.result-tbl th:nth-child(5),
@@ -339,6 +339,7 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   table.result-tbl td:nth-child(6),
   table.result-tbl th:nth-child(8),
   table.result-tbl td:nth-child(8) { display: none; }
+  .mini-bar { max-width: 40px; }
 
   /* Detail panel: pulled into normal flow, appears below grid when visible */
   .detail-overlay {

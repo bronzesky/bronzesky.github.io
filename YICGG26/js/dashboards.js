@@ -7,8 +7,28 @@ let activeSection=null;
 const sectionsInitialized={};
 
 function showSection(id){
+  const isMobile = window.innerWidth <= 768;
   document.querySelectorAll('.dashboard-section').forEach(s=>s.classList.remove('active'));
-  // Hide the scroll-based sections so they don't show behind fixed panels
+  if(isMobile){
+    // On mobile: sections are static in page flow — just show and scroll to it
+    document.getElementById('s-map').style.display='';
+    document.getElementById('s-flow').style.display='';
+    document.body.classList.remove('dashboard-open');
+    const el=document.getElementById(id);
+    if(el){
+      el.classList.add('active');
+      activeSection=id;
+      setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),30);
+      if(id==='s-carbon')initSectionA();
+      else if(id==='s-tax')initSectionB();
+      else if(id==='s-esg')initSectionC();
+      else if(id==='s-fund')initSectionD();
+      else if(id==='s-allocation')initSectionE();
+      else if(id==='s-ai')initSectionAI();
+    }
+    return;
+  }
+  // Desktop: fixed overlay behaviour
   document.getElementById('s-map').style.display='none';
   document.getElementById('s-flow').style.display='none';
   const el=document.getElementById(id);
@@ -31,6 +51,7 @@ function hideSection(){
   document.getElementById('s-map').style.display='';
   document.getElementById('s-flow').style.display='';
   document.body.classList.remove('dashboard-open');
+  activeSection=null;
 }
 window.hideSection=hideSection;
 
