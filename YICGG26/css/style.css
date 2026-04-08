@@ -43,8 +43,8 @@ nav#topnav{
 .full-section{width:100%;min-height:100vh;padding-top:var(--nav-h);position:relative;}
 
 /* === MAP SECTION === */
-#s-map{overflow:hidden;}
-#map-container{width:100%;height:calc(100vh - var(--nav-h));position:relative;}
+#s-map{overflow:hidden;padding-top:0;height:100vh;min-height:unset;}
+#map-container{width:100%;height:calc(100vh - var(--nav-h));position:relative;margin-top:var(--nav-h);}
 #leaflet-map{width:100%;height:100%;}
 
 .map-stats-bar{
@@ -347,6 +347,12 @@ body.dashboard-open{overflow:hidden;}
   align-items:center; justify-content:center;
   line-height:1;
 }
+/* Keep mobile drawer DOM from affecting desktop layout */
+#nav-drawer,
+#nav-drawer-backdrop,
+#nav-drawer-header{
+  display:none;
+}
 
 @media (max-width: 768px) {
   /* --- Nav: hamburger fixed top-left (outside nav), brand in nav bar --- */
@@ -378,6 +384,7 @@ body.dashboard-open{overflow:hidden;}
 
   /* Drawer header: logo at top */
   #nav-drawer-header{
+    display:block;
     padding:20px 20px 14px;
     border-bottom:1px solid rgba(255,255,255,0.08);
     font-size:16px; font-weight:700; color:var(--teal); letter-spacing:1.5px;

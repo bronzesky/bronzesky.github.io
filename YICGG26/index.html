@@ -376,7 +376,7 @@ window.navTo=navTo;
 // Hamburger: drawer on mobile, dropdown on desktop
 function updateNavHeight(){
   const h=document.getElementById('topnav').offsetHeight;
-  document.documentElement.style.setProperty('--nav-h',h+'px');
+  if(h>0) document.documentElement.style.setProperty('--nav-h',h+'px');
 }
 document.getElementById('nav-toggle').addEventListener('click',()=>{
   if(window.innerWidth<=768){
@@ -408,6 +408,12 @@ window.addEventListener('scroll',()=>{
 window.addEventListener('load',()=>{
   updateNavHeight();
   window.initMap();
+  setTimeout(()=>{
+    updateNavHeight();
+    if(window.map && typeof window.map.invalidateSize==='function'){
+      window.map.invalidateSize();
+    }
+  },200);
   initStats();
   setTimeout(()=>window.initFlow(),400);
 });
