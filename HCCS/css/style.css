@@ -43,8 +43,8 @@ nav#topnav{
 .full-section{width:100%;min-height:100vh;padding-top:var(--nav-h);position:relative;}
 
 /* === MAP SECTION === */
-#s-map{overflow:hidden;}
-#map-container{width:100%;height:calc(100vh - var(--nav-h));position:relative;}
+#s-map{overflow:hidden;padding-top:0;height:100vh;min-height:unset;}
+#map-container{width:100%;height:calc(100vh - var(--nav-h));position:relative;margin-top:var(--nav-h);}
 #leaflet-map{width:100%;height:100%;}
 
 .map-stats-bar{
@@ -334,4 +334,187 @@ body.dashboard-open{overflow:hidden;}
   10%{opacity:.9;}
   90%{opacity:.9;}
   100%{opacity:0;}
+}
+
+/* === MOBILE RESPONSIVE === */
+/* Hamburger button — hidden on desktop, fixed top-left on mobile */
+#nav-toggle{
+  display:none;
+  position:fixed; top:0; left:0; z-index:1201;
+  background:none;border:none;color:var(--text);
+  font-size:22px;cursor:pointer;
+  width:var(--nav-h); height:var(--nav-h);
+  align-items:center; justify-content:center;
+  line-height:1;
+}
+/* Keep mobile drawer DOM from affecting desktop layout */
+#nav-drawer,
+#nav-drawer-backdrop,
+#nav-drawer-header{
+  display:none;
+}
+
+@media (max-width: 768px) {
+  /* --- Nav: hamburger fixed top-left (outside nav), brand in nav bar --- */
+  #nav-toggle{ display:flex; }
+  nav#topnav{
+    height:var(--nav-h); padding:0 16px 0 calc(var(--nav-h) + 4px);
+    flex-wrap:nowrap; justify-content:flex-start;
+  }
+  .nav-brand{ font-size:14px; }
+  /* Hide nav-links from topnav — they live in the drawer */
+  .nav-links{ display:none !important; }
+
+  /* Drawer overlay backdrop */
+  #nav-drawer-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    z-index:1199; backdrop-filter:blur(2px);
+  }
+  body.nav-drawer-open #nav-drawer-backdrop{ display:block; }
+
+  /* Drawer panel slides in from left */
+  #nav-drawer{
+    position:fixed; top:0; left:0; bottom:0; width:72vw; max-width:300px;
+    background:#111820; z-index:1200;
+    transform:translateX(-100%); transition:transform .28s cubic-bezier(.4,0,.2,1);
+    display:flex; flex-direction:column; overflow-y:auto;
+  }
+  body.nav-drawer-open #nav-drawer{ transform:translateX(0); }
+  body.nav-drawer-open #nav-toggle{ display:none; }
+
+  /* Drawer header: logo at top */
+  #nav-drawer-header{
+    display:block;
+    padding:20px 20px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    font-size:16px; font-weight:700; color:var(--teal); letter-spacing:1.5px;
+  }
+  /* Drawer links */
+  #nav-drawer .nav-link{
+    display:block; padding:14px 20px; font-size:14px; text-align:left;
+    border-radius:0; border-left:3px solid transparent; color:var(--text2);
+    background:none; border-top:none; border-right:none; border-bottom:none;
+    width:100%; cursor:pointer;
+    transition:background .12s, border-color .12s, color .12s;
+  }
+  #nav-drawer .nav-link:hover{ background:rgba(255,255,255,0.05); color:var(--text); border-left-color:rgba(93,202,165,0.4); }
+  #nav-drawer .nav-link.active{ background:rgba(93,202,165,0.08); color:var(--teal); border-left-color:var(--teal); }
+
+  /* --- Full sections --- */
+  .full-section{ min-height:unset; }
+  #s-flow{ min-height:100svh; }
+
+  /* --- Map --- */
+  .map-stats-bar{ padding:12px 14px 20px; gap:12px; flex-wrap:wrap; }
+  .map-stat{ flex:1 1 calc(50% - 6px); }
+  .map-stat-val{ font-size:20px; }
+  .map-stat-label{ font-size:10px; }
+  #hani-btn{ bottom:14px; right:14px; font-size:12px; padding:8px 14px; }
+  #hani-panel{
+    width:100%; top:auto; height:65vh;
+    transform:translateY(102%);
+    border-left:none; border-top:1px solid var(--teal-border);
+  }
+  #hani-panel.open{ transform:translateY(0); }
+
+  /* --- Flow section: mobile vertical layout --- */
+  .flow-header{ padding:14px 14px 4px; }
+  .flow-header h2{ font-size:16px; line-height:1.3; }
+  .flow-header p{ font-size:11.5px; margin-top:4px; }
+  .flow-body{
+    grid-template-columns:1fr;
+    padding:12px 14px 16px;
+    gap:0;
+    min-height:unset;
+    overflow-y:auto;
+    display:flex; flex-direction:column;
+  }
+  .flow-col:first-child{ gap:8px; order:0; }
+  .flow-col:first-child .flow-col-label{ margin-bottom:2px; }
+  #flow-svg-wrap{
+    order:1; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    padding:0; min-height:unset;
+  }
+  #flow-svg-wrap::before,
+  #flow-svg-wrap::after {
+    content:''; position:absolute; left:50%; transform:translateX(-50%);
+    width:2px; animation:flow-pulse 1.8s ease-in-out infinite;
+  }
+  #flow-svg-wrap::before { top:-16px; height:20px; background:linear-gradient(180deg,rgba(93,202,165,0.6),rgba(93,202,165,0.1)); }
+  #flow-svg-wrap::after  { bottom:-16px; height:20px; background:linear-gradient(180deg,rgba(93,202,165,0.1),rgba(239,159,39,0.6)); animation-delay:.9s; }
+  @keyframes flow-pulse{ 0%,100%{opacity:.4;} 50%{opacity:1;} }
+  #flow-svg{ display:none; }
+  .hcca-node{ width:130px; height:130px; margin:12px auto; }
+  .hcca-node-val{ font-size:18px; }
+  .hcca-node-label{ font-size:9px; }
+  @keyframes hcca-ring{ 0%{width:130px;height:130px;opacity:.5;} 100%{width:200px;height:200px;opacity:0;} }
+  .flow-col:last-child{ gap:8px; order:2; }
+  .flow-col:last-child .flow-col-label{ margin-bottom:2px; }
+  .income-card,.expense-card{ padding:10px 14px; }
+  .card-icon{ font-size:16px; margin-bottom:4px; }
+  .card-title{ font-size:12px; }
+  .card-val{ font-size:18px; }
+  .card-sub{ font-size:10.5px; margin-top:3px; }
+  .sparkline-wrap{ margin-top:6px; height:24px; }
+  .sparkline-wrap canvas{ height:24px; }
+
+  /* --- Dashboard sections: keep fixed overlay, but scrollable inside --- */
+  .dashboard-section{ overflow-y:auto; overflow-x:hidden; }
+  .section-header{ padding:12px 14px; flex-shrink:0; gap:10px; }
+  .section-title{ font-size:15px; }
+
+  /* section-body: stack ticker above charts */
+  .section-body{ flex-direction:column; overflow:visible; min-height:unset; flex:none; }
+  .section-ticker{
+    width:100%; flex-shrink:0;
+    border-right:none; border-bottom:1px solid rgba(255,255,255,0.07);
+    height:180px;
+  }
+  .section-ticker-header{ padding:12px 14px 8px; font-size:12px; }
+  .ticker-row{ padding:9px 10px; }
+  .ticker-row .t-main{ font-size:12px; }
+  .section-charts{ flex:none; }
+  .section-charts-top{
+    grid-template-columns:1fr; grid-template-rows:unset;
+    padding:12px; gap:10px;
+  }
+  .section-charts-top > .chart-box{ grid-column:1 !important; height:200px; }
+  .chart-box{ padding:12px 12px 10px; }
+  .chart-box-title{ font-size:11.5px; letter-spacing:0.5px; margin-bottom:8px; }
+
+  /* --- Fund detail --- */
+  .kpi-row{ flex-wrap:wrap; padding:10px 12px; gap:8px; flex-shrink:0; }
+  .kpi-card{ flex:1 1 calc(50% - 4px); min-width:0; padding:10px 12px; }
+  .kpi-val{ font-size:20px; }
+  .kpi-label{ font-size:11px; margin-top:5px; }
+  #s-fund .section-body{
+    display:flex !important; flex-direction:column !important;
+    gap:10px; padding:12px !important; overflow:visible; flex:none;
+  }
+  #s-fund .section-body .chart-box{ height:200px; }
+
+  /* --- Allocation: map + scrollable list fill screen --- */
+  .formula-bar{ padding:8px 12px; gap:6px; flex-wrap:wrap; }
+  .formula-item{ font-size:11px; line-height:1.5; }
+  .alloc-body{ flex-direction:column; overflow:visible; flex:none; }
+  .alloc-map{ flex:none; height:50vw; width:100%; }
+  .alloc-list{
+    width:100%; border-left:none;
+    border-top:1px solid rgba(255,255,255,0.07);
+    height:auto; overflow-y:hidden;
+    display:flex; flex-direction:column;
+  }
+  .alloc-scroll{ flex:1; overflow-y:auto; max-height:40vh; }
+  .alloc-item{ padding:9px 14px; }
+  .alloc-item .ai-name{ font-size:12px; }
+
+  /* --- Verify panel --- */
+  .verify-panel{ padding:12px 14px; }
+  .verify-item{ padding:6px 0; }
+  .verify-item span:first-child{ width:auto; min-width:90px; font-size:11.5px; }
+
+  /* --- Progress bar --- */
+  .section-progress{ padding:10px 14px 14px; }
+  .progress-label{ font-size:11px; }
 }

@@ -30,7 +30,7 @@ window.initMap=function(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     maxZoom:18,subdomains:'abcd'
   }).addTo(map);
-  map.setView([20,10],2.5);
+  map.setView([20,10],3);
 
   // Heatmap
   if(L.heatLayer){

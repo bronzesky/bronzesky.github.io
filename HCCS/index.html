@@ -16,6 +16,7 @@
 <body>
 
 <!-- ===== NAV ===== -->
+<button id="nav-toggle" aria-label="Menu">&#9776;</button>
 <nav id="topnav">
   <div class="nav-brand" onclick="navTo('s-map')">HCCS</div>
   <div class="nav-links">
@@ -29,6 +30,20 @@
     <button class="nav-link" onclick="navTo('s-ai')">AI灵敏度</button>
   </div>
 </nav>
+
+<!-- Mobile drawer nav -->
+<div id="nav-drawer-backdrop"></div>
+<div id="nav-drawer">
+  <div id="nav-drawer-header">HCCS</div>
+  <button class="nav-link" onclick="navTo('s-map')">全球遗产</button>
+  <button class="nav-link" onclick="navTo('s-flow')">资金流向</button>
+  <button class="nav-link" onclick="navTo('s-carbon')">碳汇交易</button>
+  <button class="nav-link" onclick="navTo('s-tax')">碳税收入</button>
+  <button class="nav-link" onclick="navTo('s-esg')">ESG贡献</button>
+  <button class="nav-link" onclick="navTo('s-fund')">基金详情</button>
+  <button class="nav-link" onclick="navTo('s-allocation')">分配公式</button>
+  <button class="nav-link" onclick="navTo('s-ai')">AI灵敏度</button>
+</div>
 
 <!-- ===== SECTION 1: MAP ===== -->
 <section id="s-map" class="full-section">
@@ -343,6 +358,8 @@ function drawSparkline(id,vals,color){
 }
 
 function navTo(id){
+  // Close drawer if open
+  document.body.classList.remove('nav-drawer-open');
   if(id.startsWith('s-') && !['s-map','s-flow'].includes(id)){
     if(window.showSection) window.showSection(id);
   } else {
@@ -355,6 +372,25 @@ function navTo(id){
   if(targetBtn)targetBtn.classList.add('active');
 }
 window.navTo=navTo;
+
+// Hamburger: drawer on mobile, dropdown on desktop
+function updateNavHeight(){
+  const h=document.getElementById('topnav').offsetHeight;
+  if(h>0) document.documentElement.style.setProperty('--nav-h',h+'px');
+}
+document.getElementById('nav-toggle').addEventListener('click',()=>{
+  if(window.innerWidth<=768){
+    document.body.classList.toggle('nav-drawer-open');
+  } else {
+    document.getElementById('topnav').classList.toggle('nav-open');
+    setTimeout(updateNavHeight,10);
+  }
+});
+document.getElementById('nav-drawer-backdrop').addEventListener('click',()=>{
+  document.body.classList.remove('nav-drawer-open');
+});
+window.addEventListener('resize',updateNavHeight,{passive:true});
+window.addEventListener('load',updateNavHeight);
 
 // Scroll-based nav highlight
 const sections=['s-map','s-flow'];
@@ -370,7 +406,14 @@ window.addEventListener('scroll',()=>{
 },{ passive:true });
 
 window.addEventListener('load',()=>{
+  updateNavHeight();
   window.initMap();
+  setTimeout(()=>{
+    updateNavHeight();
+    if(window.map && typeof window.map.invalidateSize==='function'){
+      window.map.invalidateSize();
+    }
+  },200);
   initStats();
   setTimeout(()=>window.initFlow(),400);
 });
