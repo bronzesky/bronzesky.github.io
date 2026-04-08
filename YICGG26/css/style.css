@@ -349,7 +349,6 @@ body.dashboard-open{overflow:hidden;}
   /* --- Nav: hamburger dropdown --- */
   nav#topnav{
     flex-wrap:wrap; height:auto; padding:0 16px;
-    /* JS will update --nav-h via inline style on <html> */
   }
   .nav-brand{ padding:13px 0; font-size:13px; }
   #nav-toggle{ display:flex; align-items:center; }
@@ -360,23 +359,19 @@ body.dashboard-open{overflow:hidden;}
     background:rgba(13,17,23,0.97);
   }
   nav#topnav.nav-open .nav-links{ display:flex; }
-  .nav-link{ padding:11px 8px; font-size:13px; text-align:left; border-radius:0; }
+  .nav-link{ padding:11px 10px; font-size:13px; text-align:left; border-radius:0; }
 
-  /* --- Full sections: use padding-top = actual nav height (set by JS) --- */
-  .full-section{ min-height:100svh; }
-
-  /* --- Dashboard sections: fixed below actual nav height --- */
-  /* top is overridden by JS: document.documentElement.style.setProperty('--nav-h', nav.offsetHeight+'px') */
+  /* --- Full sections --- */
+  .full-section{ min-height:unset; }
+  /* #s-flow needs at least viewport height to look intentional */
+  #s-flow{ min-height:100svh; }
 
   /* --- Map --- */
-  .map-stats-bar{
-    padding:12px 14px 20px; gap:12px; flex-wrap:wrap;
-  }
+  .map-stats-bar{ padding:12px 14px 20px; gap:12px; flex-wrap:wrap; }
   .map-stat{ flex:1 1 calc(50% - 6px); }
   .map-stat-val{ font-size:20px; }
   .map-stat-label{ font-size:10px; }
   #hani-btn{ bottom:14px; right:14px; font-size:12px; padding:8px 14px; }
-  /* Hani panel: slide up from bottom on mobile */
   #hani-panel{
     width:100%; top:auto; height:65vh;
     transform:translateY(102%);
@@ -385,31 +380,34 @@ body.dashboard-open{overflow:hidden;}
   #hani-panel.open{ transform:translateY(0); }
 
   /* --- Flow section: stack columns vertically --- */
-  .flow-header{ padding:14px 14px 0; }
-  .flow-header h2{ font-size:16px; }
-  .flow-header p{ font-size:12px; }
+  .flow-header{ padding:16px 14px 4px; }
+  .flow-header h2{ font-size:17px; line-height:1.3; }
+  .flow-header p{ font-size:12px; margin-top:5px; }
   .flow-body{
     grid-template-columns:1fr;
-    padding:12px 14px 16px;
-    gap:14px;
+    padding:14px 14px 20px;
+    gap:16px;
     min-height:unset;
     overflow-y:auto;
   }
-  .flow-col{ gap:12px; }
+  .flow-col{ gap:14px; }
+  .income-card,.expense-card{ padding:14px 16px; }
+  .card-title{ font-size:12.5px; }
+  .card-val{ font-size:20px; }
   .hcca-node{ width:110px; height:110px; }
   .hcca-node-val{ font-size:17px; }
   .hcca-node-label{ font-size:9px; }
-  #flow-svg-wrap{ min-height:60px; order:-1; }
-  /* hide SVG flow lines on mobile — too complex to render in 1-col */
+  #flow-svg-wrap{ min-height:50px; order:-1; }
   #flow-svg{ display:none; }
 
-  /* --- Dashboard sections: scrollable, not clipped --- */
+  /* --- Dashboard sections: scrollable --- */
   .dashboard-section{
     overflow-y:auto;
     overflow-x:hidden;
+    padding-bottom:20px;
   }
-  .section-header{ padding:10px 14px; flex-shrink:0; }
-  .section-title{ font-size:14px; }
+  .section-header{ padding:12px 14px; flex-shrink:0; gap:10px; }
+  .section-title{ font-size:15px; }
 
   /* section-body: stack ticker above charts */
   .section-body{
@@ -422,41 +420,54 @@ body.dashboard-open{overflow:hidden;}
     width:100%; flex-shrink:0;
     border-right:none;
     border-bottom:1px solid rgba(255,255,255,0.07);
-    height:180px; /* fixed height, scrollable inside */
+    height:200px;
   }
+  .section-ticker-header{ padding:12px 14px 8px; font-size:12px; }
+  .ticker-row{ padding:9px 10px; }
+  .ticker-row .t-main{ font-size:12px; }
   .section-charts{ flex:none; }
   .section-charts-top{
     grid-template-columns:1fr;
-    grid-template-rows:repeat(4, 200px);
-    padding:10px 12px;
+    grid-template-rows:repeat(4, 210px);
+    padding:12px 12px;
     gap:10px;
   }
-  /* override inline span 2 */
   .section-charts-top > .chart-box{ grid-column:1 !important; }
+  .chart-box{ padding:12px 12px 10px; }
+  .chart-box-title{ font-size:11.5px; letter-spacing:0.5px; margin-bottom:8px; }
 
   /* --- Fund detail --- */
   .kpi-row{ flex-wrap:wrap; padding:10px 12px; gap:8px; flex-shrink:0; }
-  .kpi-card{ flex:1 1 calc(50% - 4px); min-width:0; }
-  .kpi-val{ font-size:18px; }
+  .kpi-card{ flex:1 1 calc(50% - 4px); min-width:0; padding:10px 12px; }
+  .kpi-val{ font-size:20px; }
+  .kpi-label{ font-size:11px; margin-top:5px; }
   #s-fund .section-body{
     display:grid !important;
     grid-template-columns:1fr !important;
-    grid-template-rows:repeat(4, 200px) !important;
-    gap:10px; padding:10px 12px !important;
+    grid-template-rows:repeat(4, 210px) !important;
+    gap:10px; padding:12px !important;
     overflow:visible; flex:none;
   }
 
   /* --- Allocation --- */
-  .formula-bar{ padding:8px 12px; gap:8px; flex-wrap:wrap; }
-  .formula-item{ font-size:10.5px; }
+  .formula-bar{ padding:10px 12px; gap:8px; flex-wrap:wrap; }
+  .formula-item{ font-size:11px; line-height:1.6; }
   .alloc-body{ flex-direction:column; overflow:visible; flex:none; }
-  .alloc-map{ flex:none; height:200px; width:100%; }
+  .alloc-map{ flex:none; height:210px; width:100%; }
   .alloc-list{
     width:100%; border-left:none;
     border-top:1px solid rgba(255,255,255,0.07);
-    height:320px;
+    height:340px;
   }
+  .alloc-item{ padding:11px 14px; }
+  .alloc-item .ai-name{ font-size:12px; }
 
-  /* --- KPI / verify --- */
-  .verify-item span:first-child{ width:auto; min-width:80px; }
+  /* --- Verify panel --- */
+  .verify-panel{ padding:12px 14px; }
+  .verify-item{ padding:6px 0; }
+  .verify-item span:first-child{ width:auto; min-width:90px; font-size:11.5px; }
+
+  /* --- Progress bar --- */
+  .section-progress{ padding:10px 14px 14px; }
+  .progress-label{ font-size:11px; }
 }

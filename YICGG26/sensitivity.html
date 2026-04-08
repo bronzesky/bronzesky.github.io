@@ -298,26 +298,56 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 .detail-row .dv.amber { color: var(--amber); }
 #radar-svg-wrap { margin: 10px auto 4px; display: block; }
 @media (max-width: 768px) {
-  .page-body { min-height:100svh; overflow-y:auto; }
-  .page-header { padding: 12px 14px; gap: 10px; flex-direction:column; align-items:flex-start; }
-  .page-title { font-size:17px; }
+  /* Page shell */
+  .page-body {
+    min-height: unset;
+    overflow-y: auto;
+    display: flex; flex-direction: column;
+    padding-bottom: 24px;
+  }
+  .page-header {
+    padding: 12px 14px; gap: 8px;
+    flex-direction: column; align-items: flex-start;
+    flex-shrink: 0;
+  }
+  .page-title { font-size: 17px; }
+  .page-desc { font-size: 11.5px; }
   .page-formula { display: none; }
-  .sens-grid { grid-template-columns: 1fr; overflow:visible; flex:none; }
+
+  /* Stacked grid */
+  .sens-grid { grid-template-columns: 1fr; overflow: visible; flex: none; order: 1; }
   .ctrl-panel {
     border-right: none;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     max-height: none; overflow-y: visible;
-    background:var(--bg2);
+    background: var(--bg2);
   }
-  .right-panel { overflow:visible; }
-  .chart-section { flex: 0 0 220px; }
-  .table-section { overflow-y:visible; }
-  table.result-tbl { font-size:11px; }
-  table.result-tbl th, table.result-tbl td { padding:7px 8px; }
+  .right-panel { overflow: visible; }
+  .chart-section { flex: 0 0 200px; }
+
+  /* Table: horizontal scroll so columns don't collapse */
+  .table-section { overflow-x: auto; overflow-y: visible; }
+  table.result-tbl { min-width: 580px; font-size: 11px; }
+  table.result-tbl th,
+  table.result-tbl td { padding: 8px 10px; }
+
+  /* Detail panel: pulled into normal flow, appears below grid when visible */
   .detail-overlay {
-    position:fixed;
-    width: calc(100% - 28px); right: 14px; bottom: 14px; left: 14px;
+    position: static !important;
+    width: 100% !important;
+    right: auto !important; bottom: auto !important; left: auto !important;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid var(--teal-border);
+    backdrop-filter: none;
+    cursor: default;
+    order: 2;
+    margin-top: 0;
   }
+  .detail-overlay.hidden { display: none !important; opacity: 1; pointer-events: auto; }
+  .detail-name { font-size: 13px; }
+  /* Radar: shrink slightly */
+  #radar-svg-wrap { width: 130px; height: 115px; }
 }
 </style>
 </head>
