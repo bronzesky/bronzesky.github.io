@@ -31,6 +31,20 @@
   </div>
 </nav>
 
+<!-- Mobile drawer nav -->
+<div id="nav-drawer-backdrop"></div>
+<div id="nav-drawer">
+  <div id="nav-drawer-header">HCCS</div>
+  <button class="nav-link" onclick="navTo('s-map')">Global Heritage</button>
+  <button class="nav-link" onclick="navTo('s-flow')">Fund Flow</button>
+  <button class="nav-link" onclick="navTo('s-carbon')">Carbon Trading</button>
+  <button class="nav-link" onclick="navTo('s-tax')">Tourism Levy</button>
+  <button class="nav-link" onclick="navTo('s-esg')">ESG Subscription</button>
+  <button class="nav-link" onclick="navTo('s-fund')">Fund Detail</button>
+  <button class="nav-link" onclick="navTo('s-allocation')">Allocation</button>
+  <button class="nav-link" onclick="navTo('s-ai')">AI Sensitivity</button>
+</div>
+
 <!-- ===== SECTION 1: MAP ===== -->
 <section id="s-map" class="full-section">
   <div id="map-container">
@@ -344,6 +358,8 @@ function drawSparkline(id,vals,color){
 }
 
 function navTo(id){
+  // Close drawer if open
+  document.body.classList.remove('nav-drawer-open');
   if(id.startsWith('s-') && !['s-map','s-flow'].includes(id)){
     if(window.showSection) window.showSection(id);
   } else {
@@ -357,22 +373,22 @@ function navTo(id){
 }
 window.navTo=navTo;
 
-// Hamburger toggle — also update --nav-h after open/close
+// Hamburger: drawer on mobile, dropdown on desktop
 function updateNavHeight(){
   const h=document.getElementById('topnav').offsetHeight;
   document.documentElement.style.setProperty('--nav-h',h+'px');
 }
 document.getElementById('nav-toggle').addEventListener('click',()=>{
-  document.getElementById('topnav').classList.toggle('nav-open');
-  // wait for transition then update
-  setTimeout(updateNavHeight,10);
-});
-document.querySelectorAll('.nav-link').forEach(b=>
-  b.addEventListener('click',()=>{
-    document.getElementById('topnav').classList.remove('nav-open');
+  if(window.innerWidth<=768){
+    document.body.classList.toggle('nav-drawer-open');
+  } else {
+    document.getElementById('topnav').classList.toggle('nav-open');
     setTimeout(updateNavHeight,10);
-  }));
-// Update on load and resize
+  }
+});
+document.getElementById('nav-drawer-backdrop').addEventListener('click',()=>{
+  document.body.classList.remove('nav-drawer-open');
+});
 window.addEventListener('resize',updateNavHeight,{passive:true});
 window.addEventListener('load',updateNavHeight);
 

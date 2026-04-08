@@ -346,33 +346,54 @@ body.dashboard-open{overflow:hidden;}
 }
 
 @media (max-width: 768px) {
-  /* --- Nav: MS Learn style — hamburger left, brand right, full-width dropdown --- */
+  /* --- Nav: MS Learn drawer — hamburger fixed top-left, logo in drawer --- */
   nav#topnav{
-    flex-wrap:wrap; height:auto; padding:0 12px;
+    height:var(--nav-h); padding:0 16px; flex-wrap:nowrap;
+    justify-content:flex-start;
   }
   #nav-toggle{
-    display:flex; align-items:center; order:0;
-    padding:14px 10px; font-size:20px;
+    display:flex; align-items:center; order:0; flex-shrink:0;
+    padding:0 12px 0 0; font-size:22px; z-index:1201;
   }
-  .nav-brand{ padding:14px 0; font-size:14px; font-weight:700; order:1; margin-left:12px; margin-right:auto; }
-  .nav-links{
-    display:none; flex-direction:column; width:100%; order:2;
-    border-top:1px solid rgba(255,255,255,0.08);
-    padding:4px 0 8px; gap:0;
-    background:rgba(13,17,23,0.98);
+  .nav-brand{ font-size:14px; order:1; }
+  /* Hide nav-links from topnav — they move into the drawer */
+  .nav-links{ display:none !important; }
+
+  /* Drawer overlay backdrop */
+  #nav-drawer-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    z-index:1199; backdrop-filter:blur(2px);
   }
-  nav#topnav.nav-open .nav-links{ display:flex; }
-  .nav-link{
-    padding:13px 16px; font-size:13.5px; text-align:left; border-radius:0;
-    border-left:3px solid transparent;
+  body.nav-drawer-open #nav-drawer-backdrop{ display:block; }
+
+  /* Drawer panel slides in from left */
+  #nav-drawer{
+    position:fixed; top:0; left:0; bottom:0; width:72vw; max-width:300px;
+    background:#111820; z-index:1200;
+    transform:translateX(-100%); transition:transform .28s cubic-bezier(.4,0,.2,1);
+    display:flex; flex-direction:column; overflow-y:auto;
+  }
+  body.nav-drawer-open #nav-drawer{ transform:translateX(0); }
+
+  /* Drawer header: logo at top */
+  #nav-drawer-header{
+    padding:20px 20px 14px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    font-size:16px; font-weight:700; color:var(--teal); letter-spacing:1.5px;
+  }
+  /* Drawer links */
+  #nav-drawer .nav-link{
+    display:block; padding:14px 20px; font-size:14px; text-align:left;
+    border-radius:0; border-left:3px solid transparent; color:var(--text2);
+    background:none; border-top:none; border-right:none; border-bottom:none;
+    width:100%; cursor:pointer;
     transition:background .12s, border-color .12s, color .12s;
   }
-  .nav-link:hover{ background:rgba(255,255,255,0.05); color:var(--text); border-left-color:rgba(93,202,165,0.4); }
-  .nav-link.active{ background:rgba(93,202,165,0.08); color:var(--teal); border-left-color:var(--teal); }
+  #nav-drawer .nav-link:hover{ background:rgba(255,255,255,0.05); color:var(--text); border-left-color:rgba(93,202,165,0.4); }
+  #nav-drawer .nav-link.active{ background:rgba(93,202,165,0.08); color:var(--teal); border-left-color:var(--teal); }
 
   /* --- Full sections --- */
   .full-section{ min-height:unset; }
-  /* #s-flow needs at least viewport height to look intentional */
   #s-flow{ min-height:100svh; }
 
   /* --- Map --- */
@@ -400,38 +421,26 @@ body.dashboard-open{overflow:hidden;}
     overflow-y:auto;
     display:flex; flex-direction:column;
   }
-  /* Sources group */
   .flow-col:first-child{ gap:8px; order:0; }
   .flow-col:first-child .flow-col-label{ margin-bottom:2px; }
-  /* HCCA center node */
   #flow-svg-wrap{
     order:1; position:relative;
     display:flex; align-items:center; justify-content:center;
     padding:0; min-height:unset;
   }
-  /* Animated vertical connector lines */
   #flow-svg-wrap::before,
   #flow-svg-wrap::after {
-    content:'';
-    position:absolute; left:50%; transform:translateX(-50%);
-    width:2px;
-    background:linear-gradient(180deg, rgba(93,202,165,0.6) 0%, rgba(93,202,165,0.1) 100%);
-    animation:flow-pulse 1.8s ease-in-out infinite;
+    content:''; position:absolute; left:50%; transform:translateX(-50%);
+    width:2px; animation:flow-pulse 1.8s ease-in-out infinite;
   }
-  #flow-svg-wrap::before { top:-16px; height:20px; }
-  #flow-svg-wrap::after  { bottom:-16px; height:20px; background:linear-gradient(180deg, rgba(93,202,165,0.1) 0%, rgba(239,159,39,0.6) 100%); animation-delay:.9s; }
-  @keyframes flow-pulse {
-    0%,100%{ opacity:.4; } 50%{ opacity:1; }
-  }
+  #flow-svg-wrap::before { top:-16px; height:20px; background:linear-gradient(180deg,rgba(93,202,165,0.6),rgba(93,202,165,0.1)); }
+  #flow-svg-wrap::after  { bottom:-16px; height:20px; background:linear-gradient(180deg,rgba(93,202,165,0.1),rgba(239,159,39,0.6)); animation-delay:.9s; }
+  @keyframes flow-pulse{ 0%,100%{opacity:.4;} 50%{opacity:1;} }
   #flow-svg{ display:none; }
   .hcca-node{ width:130px; height:130px; margin:12px auto; }
   .hcca-node-val{ font-size:18px; }
   .hcca-node-label{ font-size:9px; }
-  @keyframes hcca-ring{
-    0%{width:130px;height:130px;opacity:.5;}
-    100%{width:200px;height:200px;opacity:0;}
-  }
-  /* Allocation group */
+  @keyframes hcca-ring{ 0%{width:130px;height:130px;opacity:.5;} 100%{width:200px;height:200px;opacity:0;} }
   .flow-col:last-child{ gap:8px; order:2; }
   .flow-col:last-child .flow-col-label{ margin-bottom:2px; }
   .income-card,.expense-card{ padding:10px 14px; }
@@ -442,45 +451,25 @@ body.dashboard-open{overflow:hidden;}
   .sparkline-wrap{ margin-top:6px; height:24px; }
   .sparkline-wrap canvas{ height:24px; }
 
-  /* --- Dashboard sections: static flow, height = content --- */
-  .dashboard-section{
-    position:static !important;
-    display:none;
-    height:auto !important;
-    overflow:visible !important;
-    padding-bottom:0;
-  }
-  .dashboard-section.active{
-    display:block !important;
-  }
-  body.dashboard-open{ overflow:auto !important; }
+  /* --- Dashboard sections: keep fixed overlay, but scrollable inside --- */
+  .dashboard-section{ overflow-y:auto; overflow-x:hidden; }
   .section-header{ padding:12px 14px; flex-shrink:0; gap:10px; }
   .section-title{ font-size:15px; }
 
-  /* section-body: stack ticker above charts, height = content */
-  .section-body{
-    flex-direction:column;
-    overflow:visible;
-    min-height:unset;
-    flex:none;
-    height:auto;
-  }
+  /* section-body: stack ticker above charts */
+  .section-body{ flex-direction:column; overflow:visible; min-height:unset; flex:none; }
   .section-ticker{
     width:100%; flex-shrink:0;
-    border-right:none;
-    border-bottom:1px solid rgba(255,255,255,0.07);
-    height:auto; max-height:220px; overflow-y:auto;
+    border-right:none; border-bottom:1px solid rgba(255,255,255,0.07);
+    height:180px;
   }
   .section-ticker-header{ padding:12px 14px 8px; font-size:12px; }
-  .ticker-feed{ max-height:160px; overflow-y:auto; }
   .ticker-row{ padding:9px 10px; }
   .ticker-row .t-main{ font-size:12px; }
   .section-charts{ flex:none; }
   .section-charts-top{
-    grid-template-columns:1fr;
-    grid-template-rows:unset;
-    padding:12px;
-    gap:10px;
+    grid-template-columns:1fr; grid-template-rows:unset;
+    padding:12px; gap:10px;
   }
   .section-charts-top > .chart-box{ grid-column:1 !important; height:200px; }
   .chart-box{ padding:12px 12px 10px; }
@@ -492,24 +481,22 @@ body.dashboard-open{overflow:hidden;}
   .kpi-val{ font-size:20px; }
   .kpi-label{ font-size:11px; margin-top:5px; }
   #s-fund .section-body{
-    display:flex !important;
-    flex-direction:column !important;
-    gap:10px; padding:12px !important;
-    overflow:visible; flex:none; height:auto !important;
+    display:flex !important; flex-direction:column !important;
+    gap:10px; padding:12px !important; overflow:visible; flex:none;
   }
   #s-fund .section-body .chart-box{ height:200px; }
 
-  /* --- Allocation --- */
+  /* --- Allocation: fill screen, no excess whitespace --- */
   .formula-bar{ padding:8px 12px; gap:6px; flex-wrap:wrap; }
   .formula-item{ font-size:11px; line-height:1.5; }
-  .alloc-body{ flex-direction:column; overflow:visible; flex:none; height:auto; }
-  .alloc-map{ flex:none; height:55vw; width:100%; }
+  .alloc-body{ flex-direction:column; overflow:visible; flex:none; }
+  .alloc-map{ flex:none; height:50vw; width:100%; }
   .alloc-list{
     width:100%; border-left:none;
     border-top:1px solid rgba(255,255,255,0.07);
     height:auto; overflow-y:visible;
   }
-  .alloc-scroll{ overflow-y:visible; height:auto; }
+  .alloc-scroll{ overflow-y:visible; }
   .alloc-item{ padding:9px 14px; }
   .alloc-item .ai-name{ font-size:12px; }
 

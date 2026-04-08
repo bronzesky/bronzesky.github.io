@@ -298,12 +298,11 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 .detail-row .dv.amber { color: var(--amber); }
 #radar-svg-wrap { margin: 10px auto 4px; display: block; }
 @media (max-width: 768px) {
-  /* Page shell */
+  /* Page shell: full viewport, scrollable */
   .page-body {
-    min-height: unset;
+    min-height: 100svh;
     overflow-y: auto;
     display: flex; flex-direction: column;
-    padding-bottom: 24px;
   }
   .page-header {
     padding: 12px 14px; gap: 8px;
@@ -315,48 +314,36 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   .page-formula { display: none; }
 
   /* Stacked grid */
-  .sens-grid { grid-template-columns: 1fr; overflow: visible; flex: none; order: 1; }
+  .sens-grid { grid-template-columns: 1fr; overflow: visible; flex: none; }
   .ctrl-panel {
     border-right: none;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     max-height: none; overflow-y: visible;
-    background: var(--bg2);
   }
   .right-panel { overflow: visible; }
   .chart-section { flex: 0 0 200px; }
 
-  /* Table: hide less-critical columns, fit in viewport */
+  /* Table: hide individual score cols (shown in radar), fit viewport */
   .table-section { overflow-x: hidden; overflow-y: visible; }
   table.result-tbl { width: 100%; min-width: unset; font-size: 11px; }
   table.result-tbl th,
   table.result-tbl td { padding: 7px 6px; white-space: normal; }
-  /* Hide individual score cols — shown in radar */
-  table.result-tbl th:nth-child(4),
-  table.result-tbl td:nth-child(4),
-  table.result-tbl th:nth-child(5),
-  table.result-tbl td:nth-child(5),
-  table.result-tbl th:nth-child(6),
-  table.result-tbl td:nth-child(6),
-  table.result-tbl th:nth-child(8),
-  table.result-tbl td:nth-child(8) { display: none; }
+  table.result-tbl th:nth-child(4), table.result-tbl td:nth-child(4),
+  table.result-tbl th:nth-child(5), table.result-tbl td:nth-child(5),
+  table.result-tbl th:nth-child(6), table.result-tbl td:nth-child(6),
+  table.result-tbl th:nth-child(8), table.result-tbl td:nth-child(8) { display: none; }
   .mini-bar { max-width: 40px; }
 
-  /* Detail panel: pulled into normal flow, appears below grid when visible */
+  /* Detail panel: inline below grid */
   .detail-overlay {
     position: static !important;
     width: 100% !important;
     right: auto !important; bottom: auto !important; left: auto !important;
-    border-radius: 0;
-    border: none;
+    border-radius: 0; border: none;
     border-top: 1px solid var(--teal-border);
-    backdrop-filter: none;
-    cursor: default;
-    order: 2;
-    margin-top: 0;
+    backdrop-filter: none; cursor: default;
   }
-  .detail-overlay.hidden { display: none !important; opacity: 1; pointer-events: auto; }
-  .detail-name { font-size: 13px; }
-  /* Radar: shrink slightly */
+  .detail-overlay.hidden { display: none !important; }
   #radar-svg-wrap { width: 130px; height: 115px; }
 }
 </style>
