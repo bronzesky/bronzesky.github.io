@@ -298,6 +298,10 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 .detail-row .dv.amber { color: var(--amber); }
 #radar-svg-wrap { margin: 10px auto 4px; display: block; }
 @media (max-width: 768px) {
+  input[type=range] { height: 8px; }
+  input[type=range]::-webkit-slider-thumb { width: 26px; height: 26px; }
+  input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--teal); border: none; }
+
   /* Page shell: full viewport, scrollable */
   .page-body {
     min-height: 100svh;
