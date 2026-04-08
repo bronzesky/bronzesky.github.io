@@ -266,7 +266,7 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   vertical-align: middle;
 }
 
-/* ── Radar detail panel ── */
+/* ── Draggable Detail Panel ── */
 .detail-overlay {
   position: fixed;
   bottom: 24px;
@@ -297,6 +297,14 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 .detail-row .dv { color: var(--teal); font-weight: 600; }
 .detail-row .dv.amber { color: var(--amber); }
 #radar-svg-wrap { margin: 10px auto 4px; display: block; }
+@media (max-width: 768px) {
+  .page-header { padding: 14px 16px; gap: 12px; }
+  .page-formula { display: none; }
+  .sens-grid { grid-template-columns: 1fr; }
+  .ctrl-panel { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); max-height: 320px; overflow-y: auto; }
+  .chart-section { flex: 0 0 200px; }
+  .detail-overlay { width: calc(100% - 32px); right: 16px; bottom: 16px; left: 16px; }
+}
 </style>
 </head>
 <body>
