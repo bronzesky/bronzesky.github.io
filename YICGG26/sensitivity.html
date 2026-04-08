@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HCCS — AI权重灵敏度分析</title>
+<title>HCCS — AI Weight Sensitivity Analysis</title>
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <style>
@@ -306,14 +306,14 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   <!-- Page header -->
   <div class="page-header">
     <div class="page-header-left">
-      <div class="page-eyebrow">HCCS · B轨分配算法</div>
-      <div class="page-title">AI 权重灵敏度分析</div>
-      <div class="page-desc">实时调整三维度权重与遗址/国家积分占比，观察 HCCA 基金分配排名的变动，验证算法稳健性。</div>
+      <div class="page-eyebrow">HCCS · Track B Allocation Algorithm</div>
+      <div class="page-title">AI Weight Sensitivity Analysis</div>
+      <div class="page-desc">Adjust three-dimension weights and site/national credit ratios in real time to observe changes in HCCA fund allocation rankings and verify algorithm robustness.</div>
     </div>
     <div class="page-formula">
-      <div><span class="f-key">Priority</span> = <span class="f-w">α</span> × (<span class="f-w">w₁</span>·濒危度 + <span class="f-w">w₂</span>·稀缺性 + <span class="f-w">w₃</span>·保护缺口)</div>
-      <div style="padding-left:68px">+ <span class="f-w">(1−α)</span> × 国家积分系数</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:3px">w₁+w₂+w₃ = 1 &nbsp;·&nbsp; 默认：α=70%，w₁=40%，w₂=35%，w₃=25%</div>
+      <div><span class="f-key">Priority</span> = <span class="f-w">α</span> × (<span class="f-w">w₁</span>·Endangerment + <span class="f-w">w₂</span>·Scarcity + <span class="f-w">w₃</span>·Protection Gap)</div>
+      <div style="padding-left:68px">+ <span class="f-w">(1−α)</span> × National Credit Coefficient</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px">w₁+w₂+w₃ = 1 &nbsp;·&nbsp; Default: α=70%, w₁=40%, w₂=35%, w₃=25%</div>
     </div>
   </div>
 
@@ -325,68 +325,68 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 
       <!-- Alpha -->
       <div class="ctrl-card">
-        <div class="ctrl-section-title">外层权重</div>
+        <div class="ctrl-section-title">Outer Weight</div>
         <div class="slider-group">
           <div class="slider-row">
-            <span class="slider-lbl">遗址评分占比 α <span class="en">Site Weight</span></span>
+            <span class="slider-lbl">Site Score Weight α <span class="en">Site Weight</span></span>
             <span class="slider-val" id="v-alpha">70%</span>
           </div>
           <input type="range" id="s-alpha" min="40" max="90" value="70" step="1">
           <div class="alpha-pills">
-            <div class="alpha-pill site">遗址评分 <span id="p-site">70%</span></div>
-            <div class="alpha-pill nat">国家积分 <span id="p-nat">30%</span></div>
+            <div class="alpha-pill site">Site Score <span id="p-site">70%</span></div>
+            <div class="alpha-pill nat">National Credit <span id="p-nat">30%</span></div>
           </div>
         </div>
       </div>
 
       <!-- Dimension weights -->
       <div class="ctrl-card">
-        <div class="ctrl-section-title">遗址评分维度权重</div>
+        <div class="ctrl-section-title">Site Score Dimension Weights</div>
         <div class="slider-group">
           <div class="slider-row">
-            <span class="slider-lbl">濒危度 <span class="en">Endangerment</span></span>
+            <span class="slider-lbl">Endangerment <span class="en">Endangerment</span></span>
             <span class="slider-val" id="v-w1">40%</span>
           </div>
           <input type="range" id="s-w1" min="5" max="80" value="40" step="1">
         </div>
         <div class="slider-group">
           <div class="slider-row">
-            <span class="slider-lbl">稀缺性 <span class="en">Scarcity</span></span>
+            <span class="slider-lbl">Scarcity <span class="en">Scarcity</span></span>
             <span class="slider-val" id="v-w2">35%</span>
           </div>
           <input type="range" id="s-w2" min="5" max="80" value="35" step="1">
         </div>
         <div class="slider-group">
           <div class="slider-row">
-            <span class="slider-lbl">保护缺口 <span class="en">Protection Gap</span></span>
+            <span class="slider-lbl">Protection Gap <span class="en">Protection Gap</span></span>
             <span class="slider-val" id="v-w3">25%</span>
           </div>
           <input type="range" id="s-w3" min="5" max="80" value="25" step="1">
         </div>
-        <div class="w-hint">三维度权重自动归一化，合计恒为 <span>100%</span></div>
+        <div class="w-hint">Three dimension weights auto-normalize, always summing to <span>100%</span></div>
       </div>
 
       <!-- Stats -->
       <div class="ctrl-card">
-        <div class="ctrl-section-title">模拟参数</div>
+        <div class="ctrl-section-title">Simulation Parameters</div>
         <div class="stat-row">
-          <span class="stat-row-lbl">HCCA 本期预算</span>
-          <span class="stat-row-val teal">¥ 50,000,000</span>
+          <span class="stat-row-lbl">HCCA Current Budget</span>
+          <span class="stat-row-val teal">$ 6,944,444</span>
         </div>
         <div class="stat-row">
-          <span class="stat-row-lbl">参与遗产地</span>
-          <span class="stat-row-val" id="st-count">10 个</span>
+          <span class="stat-row-lbl">Participating Sites</span>
+          <span class="stat-row-val" id="st-count">10</span>
         </div>
         <div class="stat-row">
-          <span class="stat-row-lbl">最高分配金额</span>
+          <span class="stat-row-lbl">Highest Allocation</span>
           <span class="stat-row-val teal" id="st-max">—</span>
         </div>
         <div class="stat-row">
-          <span class="stat-row-lbl">最低分配金额</span>
+          <span class="stat-row-lbl">Lowest Allocation</span>
           <span class="stat-row-val" id="st-min">—</span>
         </div>
         <div class="stat-row">
-          <span class="stat-row-lbl">参数更新时间</span>
+          <span class="stat-row-lbl">Last Updated</span>
           <span class="stat-row-val" id="st-time">—</span>
         </div>
       </div>
@@ -397,7 +397,7 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
     <div class="right-panel">
       <!-- Bar chart -->
       <div class="chart-section">
-        <div class="section-lbl">分配金额排名（按优先权得分）</div>
+        <div class="section-lbl">Allocation Ranking (by Priority Score)</div>
         <div id="bar-wrap"><svg id="bar-svg"></svg></div>
       </div>
 
@@ -406,16 +406,16 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
         <table class="result-tbl">
           <thead>
             <tr>
-              <th>排名</th>
-              <th>遗产地</th>
-              <th>国家</th>
-              <th>濒危度</th>
-              <th>稀缺性</th>
-              <th>保护缺口</th>
-              <th>遗址评分</th>
-              <th>国家积分</th>
-              <th>优先权得分</th>
-              <th>分配金额</th>
+              <th>Rank</th>
+              <th>Heritage Site</th>
+              <th>Country</th>
+              <th>Endangerment</th>
+              <th>Scarcity</th>
+              <th>Protection Gap</th>
+              <th>Site Score</th>
+              <th>National Credit</th>
+              <th>Priority Score</th>
+              <th>Allocation</th>
             </tr>
           </thead>
           <tbody id="result-tbody"></tbody>
@@ -430,27 +430,27 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   <div class="detail-name" id="d-name">—</div>
   <div class="detail-country" id="d-country">—</div>
   <svg id="radar-svg-wrap" width="160" height="140"></svg>
-  <div class="detail-row"><span class="dl">濒危度</span><span class="dv" id="d-e">—</span></div>
-  <div class="detail-row"><span class="dl">稀缺性</span><span class="dv" id="d-s">—</span></div>
-  <div class="detail-row"><span class="dl">保护缺口</span><span class="dv" id="d-p">—</span></div>
-  <div class="detail-row"><span class="dl">国家积分系数</span><span class="dv" id="d-n">—</span></div>
-  <div class="detail-row"><span class="dl">优先权得分</span><span class="dv" id="d-score">—</span></div>
-  <div class="detail-row"><span class="dl">本期分配</span><span class="dv amber" id="d-alloc">—</span></div>
+  <div class="detail-row"><span class="dl">Endangerment</span><span class="dv" id="d-e">—</span></div>
+  <div class="detail-row"><span class="dl">Scarcity</span><span class="dv" id="d-s">—</span></div>
+  <div class="detail-row"><span class="dl">Protection Gap</span><span class="dv" id="d-p">—</span></div>
+  <div class="detail-row"><span class="dl">National Credit Coefficient</span><span class="dv" id="d-n">—</span></div>
+  <div class="detail-row"><span class="dl">Priority Score</span><span class="dv" id="d-score">—</span></div>
+  <div class="detail-row"><span class="dl">Current Allocation</span><span class="dv amber" id="d-alloc">—</span></div>
 </div>
 
 <script>
 // ── DATA ──────────────────────────────────────────────────────────────────
 const SITES = [
-  { id:0, name:'哈尼梯田',          country:'中国',     flag:'🇨🇳', year:2013, e:72, s:85, p:68, n:0.78 },
-  { id:1, name:'利比亚古城加大麦斯', country:'利比亚',   flag:'🇱🇾', year:1982, e:95, s:90, p:95, n:0.31 },
-  { id:2, name:'廷巴克图古城',       country:'马里',     flag:'🇲🇱', year:1988, e:88, s:92, p:90, n:0.28 },
-  { id:3, name:'凡尔赛宫与花园',     country:'法国',     flag:'🇫🇷', year:1979, e:20, s:55, p:18, n:0.95 },
-  { id:4, name:'丽江古城',           country:'中国',     flag:'🇨🇳', year:1997, e:55, s:70, p:52, n:0.75 },
-  { id:5, name:'巴格哈清真寺城',     country:'孟加拉',   flag:'🇧🇩', year:1985, e:78, s:80, p:82, n:0.40 },
-  { id:6, name:'昌昌城遗址',         country:'秘鲁',     flag:'🇵🇪', year:1986, e:65, s:75, p:70, n:0.55 },
-  { id:7, name:'加拉帕戈斯群岛',     country:'厄瓜多尔', flag:'🇪🇨', year:1978, e:60, s:95, p:65, n:0.60 },
-  { id:8, name:'故宫',               country:'中国',     flag:'🇨🇳', year:1987, e:30, s:80, p:25, n:0.85 },
-  { id:9, name:'斯塔里格勒旧桥区',   country:'波黑',     flag:'🇧🇦', year:2005, e:70, s:72, p:75, n:0.45 },
+  { id:0, name:'Hani Rice Terraces',          country:'China',     flag:'🇨🇳', year:2013, e:72, s:85, p:68, n:0.78 },
+  { id:1, name:'Ghadamès Old Town', country:'Libya',   flag:'🇱🇾', year:1982, e:95, s:90, p:95, n:0.31 },
+  { id:2, name:'Timbuktu',       country:'Mali',     flag:'🇲🇱', year:1988, e:88, s:92, p:90, n:0.28 },
+  { id:3, name:'Palace of Versailles',     country:'France',     flag:'🇫🇷', year:1979, e:20, s:55, p:18, n:0.95 },
+  { id:4, name:'Old Town of Lijiang',           country:'China',     flag:'🇨🇳', year:1997, e:55, s:70, p:52, n:0.75 },
+  { id:5, name:'Mosque City of Bagerhat',     country:'Bangladesh',   flag:'🇧🇩', year:1985, e:78, s:80, p:82, n:0.40 },
+  { id:6, name:'Chan Chan Archaeological Zone',         country:'Peru',     flag:'🇵🇪', year:1986, e:65, s:75, p:70, n:0.55 },
+  { id:7, name:'Galápagos Islands',     country:'Ecuador', flag:'🇪🇨', year:1978, e:60, s:95, p:65, n:0.60 },
+  { id:8, name:'Imperial Palace (Forbidden City)',               country:'China',     flag:'🇨🇳', year:1987, e:30, s:80, p:25, n:0.85 },
+  { id:9, name:'Old Bridge Area of Mostar',   country:'Bosnia',     flag:'🇧🇦', year:2005, e:70, s:72, p:75, n:0.45 },
 ];
 
 const BUDGET = 50_000_000;
@@ -503,15 +503,15 @@ function renderTable(rows) {
           <span class="mini-bar" style="width:${barW}px"></span>
         </span>
       </td>
-      <td class="td-alloc">¥${(r.alloc/1e6).toFixed(2)}M</td>
+      <td class="td-alloc">$${(r.alloc/7.2/1e6).toFixed(2)}M</td>
     `;
     tr.addEventListener('click', () => { selId = r.id; update(); });
     tbody.appendChild(tr);
   });
 
-  document.getElementById('st-max').textContent = `¥${(rows[0].alloc/1e6).toFixed(2)}M`;
-  document.getElementById('st-min').textContent = `¥${(rows[rows.length-1].alloc/1e6).toFixed(2)}M`;
-  document.getElementById('st-time').textContent = new Date().toLocaleTimeString('zh-CN');
+  document.getElementById('st-max').textContent = `$${(rows[0].alloc/7.2/1e6).toFixed(2)}M`;
+  document.getElementById('st-min').textContent = `$${(rows[rows.length-1].alloc/7.2/1e6).toFixed(2)}M`;
+  document.getElementById('st-time').textContent = new Date().toLocaleTimeString('en-US');
 }
 
 // ── D3 BAR CHART ──────────────────────────────────────────────────────────
@@ -583,13 +583,13 @@ function renderBar(rows) {
     .attr('x',d=>xScale(d.alloc)+6).attr('y',d=>yBand(d.id)+yBand.bandwidth()/2+4)
     .attr('fill','rgba(234,243,222,0.7)').attr('font-size',10.5)
     .attr('font-family','Helvetica Neue,Arial,sans-serif')
-    .text(d=>`¥${(d.alloc/1e6).toFixed(2)}M`);
+    .text(d=>`$${(d.alloc/7.2/1e6).toFixed(2)}M`);
 }
 
 // ── D3 RADAR ──────────────────────────────────────────────────────────────
 function renderRadar(site) {
   const W=160, H=140, cx=80, cy=76, R=52;
-  const dims = ['濒危度','稀缺性','保护缺口'];
+  const dims = ['Endangerment','Scarcity','Protection Gap'];
   const vals = [site.e/100, site.s/100, site.p/100];
   const angles = dims.map((_,i) => i/dims.length * 2*Math.PI - Math.PI/2);
 
@@ -631,7 +631,7 @@ function updateDetail(site, rows) {
   document.getElementById('d-n').textContent = site.n;
   if (r) {
     document.getElementById('d-score').textContent = (r.priority*100).toFixed(2);
-    document.getElementById('d-alloc').textContent = `¥${(r.alloc/1e6).toFixed(2)}M`;
+    document.getElementById('d-alloc').textContent = `$${(r.alloc/7.2/1e6).toFixed(2)}M`;
   }
   renderRadar(site);
   document.getElementById('detail-panel').classList.remove('hidden');
@@ -688,7 +688,7 @@ document.getElementById('s-w3').addEventListener('input', e => {
 });
 
 // ── INIT ─────────────────────────────────────────────────────────────────
-document.getElementById('st-count').textContent = `${SITES.length} 个`;
+document.getElementById('st-count').textContent = `${SITES.length}`;
 update();
 window.addEventListener('resize', () => {
   barReady = false;

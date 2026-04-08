@@ -19,11 +19,11 @@ function dayDate(d){// d=0..29
 }
 function randTime(){return `${String(ri(8,22)).padStart(2,'0')}:${String(ri(0,59)).padStart(2,'0')}:${String(ri(0,59)).padStart(2,'0')}`;}
 
-const BUYERS=['中石化','中国国航','中远海运','华润电力','中国华能','大唐发电','国家电投','中国铝业','宝武钢铁','中海油','平安集团','阿里巴巴','腾讯','比亚迪','宁德时代','华为','中国银行','工商银行','中国移动','中兴通讯'];
-const HSITES=['哈尼梯田','黄山','武夷山','峨眉山','故宫','长城','敦煌莫高窟','西湖','丽江古城','吴哥窟','廷巴克图','马丘比丘','佩特拉','科隆大教堂','波罗浮屠'];
-const TSITES=['故宫博物院','哈尼梯田','西湖景区','黄山景区','九寨沟','张家界','峨眉山','丽江古城','武夷山','敦煌莫高窟','布达拉宫','泰山','秦始皇陵','庐山','天坛','颐和园','少林寺','龙门石窟','宏村','碛口古镇'];
-const ETYPES=['CCER履约抵消','CORSIA强制','ESG自愿认购'];
-const ECOS=['中国国航','平安集团','华润电力','腾讯','阿里巴巴','中国移动','宝武钢铁','中远海运','国泰航空','香港电讯','新加坡航空','马来西亚航空','日本航空','韩国航空','壳牌亚太','BP亚洲','西门子','博世','施耐德电气','麦当劳中国'];
+const BUYERS=['Sinopec','Air China','COSCO Shipping','CR Power','CHN Energy','Datang Power','SPIC','Chalco','Baowu Steel','CNOOC','Ping An Group','Alibaba','Tencent','BYD','CATL','Huawei','Bank of China','ICBC','China Mobile','ZTE'];
+const HSITES=['Hani Rice Terraces','Huangshan','Wuyi Mountains','Mount Emei','Forbidden City','Great Wall','Dunhuang Mogao Caves','West Lake','Old Town of Lijiang','Angkor Wat','Timbuktu','Machu Picchu','Petra','Cologne Cathedral','Borobudur'];
+const TSITES=['Palace Museum','Hani Rice Terraces','West Lake','Huangshan','Jiuzhaigou','Zhangjiajie','Mount Emei','Old Town of Lijiang','Wuyi Mountains','Dunhuang Mogao Caves','Potala Palace','Mount Tai','Qin Shi Huang Mausoleum','Mount Lu','Temple of Heaven','Summer Palace','Shaolin Temple','Longmen Grottoes','Hongcun','Qikou Ancient Town'];
+const ETYPES=['CCER Compliance Offset','CORSIA Mandatory','ESG Voluntary Subscription'];
+const ECOS=['Air China','Ping An Group','CR Power','Tencent','Alibaba','China Mobile','Baowu Steel','COSCO Shipping','Cathay Pacific','HKT','Singapore Airlines','Malaysia Airlines','Japan Airlines','Korean Air','Shell Asia Pacific','BP Asia','Siemens','Bosch','Schneider Electric','McDonald\'s China'];
 // Carbon trades: 30 days, 8-14 trades/day
 const CARBON_TRADES=[];
 for(let d=0;d<30;d++){
@@ -46,7 +46,7 @@ CARBON_DAILY.forEach(r=>{cumC+=r.rev;CARBON_CUM.push(cumC);});
 
 // Tourism tax: 30 days, all sites
 const TAX_RECORDS=[];
-const SITE_BASE={'故宫博物院':18000,'哈尼梯田':3200,'西湖景区':12000,'黄山景区':5500,'九寨沟':2800,'张家界':4200,'峨眉山':3800,'丽江古城':9000,'武夷山':4600,'敦煌莫高窟':1800,'布达拉宫':2400,'泰山':6200,'秦始皇陵':8500,'庐山':3100,'天坛':10000,'颐和园':11000,'少林寺':4800,'龙门石窟':3900,'宏村':2200,'碛口古镇':900};
+const SITE_BASE={'Palace Museum':18000,'Hani Rice Terraces':3200,'West Lake':12000,'Huangshan':5500,'Jiuzhaigou':2800,'Zhangjiajie':4200,'Mount Emei':3800,'Old Town of Lijiang':9000,'Wuyi Mountains':4600,'Dunhuang Mogao Caves':1800,'Potala Palace':2400,'Mount Tai':6200,'Qin Shi Huang Mausoleum':8500,'Mount Lu':3100,'Temple of Heaven':10000,'Summer Palace':11000,'Shaolin Temple':4800,'Longmen Grottoes':3900,'Hongcun':2200,'Qikou Ancient Town':900};
 for(let d=0;d<30;d++){
   TSITES.forEach(site=>{
     const base=SITE_BASE[site]||2000;
@@ -84,31 +84,31 @@ for(let d=0;d<30;d++){
 
 // Allocation sites (25 real UNESCO cultural heritage sites)
 const ALLOC_SITES=[
-  {name:'廷巴克图',country:'MLI',lat:16.77,lng:-3.0,score:8.7,phase:'mid',verif:92},
-  {name:'吴哥窟',country:'KHM',lat:13.41,lng:103.87,score:7.9,phase:'pre',verif:45},
-  {name:'朱比特神庙（巴勒贝克）',country:'LBN',lat:34.0,lng:36.21,score:7.4,phase:'final',verif:100},
-  {name:'莫恩布雷山文化景观',country:'HTI',lat:18.46,lng:-73.97,score:8.1,phase:'pre',verif:30},
-  {name:'奥古斯丁伯纳迪诺修道院',country:'MEX',lat:19.3,lng:-99.08,score:6.8,phase:'mid',verif:78},
-  {name:'查科文化国家历史公园',country:'USA',lat:36.06,lng:-107.96,score:6.2,phase:'pre',verif:55},
-  {name:'孟加拉国清真寺城',country:'BGD',lat:24.74,lng:88.27,score:7.6,phase:'mid',verif:82},
-  {name:'苏库尔巴拉考古遗址',country:'PAK',lat:27.55,lng:68.82,score:8.3,phase:'pre',verif:25},
-  {name:'哈拉帕考古遗址',country:'PAK',lat:30.63,lng:72.86,score:7.1,phase:'final',verif:100},
-  {name:'拉利贝拉岩石教堂',country:'ETH',lat:12.03,lng:39.05,score:8.9,phase:'mid',verif:88},
-  {name:'罗宾岛',country:'ZAF',lat:-33.8,lng:18.37,score:5.9,phase:'final',verif:100},
-  {name:'布基纳法索古要塞',country:'BFA',lat:11.15,lng:-4.3,score:8.4,phase:'pre',verif:20},
-  {name:'苏里南中部自然保护区',country:'SUR',lat:4.0,lng:-56.0,score:6.5,phase:'mid',verif:70},
-  {name:'丝绸之路：长安-天山廊道',country:'CHN/KAZ/KGZ',lat:39.9,lng:76.0,score:7.3,phase:'final',verif:97},
-  {name:'哈尼梯田文化景观',country:'CHN',lat:23.1,lng:102.8,score:9.1,phase:'pre',verif:60},
-  {name:'维龙加国家公园',country:'COD',lat:-1.45,lng:29.28,score:9.3,phase:'mid',verif:75},
-  {name:'菲律宾科迪勒拉水稻梯田',country:'PHL',lat:16.92,lng:121.08,score:8.5,phase:'pre',verif:40},
-  {name:'尼泊尔加德满都谷地',country:'NPL',lat:27.7,lng:85.31,score:7.8,phase:'mid',verif:85},
-  {name:'也门萨那古城',country:'YEM',lat:15.35,lng:44.21,score:9.5,phase:'pre',verif:15},
-  {name:'利比亚古城加达梅斯',country:'LBY',lat:30.13,lng:9.5,score:8.8,phase:'pre',verif:10},
-  {name:'叙利亚帕尔米拉',country:'SYR',lat:34.55,lng:38.27,score:9.7,phase:'mid',verif:50},
-  {name:'伊拉克萨迈拉古城',country:'IRQ',lat:34.2,lng:43.87,score:8.6,phase:'final',verif:95},
-  {name:'佩特拉',country:'JOR',lat:30.32,lng:35.44,score:7.2,phase:'final',verif:100},
-  {name:'波斯波利斯',country:'IRN',lat:29.94,lng:52.89,score:6.7,phase:'mid',verif:80},
-  {name:'格罗宁根古运河城',country:'NLD',lat:53.22,lng:6.57,score:5.5,phase:'final',verif:100},
+  {name:'Timbuktu',country:'MLI',lat:16.77,lng:-3.0,score:8.7,phase:'mid',verif:92},
+  {name:'Angkor Wat',country:'KHM',lat:13.41,lng:103.87,score:7.9,phase:'pre',verif:45},
+  {name:'Temple of Jupiter (Baalbek)',country:'LBN',lat:34.0,lng:36.21,score:7.4,phase:'final',verif:100},
+  {name:'Morne Bruant Cultural Landscape',country:'HTI',lat:18.46,lng:-73.97,score:8.1,phase:'pre',verif:30},
+  {name:'Augustinian Convent of Acolman',country:'MEX',lat:19.3,lng:-99.08,score:6.8,phase:'mid',verif:78},
+  {name:'Chaco Culture NHP',country:'USA',lat:36.06,lng:-107.96,score:6.2,phase:'pre',verif:55},
+  {name:'Mosque City of Bagerhat',country:'BGD',lat:24.74,lng:88.27,score:7.6,phase:'mid',verif:82},
+  {name:'Sukkur Barrage Archaeological Site',country:'PAK',lat:27.55,lng:68.82,score:8.3,phase:'pre',verif:25},
+  {name:'Harappa Archaeological Site',country:'PAK',lat:30.63,lng:72.86,score:7.1,phase:'final',verif:100},
+  {name:'Rock-Hewn Churches of Lalibela',country:'ETH',lat:12.03,lng:39.05,score:8.9,phase:'mid',verif:88},
+  {name:'Robben Island',country:'ZAF',lat:-33.8,lng:18.37,score:5.9,phase:'final',verif:100},
+  {name:'Ancient Fortresses of Burkina Faso',country:'BFA',lat:11.15,lng:-4.3,score:8.4,phase:'pre',verif:20},
+  {name:'Central Suriname Nature Reserve',country:'SUR',lat:4.0,lng:-56.0,score:6.5,phase:'mid',verif:70},
+  {name:'Silk Roads: Chang\'an–Tianshan Corridor',country:'CHN/KAZ/KGZ',lat:39.9,lng:76.0,score:7.3,phase:'final',verif:97},
+  {name:'Hani Rice Terraces Cultural Landscape',country:'CHN',lat:23.1,lng:102.8,score:9.1,phase:'pre',verif:60},
+  {name:'Virunga National Park',country:'COD',lat:-1.45,lng:29.28,score:9.3,phase:'mid',verif:75},
+  {name:'Rice Terraces of the Philippine Cordilleras',country:'PHL',lat:16.92,lng:121.08,score:8.5,phase:'pre',verif:40},
+  {name:'Kathmandu Valley',country:'NPL',lat:27.7,lng:85.31,score:7.8,phase:'mid',verif:85},
+  {name:'Old City of Sana\'a',country:'YEM',lat:15.35,lng:44.21,score:9.5,phase:'pre',verif:15},
+  {name:'Old Town of Ghadamès',country:'LBY',lat:30.13,lng:9.5,score:8.8,phase:'pre',verif:10},
+  {name:'Site of Palmyra',country:'SYR',lat:34.55,lng:38.27,score:9.7,phase:'mid',verif:50},
+  {name:'Samarra Archaeological City',country:'IRQ',lat:34.2,lng:43.87,score:8.6,phase:'final',verif:95},
+  {name:'Petra',country:'JOR',lat:30.32,lng:35.44,score:7.2,phase:'final',verif:100},
+  {name:'Persepolis',country:'IRN',lat:29.94,lng:52.89,score:6.7,phase:'mid',verif:80},
+  {name:'Groningen Historic Canal City',country:'NLD',lat:53.22,lng:6.57,score:5.5,phase:'final',verif:100},
 ];
 // Allocation amounts per site per day (30 days cycle)
 const ALLOC_DAILY=ALLOC_SITES.map(site=>{

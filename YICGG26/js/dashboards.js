@@ -47,7 +47,7 @@ function dims(sel){
 }
 const fmt=d3.format(',');
 const fmtM=v=>v>=1e6?`$${(v/1e6).toFixed(1)}M`:v>=1e3?`$${(v/1e3).toFixed(0)}K`:`$${v}`;
-const fmtCNY=v=>v>=1e6?`¥${(v/1e6).toFixed(1)}M`:v>=1e3?`¥${(v/1e3).toFixed(0)}K`:`¥${v}`;
+const fmtCNY=v=>v>=1e6?`$${(v/7.2/1e6).toFixed(1)}M`:v>=1e3?`$${(v/7.2/1e3).toFixed(0)}K`:`$${Math.round(v/7.2)}`;
 
 // === SECTION A: CARBON TRADING ===
 function initSectionA(){
@@ -71,7 +71,7 @@ function initSectionA(){
     div.className='ticker-row';
     div.innerHTML=`<div class="t-time">${r.date} ${r.time}</div>
       <div class="t-main">${r.buyer} <span style="color:var(--text3)">→</span> ${r.site} &nbsp;
-      <span style="color:var(--text2)">${fmt(r.qty)} tCO₂ &nbsp; ¥${r.price}/t</span> &nbsp;
+      <span style="color:var(--text2)">${fmt(r.qty)} tCO₂ &nbsp; $${(r.price/7.2).toFixed(1)}/t</span> &nbsp;
       <span class="t-val">${fmtCNY(r.total)}</span></div>`;
     feed.prepend(div);
     while(feed.children.length>12)feed.removeChild(feed.lastChild);
@@ -91,7 +91,7 @@ function initSectionA(){
       sliceData.push(D.CARBON_DAILY[(startIdx+i)%D.CARBON_DAILY.length]);
     }
     drawLine('#s-carbon-chart1',sliceData.map(r=>({x:r.date,y:r.vol})),'tCO₂','#5DCAA5',carbonVolMax);
-    drawLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#EF9F27',carbonRevMax);
+    drawLine('#s-carbon-chart2',sliceData.map(r=>({x:r.date,y:r.rev/7.2})),'$','#EF9F27',carbonRevMax/7.2);
     dayOffset++;
   }
   updateCharts();
@@ -100,9 +100,9 @@ function initSectionA(){
   // Proportion bar (replaces pie)
   let barIdx=0;
   const barData=[
-    [{label:'控排企业',v:0.52,color:'#5DCAA5'},{label:'CORSIA',v:0.31,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
-    [{label:'控排企业',v:0.48,color:'#5DCAA5'},{label:'CORSIA',v:0.35,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
-    [{label:'控排企业',v:0.55,color:'#5DCAA5'},{label:'CORSIA',v:0.28,color:'#85B7EB'},{label:'ESG自愿',v:0.17,color:'#EF9F27'}],
+    [{label:'Regulated Enterprises',v:0.52,color:'#5DCAA5'},{label:'CORSIA',v:0.31,color:'#85B7EB'},{label:'ESG Voluntary',v:0.17,color:'#EF9F27'}],
+    [{label:'Regulated Enterprises',v:0.48,color:'#5DCAA5'},{label:'CORSIA',v:0.35,color:'#85B7EB'},{label:'ESG Voluntary',v:0.17,color:'#EF9F27'}],
+    [{label:'Regulated Enterprises',v:0.55,color:'#5DCAA5'},{label:'CORSIA',v:0.28,color:'#85B7EB'},{label:'ESG Voluntary',v:0.17,color:'#EF9F27'}],
   ];
   function updateBar(){
     drawProportionBar('#s-carbon-chart3',barData[barIdx%barData.length]);
@@ -145,7 +145,7 @@ function initSectionB(){
     div.className='ticker-row';
     div.innerHTML=`<div class="t-time">${r.date}</div>
       <div class="t-main">${r.site} &nbsp;
-      <span style="color:var(--text2)">${fmt(r.visitors)}人</span> &nbsp;
+      <span style="color:var(--text2)">${fmt(r.visitors)} visitors</span> &nbsp;
       <span class="t-val">${fmtCNY(r.tax)}</span></div>`;
     feed.prepend(div);
     while(feed.children.length>14)feed.removeChild(feed.lastChild);
@@ -176,7 +176,7 @@ function initSectionB(){
     const siteRev=Object.entries(siteRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,15);
     // Pass global max so bars stay fixed width overall
     drawHBar('#s-tax-chart1',siteRev,'#85B7EB',taxHBarMax);
-    drawLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev})),'¥','#85B7EB',taxRevMax);
+    drawLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev/7.2})),'$','#85B7EB',taxRevMax/7.2);
     dayOffset++;
   }
   updateCharts();
@@ -185,9 +185,9 @@ function initSectionB(){
   // Proportion bar
   let barIdx=0;
   const barData=[
-    [{label:'文化遗址',v:0.58,color:'#85B7EB'},{label:'自然遗产',v:0.28,color:'#5DCAA5'},{label:'混合遗产',v:0.14,color:'#EF9F27'}],
-    [{label:'文化遗址',v:0.55,color:'#85B7EB'},{label:'自然遗产',v:0.32,color:'#5DCAA5'},{label:'混合遗产',v:0.13,color:'#EF9F27'}],
-    [{label:'文化遗址',v:0.60,color:'#85B7EB'},{label:'自然遗产',v:0.26,color:'#5DCAA5'},{label:'混合遗产',v:0.14,color:'#EF9F27'}],
+    [{label:'Cultural Sites',v:0.58,color:'#85B7EB'},{label:'Natural Heritage',v:0.28,color:'#5DCAA5'},{label:'Mixed Heritage',v:0.14,color:'#EF9F27'}],
+    [{label:'Cultural Sites',v:0.55,color:'#85B7EB'},{label:'Natural Heritage',v:0.32,color:'#5DCAA5'},{label:'Mixed Heritage',v:0.13,color:'#EF9F27'}],
+    [{label:'Cultural Sites',v:0.60,color:'#85B7EB'},{label:'Natural Heritage',v:0.26,color:'#5DCAA5'},{label:'Mixed Heritage',v:0.14,color:'#EF9F27'}],
   ];
   function updateBar(){
     drawProportionBar('#s-tax-chart3',barData[barIdx%barData.length]);
@@ -260,9 +260,9 @@ function initSectionC(){
   // Proportion bar
   let barIdx=0;
   const barData=[
-    [{label:'CCER履约',v:0.45,color:'#EF9F27'},{label:'CORSIA',v:0.32,color:'#F0997B'},{label:'ESG自愿',v:0.23,color:'#5DCAA5'}],
-    [{label:'CCER履约',v:0.48,color:'#EF9F27'},{label:'CORSIA',v:0.30,color:'#F0997B'},{label:'ESG自愿',v:0.22,color:'#5DCAA5'}],
-    [{label:'CCER履约',v:0.42,color:'#EF9F27'},{label:'CORSIA',v:0.35,color:'#F0997B'},{label:'ESG自愿',v:0.23,color:'#5DCAA5'}],
+    [{label:'CCER Compliance',v:0.45,color:'#EF9F27'},{label:'CORSIA',v:0.32,color:'#F0997B'},{label:'ESG Voluntary',v:0.23,color:'#5DCAA5'}],
+    [{label:'CCER Compliance',v:0.48,color:'#EF9F27'},{label:'CORSIA',v:0.30,color:'#F0997B'},{label:'ESG Voluntary',v:0.22,color:'#5DCAA5'}],
+    [{label:'CCER Compliance',v:0.42,color:'#EF9F27'},{label:'CORSIA',v:0.35,color:'#F0997B'},{label:'ESG Voluntary',v:0.23,color:'#5DCAA5'}],
   ];
   function updateBar(){
     drawProportionBar('#s-esg-chart3',barData[barIdx%barData.length]);
@@ -298,13 +298,13 @@ function initSectionD(){
     }
     drawWaterfall('#s-fund-chart1',sliceData.map(r=>({x:r.date,y:r.net})));
     drawStackedArea('#s-fund-chart2',sliceData,[
-      {key:'inflow',label:'流入',color:'#5DCAA5'},
-      {key:'outflow',label:'支出',color:'#EF9F27'}
+      {key:'inflow',label:'Inflow',color:'#5DCAA5'},
+      {key:'outflow',label:'Outflow',color:'#EF9F27'}
     ]);
     drawLine('#s-fund-chart3',sliceData.map(r=>({x:r.date,y:r.balance})),'$','#85B7EB',fundBalMax);
     drawDualLine('#s-fund-chart4',
       sliceData.map(r=>({x:r.date,y1:+(r.outflow/r.inflow*100).toFixed(1),y2:+(D.ALLOC_SITES.filter(s=>s.verif>=60).length/D.ALLOC_SITES.length*100).toFixed(1)})),
-      '拨付率%','核查率%');
+      'Disbursement%','Verification%');
     dayOffset++;
   }
   updateCharts();
@@ -322,7 +322,7 @@ function initSectionE(){
   if(list){
     list.innerHTML='';
     [...D.ALLOC_SITES].sort((a,b)=>b.score-a.score).forEach(s=>{
-      const pLabel={'pre':'预拨','mid':'中期','final':'尾款'}[s.phase]||s.phase;
+      const pLabel={'pre':'Initial','mid':'Mid-term','final':'Final'}[s.phase]||s.phase;
       const pClass={'pre':'phase-pre','mid':'phase-mid','final':'phase-final'}[s.phase]||'';
       const amt=Math.round(s.score*50000);
       const icon=s.verif>=90?'✓':s.verif>=60?'⏳':'◌';
@@ -330,7 +330,7 @@ function initSectionE(){
       div.className='alloc-item';
       div.innerHTML=`<div class="ai-name">${s.name} <span class="ai-score">${s.score}/10</span></div>
         <div class="ai-meta">${s.country} &nbsp; ${fmtM(amt)} &nbsp; <span class="${pClass}">${pLabel}</span></div>
-        <div class="ai-status">${icon} 核查进度 ${s.verif}%</div>`;
+        <div class="ai-status">${icon} Verification ${s.verif}%</div>`;
       list.appendChild(div);
     });
     let st=0;
@@ -586,7 +586,7 @@ function drawGeoBubbles(svg,proj,sites){
     .attr('stroke','rgba(0,0,0,.4)').attr('stroke-width',1)
     .on('mousemove',function(e,s){
       tip.style('display','block').style('left',(e.clientX+12)+'px').style('top',(e.clientY-10)+'px')
-        .html(`<strong>${s.name}</strong>${s.country}<br>得分 ${s.score}/10<br>拨付 ${fmtM(s.score*50000)}<br>阶段 ${{pre:'预拨',mid:'中期',final:'尾款'}[s.phase]||s.phase}`);
+        .html(`<strong>${s.name}</strong>${s.country}<br>Score ${s.score}/10<br>Allocation ${fmtM(s.score*50000)}<br>Phase ${{pre:'Initial',mid:'Mid-term',final:'Final'}[s.phase]||s.phase}`);
     })
     .on('mouseleave',()=>tip.style('display','none'));
 }
