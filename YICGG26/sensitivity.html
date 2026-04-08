@@ -325,11 +325,20 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
   .right-panel { overflow: visible; }
   .chart-section { flex: 0 0 200px; }
 
-  /* Table: horizontal scroll so columns don't collapse */
-  .table-section { overflow-x: auto; overflow-y: visible; }
-  table.result-tbl { min-width: 580px; font-size: 11px; }
+  /* Table: hide less-critical columns, fit in viewport */
+  .table-section { overflow-x: hidden; overflow-y: visible; }
+  table.result-tbl { width: 100%; min-width: unset; font-size: 11px; }
   table.result-tbl th,
-  table.result-tbl td { padding: 8px 10px; }
+  table.result-tbl td { padding: 7px 8px; }
+  /* Hide Endangerment/Scarcity/Protection Gap individual cols — shown in radar */
+  table.result-tbl th:nth-child(4),
+  table.result-tbl td:nth-child(4),
+  table.result-tbl th:nth-child(5),
+  table.result-tbl td:nth-child(5),
+  table.result-tbl th:nth-child(6),
+  table.result-tbl td:nth-child(6),
+  table.result-tbl th:nth-child(8),
+  table.result-tbl td:nth-child(8) { display: none; }
 
   /* Detail panel: pulled into normal flow, appears below grid when visible */
   .detail-overlay {
