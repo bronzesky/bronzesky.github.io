@@ -173,7 +173,7 @@ function initSectionB(){
       const r=D.TAX_RECORDS[(startIdx*10+i)%D.TAX_RECORDS.length];
       siteRevMap[r.site]=(siteRevMap[r.site]||0)+r.tax;
     }
-    const siteRev=Object.entries(siteRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,15);
+    const siteRev=Object.entries(siteRevMap).map(([k,v])=>({label:k,v})).sort((a,b)=>b.v-a.v).slice(0,10);
     // Pass global max so bars stay fixed width overall
     drawHBar('#s-tax-chart1',siteRev,'#85B7EB',taxHBarMax);
     drawLine('#s-tax-chart2',sliceData.map(r=>({x:r.date,y:r.rev/7.2})),'$','#85B7EB',taxRevMax/7.2);
