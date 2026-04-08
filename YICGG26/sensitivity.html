@@ -298,12 +298,26 @@ table.result-tbl tr.sel .td-name { color: var(--teal); }
 .detail-row .dv.amber { color: var(--amber); }
 #radar-svg-wrap { margin: 10px auto 4px; display: block; }
 @media (max-width: 768px) {
-  .page-header { padding: 14px 16px; gap: 12px; }
+  .page-body { min-height:100svh; overflow-y:auto; }
+  .page-header { padding: 12px 14px; gap: 10px; flex-direction:column; align-items:flex-start; }
+  .page-title { font-size:17px; }
   .page-formula { display: none; }
-  .sens-grid { grid-template-columns: 1fr; }
-  .ctrl-panel { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); max-height: 320px; overflow-y: auto; }
-  .chart-section { flex: 0 0 200px; }
-  .detail-overlay { width: calc(100% - 32px); right: 16px; bottom: 16px; left: 16px; }
+  .sens-grid { grid-template-columns: 1fr; overflow:visible; flex:none; }
+  .ctrl-panel {
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    max-height: none; overflow-y: visible;
+    background:var(--bg2);
+  }
+  .right-panel { overflow:visible; }
+  .chart-section { flex: 0 0 220px; }
+  .table-section { overflow-y:visible; }
+  table.result-tbl { font-size:11px; }
+  table.result-tbl th, table.result-tbl td { padding:7px 8px; }
+  .detail-overlay {
+    position:fixed;
+    width: calc(100% - 28px); right: 14px; bottom: 14px; left: 14px;
+  }
 }
 </style>
 </head>

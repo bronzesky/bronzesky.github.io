@@ -70,7 +70,7 @@ window.initMap=function(){
       haniPoly.addTo(map);
       const panel=document.getElementById('hani-panel');
       panel.classList.add('open');
-      document.getElementById('hani-btn').textContent='← 返回全球视图';
+      document.getElementById('hani-btn').textContent='← Back to Global View';
       document.getElementById('hani-btn').classList.add('reset');
     },2000);
   }
@@ -79,7 +79,7 @@ window.initMap=function(){
     haniOpen=false;
     haniPoly.removeFrom(map);
     document.getElementById('hani-panel').classList.remove('open');
-    document.getElementById('hani-btn').textContent='查看示例：哈尼梯田 →';
+    document.getElementById('hani-btn').textContent='View Example: Hani Rice Terraces →';
     document.getElementById('hani-btn').classList.remove('reset');
     setTimeout(()=>map.flyTo([20,10],2,{duration:2}),400);
   }

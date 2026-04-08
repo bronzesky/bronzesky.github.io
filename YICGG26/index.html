@@ -357,12 +357,24 @@ function navTo(id){
 }
 window.navTo=navTo;
 
-// Hamburger toggle
-document.getElementById('nav-toggle').addEventListener('click',()=>
-  document.getElementById('topnav').classList.toggle('nav-open'));
+// Hamburger toggle — also update --nav-h after open/close
+function updateNavHeight(){
+  const h=document.getElementById('topnav').offsetHeight;
+  document.documentElement.style.setProperty('--nav-h',h+'px');
+}
+document.getElementById('nav-toggle').addEventListener('click',()=>{
+  document.getElementById('topnav').classList.toggle('nav-open');
+  // wait for transition then update
+  setTimeout(updateNavHeight,10);
+});
 document.querySelectorAll('.nav-link').forEach(b=>
-  b.addEventListener('click',()=>
-    document.getElementById('topnav').classList.remove('nav-open')));
+  b.addEventListener('click',()=>{
+    document.getElementById('topnav').classList.remove('nav-open');
+    setTimeout(updateNavHeight,10);
+  }));
+// Update on load and resize
+window.addEventListener('resize',updateNavHeight,{passive:true});
+window.addEventListener('load',updateNavHeight);
 
 // Scroll-based nav highlight
 const sections=['s-map','s-flow'];
@@ -378,6 +390,7 @@ window.addEventListener('scroll',()=>{
 },{ passive:true });
 
 window.addEventListener('load',()=>{
+  updateNavHeight();
   window.initMap();
   initStats();
   setTimeout(()=>window.initFlow(),400);

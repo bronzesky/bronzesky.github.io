@@ -341,58 +341,122 @@ body.dashboard-open{overflow:hidden;}
 #nav-toggle{
   display:none;
   background:none;border:none;color:var(--text);
-  font-size:20px;cursor:pointer;padding:6px;margin-left:auto;
-  line-height:1;
+  font-size:22px;cursor:pointer;padding:8px 4px;margin-left:auto;
+  line-height:1;flex-shrink:0;
 }
 
 @media (max-width: 768px) {
-  /* --- Nav --- */
-  nav#topnav{ flex-wrap:wrap; height:auto; padding:0 16px; }
-  .nav-brand{ padding:14px 0; }
-  #nav-toggle{ display:block; padding:14px 0; }
+  /* --- Nav: hamburger dropdown --- */
+  nav#topnav{
+    flex-wrap:wrap; height:auto; padding:0 16px;
+    /* JS will update --nav-h via inline style on <html> */
+  }
+  .nav-brand{ padding:13px 0; font-size:13px; }
+  #nav-toggle{ display:flex; align-items:center; }
   .nav-links{
     display:none; flex-direction:column; width:100%;
     border-top:1px solid rgba(255,255,255,0.07);
-    padding:8px 0 12px; gap:2px;
+    padding:6px 0 10px; gap:0;
+    background:rgba(13,17,23,0.97);
   }
   nav#topnav.nav-open .nav-links{ display:flex; }
-  .nav-link{ padding:10px 12px; font-size:13px; }
-  /* Nav height becomes variable; use JS-measured offset or just use 52px for fixed sections */
+  .nav-link{ padding:11px 8px; font-size:13px; text-align:left; border-radius:0; }
+
+  /* --- Full sections: use padding-top = actual nav height (set by JS) --- */
+  .full-section{ min-height:100svh; }
+
+  /* --- Dashboard sections: fixed below actual nav height --- */
+  /* top is overridden by JS: document.documentElement.style.setProperty('--nav-h', nav.offsetHeight+'px') */
 
   /* --- Map --- */
-  .map-stats-bar{ padding:16px 16px 24px; gap:16px; flex-wrap:wrap; }
-  .map-stat-val{ font-size:22px; }
-  #hani-btn{ bottom:16px; right:16px; font-size:12px; padding:9px 16px; }
-  #hani-panel{ width:100%; top:auto; height:60vh; transform:translateY(102%); border-left:none; border-top:1px solid var(--teal-border); }
+  .map-stats-bar{
+    padding:12px 14px 20px; gap:12px; flex-wrap:wrap;
+  }
+  .map-stat{ flex:1 1 calc(50% - 6px); }
+  .map-stat-val{ font-size:20px; }
+  .map-stat-label{ font-size:10px; }
+  #hani-btn{ bottom:14px; right:14px; font-size:12px; padding:8px 14px; }
+  /* Hani panel: slide up from bottom on mobile */
+  #hani-panel{
+    width:100%; top:auto; height:65vh;
+    transform:translateY(102%);
+    border-left:none; border-top:1px solid var(--teal-border);
+  }
   #hani-panel.open{ transform:translateY(0); }
 
-  /* --- Flow --- */
-  .flow-header{ padding:16px 16px 0; }
-  .flow-header h2{ font-size:17px; }
-  .flow-body{ grid-template-columns:1fr; padding:12px 16px; gap:16px; min-height:unset; }
-  .hcca-node{ width:120px; height:120px; }
-  .hcca-node-val{ font-size:18px; }
-  @keyframes hcca-ring{ 0%{width:120px;height:120px;opacity:.5;} 100%{width:200px;height:200px;opacity:0;} }
-  #flow-svg-wrap{ min-height:80px; }
+  /* --- Flow section: stack columns vertically --- */
+  .flow-header{ padding:14px 14px 0; }
+  .flow-header h2{ font-size:16px; }
+  .flow-header p{ font-size:12px; }
+  .flow-body{
+    grid-template-columns:1fr;
+    padding:12px 14px 16px;
+    gap:14px;
+    min-height:unset;
+    overflow-y:auto;
+  }
+  .flow-col{ gap:12px; }
+  .hcca-node{ width:110px; height:110px; }
+  .hcca-node-val{ font-size:17px; }
+  .hcca-node-label{ font-size:9px; }
+  #flow-svg-wrap{ min-height:60px; order:-1; }
+  /* hide SVG flow lines on mobile — too complex to render in 1-col */
+  #flow-svg{ display:none; }
 
-  /* --- Dashboard sections --- */
-  .section-header{ padding:10px 14px; }
-  .section-title{ font-size:15px; }
-  .section-body{ flex-direction:column; overflow-y:auto; }
-  .section-ticker{ width:100%; flex-shrink:0; border-right:none; border-bottom:1px solid rgba(255,255,255,0.07); max-height:200px; }
-  .section-charts-top{ grid-template-columns:1fr; grid-template-rows:repeat(4,160px); }
-  .section-charts-top .chart-box[style*="span 2"]{ grid-column:span 1; }
+  /* --- Dashboard sections: scrollable, not clipped --- */
+  .dashboard-section{
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .section-header{ padding:10px 14px; flex-shrink:0; }
+  .section-title{ font-size:14px; }
+
+  /* section-body: stack ticker above charts */
+  .section-body{
+    flex-direction:column;
+    overflow:visible;
+    min-height:unset;
+    flex:none;
+  }
+  .section-ticker{
+    width:100%; flex-shrink:0;
+    border-right:none;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    height:180px; /* fixed height, scrollable inside */
+  }
+  .section-charts{ flex:none; }
+  .section-charts-top{
+    grid-template-columns:1fr;
+    grid-template-rows:repeat(4, 200px);
+    padding:10px 12px;
+    gap:10px;
+  }
+  /* override inline span 2 */
+  .section-charts-top > .chart-box{ grid-column:1 !important; }
 
   /* --- Fund detail --- */
-  .kpi-row{ flex-wrap:wrap; padding:10px 12px; gap:8px; }
+  .kpi-row{ flex-wrap:wrap; padding:10px 12px; gap:8px; flex-shrink:0; }
   .kpi-card{ flex:1 1 calc(50% - 4px); min-width:0; }
   .kpi-val{ font-size:18px; }
-  #s-fund .section-body{ grid-template-columns:1fr !important; grid-template-rows:repeat(4,180px) !important; overflow-y:auto; padding:10px 12px !important; }
+  #s-fund .section-body{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:repeat(4, 200px) !important;
+    gap:10px; padding:10px 12px !important;
+    overflow:visible; flex:none;
+  }
 
   /* --- Allocation --- */
-  .formula-bar{ padding:10px 14px; gap:10px; }
-  .formula-item{ font-size:11px; }
-  .alloc-body{ flex-direction:column; }
-  .alloc-map{ flex:none; height:220px; width:100%; }
-  .alloc-list{ width:100%; border-left:none; border-top:1px solid rgba(255,255,255,0.07); }
+  .formula-bar{ padding:8px 12px; gap:8px; flex-wrap:wrap; }
+  .formula-item{ font-size:10.5px; }
+  .alloc-body{ flex-direction:column; overflow:visible; flex:none; }
+  .alloc-map{ flex:none; height:200px; width:100%; }
+  .alloc-list{
+    width:100%; border-left:none;
+    border-top:1px solid rgba(255,255,255,0.07);
+    height:320px;
+  }
+
+  /* --- KPI / verify --- */
+  .verify-item span:first-child{ width:auto; min-width:80px; }
 }
