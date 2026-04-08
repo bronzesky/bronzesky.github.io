@@ -374,6 +374,7 @@ body.dashboard-open{overflow:hidden;}
     display:flex; flex-direction:column; overflow-y:auto;
   }
   body.nav-drawer-open #nav-drawer{ transform:translateX(0); }
+  body.nav-drawer-open #nav-toggle{ display:none; }
 
   /* Drawer header: logo at top */
   #nav-drawer-header{
