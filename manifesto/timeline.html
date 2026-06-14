@@ -31,13 +31,18 @@
   .timeline-layout{grid-template-columns:32px 1fr;padding:1rem .5rem;gap:0}
   .tl-left{display:none !important}
   .tl-empty{display:none !important}
-  .tl-center{grid-column:1;justify-content:center;padding-top:.8rem}
+  /* 手机端 left 事件内容放入 .tl-left-mobile */
+  .tl-left-mobile{display:block;grid-column:2;padding:.6rem 0 .6rem .75rem;text-align:left}
+  .tl-center{justify-content:center;padding-top:.8rem}
   .tl-right{grid-column:2;padding:.6rem 0 .6rem .75rem;text-align:left}
   .timeline-col-header.left{display:none}
   .timeline-col-header{grid-column:2}
   .tl-year{font-size:1rem}
   .tl-title{font-size:.85rem}
   .tl-desc{font-size:.75rem}
+}
+@media(min-width:641px){
+  .tl-left-mobile{display:none}
 }
 </style>
 </head>
@@ -156,7 +161,7 @@ function renderTimeline() {
     const tagClass = ev.tag === 'world' ? 'world' : ev.tag === 'china' ? 'china' : 'manifesto';
     const card = `<div class="tl-year${dotClass ? ' gold':''}">` + ev.year + `</div><span class="tl-tag ${tagClass}">` + tagLabel + `</span><div class="tl-title">` + ev.title + `</div><div class="tl-desc">` + ev.desc + `</div>`;
     if (ev.side === 'left') {
-      html += `<div class="tl-left">${card}</div><div class="tl-center"><div class="tl-dot${dotClass}"></div></div><div class="tl-empty"></div>`;
+      html += `<div class="tl-left">${card}</div><div class="tl-center"><div class="tl-dot${dotClass}"></div></div><div class="tl-left-mobile">${card}</div>`;
     } else {
       html += `<div class="tl-empty"></div><div class="tl-center"><div class="tl-dot${dotClass}"></div></div><div class="tl-right">${card}</div>`;
     }
