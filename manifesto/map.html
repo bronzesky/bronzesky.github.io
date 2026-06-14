@@ -6,7 +6,7 @@
 <title>全球传播地图 — 《共产党宣言》展览</title>
 <link rel="stylesheet" href="assets/style.css">
 <style>
-.map-wrap{position:relative;background:#eef2f7;border:1px solid #e8e0d5;overflow:hidden}
+.map-wrap{position:relative;background:#eef2f7;border:1px solid #e8e0d5;overflow:hidden;min-height:300px}
 #world-map{width:100%;display:block;cursor:grab}
 #world-map:active{cursor:grabbing}
 .map-country{fill:#ddd8ce;stroke:#fff;stroke-width:.5;transition:opacity .15s}
@@ -60,6 +60,9 @@
       <li><a href="reader.html">三语原文</a></li>
       <li><a href="quiz.html">知识问答</a></li>
     </ul>
+  <button class="site-nav__toggle" id="nav-toggle" aria-label="菜单" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
   </div>
 </nav>
 <main>
@@ -306,9 +309,10 @@ const svg = d3.select('#world-map');
 const tooltip = document.getElementById('map-tooltip');
 const detail = document.getElementById('map-detail');
 
-const W = wrap.clientWidth || 900;
-const H = Math.round(W * 0.52);
-svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+function initMap() {
+  const W = wrap.getBoundingClientRect().width || wrap.offsetWidth || 900;
+  const H = Math.round(W * 0.52);
+  svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
 
 const projection = d3.geoNaturalEarth1()
   .scale(W / 6.2)
@@ -366,7 +370,36 @@ document.getElementById('detail-close').onclick = () => detail.classList.remove(
       detail.scrollIntoView({behavior:'smooth', block:'nearest'});
     });
 })(window.WORLD_TOPO);
+}
 
+// Run after layout is complete
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMap);
+} else {
+  requestAnimationFrame(() => requestAnimationFrame(initMap));
+}
+
+// Re-render on resize
+let resizeTimer;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(function() {
+    svg.selectAll('*').remove();
+    initMap();
+  }, 250);
+});
+
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('nav-toggle');
+  var links=document.querySelector('.site-nav__links');
+  if(btn&&links){btn.addEventListener('click',function(){
+    var open=links.classList.toggle('is-open');
+    btn.classList.toggle('is-open',open);
+    btn.setAttribute('aria-expanded',open);
+  });}
+})();
 </script>
 </body>
 </html>

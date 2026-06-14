@@ -42,6 +42,9 @@
       <li><a href="reader.html">三语原文</a></li>
       <li><a href="quiz.html">知识问答</a></li>
     </ul>
+  <button class="site-nav__toggle" id="nav-toggle" aria-label="菜单" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
   </div>
 </nav>
 <header class="page-hero" style="background:linear-gradient(135deg,#0a0a14 0%,#1a1a2e 50%,#2d1b4e 100%)">
@@ -150,6 +153,17 @@ function renderTimeline() {
   container.innerHTML = html;
 }
 renderTimeline();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('nav-toggle');
+  var links=document.querySelector('.site-nav__links');
+  if(btn&&links){btn.addEventListener('click',function(){
+    var open=links.classList.toggle('is-open');
+    btn.classList.toggle('is-open',open);
+    btn.setAttribute('aria-expanded',open);
+  });}
+})();
 </script>
 </body>
 </html>

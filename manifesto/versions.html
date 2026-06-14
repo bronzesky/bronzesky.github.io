@@ -70,6 +70,9 @@
       <li><a href="reader.html">三语原文</a></li>
       <li><a href="quiz.html">知识问答</a></li>
     </ul>
+  <button class="site-nav__toggle" id="nav-toggle" aria-label="菜单" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
   </div>
 </nav>
 <section class="vlib-hero">
@@ -199,5 +202,16 @@ document.addEventListener('DOMContentLoaded', () => {
     <p>数据来源：Project Gutenberg · Marxists Internet Archive · 各国国家图书馆</p>
   </div>
 </footer>
+<script>
+(function(){
+  var btn=document.getElementById('nav-toggle');
+  var links=document.querySelector('.site-nav__links');
+  if(btn&&links){btn.addEventListener('click',function(){
+    var open=links.classList.toggle('is-open');
+    btn.classList.toggle('is-open',open);
+    btn.setAttribute('aria-expanded',open);
+  });}
+})();
+</script>
 </body>
 </html>
