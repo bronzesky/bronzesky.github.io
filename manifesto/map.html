@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全球传播地图 — 《共产党宣言》展览</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.map-wrap{position:relative;background:#eef2f7;border:1px solid #e8e0d5;overflow:hidden}
+#world-map{width:100%;display:block;cursor:grab}
+#world-map:active{cursor:grabbing}
+.map-country{fill:#ddd8ce;stroke:#fff;stroke-width:.5;transition:opacity .15s}
+.map-country:hover{opacity:.72;cursor:pointer}
+.era-1848{fill:#6b1a1a}.era-1861{fill:#9b2c2c}.era-1871{fill:#c0392b}
+.era-1881{fill:#d4703a}.era-1891{fill:#c8943a}.era-1901{fill:#8b7040}
+.era-1911{fill:#5a6e4a}.era-1921{fill:#3d5a3e}
+.map-graticule{fill:none;stroke:#c8d4e0;stroke-width:.3}
+.map-sphere{fill:#dce8f4}
+.map-tooltip{position:absolute;background:#1a1a1a;color:#fff;padding:.75rem 1rem;font-size:.8rem;pointer-events:none;opacity:0;transition:opacity .15s;max-width:220px;z-index:10;line-height:1.4}
+.map-tooltip.visible{opacity:1}
+.map-tooltip__country{font-weight:700;font-size:.9rem;margin-bottom:.25rem}
+.map-tooltip__year{color:#f0c87a;font-family:"Playfair Display", Georgia, serif;font-size:1.2rem;font-weight:700}
+.map-tooltip__lang{color:#bbb;font-size:.75rem;margin-top:.15rem}
+.map-legend{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;padding:1.25rem 1.5rem;border:1px solid #e8e0d5;border-top:none;background:#fff}
+.map-legend__title{width:100%;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#666;margin-bottom:.25rem}
+.map-legend__item{display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:#666}
+.map-legend__swatch{width:14px;height:14px;flex-shrink:0}
+.map-detail{border:1px solid #e8e0d5;border-top:none;padding:1.5rem 2rem;background:#fff;display:none}
+.map-detail.visible{display:block}
+.map-detail__inner{display:flex;align-items:flex-start;gap:2rem}
+.map-detail__year-block{text-align:center;flex-shrink:0;min-width:80px}
+.map-detail__year{font-family:"Playfair Display", Georgia, serif;font-size:3rem;font-weight:700;color:#8b1a1a;line-height:1}
+.map-detail__year-label{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#666;margin-top:.25rem}
+.map-detail__info{flex:1}
+.map-detail__country{font-family:"Playfair Display", Georgia, serif;font-size:1.3rem;font-weight:700;margin-bottom:.25rem}
+.map-detail__lang{font-size:.85rem;color:#666;letter-spacing:.04em;margin-bottom:.5rem}
+.map-detail__note{font-size:.85rem;color:#666;line-height:1.6}
+.map-detail__close{margin-left:auto;background:none;border:1px solid #e8e0d5;padding:.25rem .75rem;font-size:.8rem;cursor:pointer;color:#666;flex-shrink:0;align-self:flex-start}
+.map-detail__close:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.map-controls{position:absolute;top:1rem;right:1rem;display:flex;flex-direction:column;gap:.25rem}
+.map-btn{width:32px;height:32px;background:rgba(255,255,255,.9);border:1px solid #e8e0d5;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1a1a1a;line-height:1}
+.map-btn:hover{background:#1a1a1a;color:#fff}
+.map-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid #e8e0d5;border-bottom:none;background:#fff}
+.map-stat{padding:1.25rem 1.5rem;border-right:1px solid #e8e0d5;text-align:center}
+.map-stat:last-child{border-right:none}
+.map-stat__n{font-family:"Playfair Display", Georgia, serif;font-size:2rem;font-weight:700;color:#8b1a1a;line-height:1}
+.map-stat__l{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#666;margin-top:.3rem}
+@media(max-width:600px){.map-stats{grid-template-columns:repeat(2,1fr)}.map-stat:nth-child(2){border-right:none}.map-stat:nth-child(3){border-top:1px solid #e8e0d5}.map-detail__inner{flex-direction:column;gap:1rem}.map-detail__year{font-size:2rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav__inner">
+    <a href="index.html" class="site-nav__logo">共产党宣言</a>
+    <ul class="site-nav__links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="person.html">人物志</a></li>
+      <li><a href="timeline.html">历史年表</a></li>
+      <li><a href="map.html" class="active">传播地图</a></li>
+      <li><a href="reader.html">三语原文</a></li>
+      <li><a href="quiz.html">知识问答</a></li>
+    </ul>
+  </div>
+</nav>
+<main>
+  <div class="page-hero" style="background:#1a1a1a">
+    <div class="container">
+      <p class="page-hero__eyebrow">全球传播</p>
+      <h1 class="page-hero__title">《宣言》的世界版图</h1>
+      <p class="page-hero__desc">自1848年德文原版问世，《共产党宣言》在不到一个世纪内传遍全球，被译成100余种语言。地图颜色深浅代表首译年代的早晚——颜色越深，传入越早。点击国家查看详情。</p>
+    </div>
+  </div>
+  <div class="container">
+    <div class="map-stats">
+      <div class="map-stat"><div class="map-stat__n">100+</div><div class="map-stat__l">语言版本</div></div>
+      <div class="map-stat"><div class="map-stat__n">1848</div><div class="map-stat__l">首版年份</div></div>
+      <div class="map-stat"><div class="map-stat__n">1920</div><div class="map-stat__l">中文首译</div></div>
+      <div class="map-stat"><div class="map-stat__n">175+</div><div class="map-stat__l">年传播历史</div></div>
+    </div>
+    <div class="map-wrap" id="map-wrap">
+      <svg id="world-map"></svg>
+      <div class="map-tooltip" id="map-tooltip">
+        <div class="map-tooltip__country" id="tt-country"></div>
+        <div class="map-tooltip__year" id="tt-year"></div>
+        <div class="map-tooltip__lang" id="tt-lang"></div>
+      </div>
+      <div class="map-controls">
+        <button class="map-btn" id="btn-zoom-in" title="放大">+</button>
+        <button class="map-btn" id="btn-zoom-out" title="缩小">−</button>
+        <button class="map-btn" id="btn-reset" title="重置" style="font-size:.65rem">⌂</button>
+      </div>
+    </div>
+    <div class="map-legend">
+      <div class="map-legend__title">首译年代</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#6b1a1a"></div>1848–1860 原版时代</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#9b2c2c"></div>1861–1870 早期扩散</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#c0392b"></div>1871–1880 工人运动</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#d4703a"></div>1881–1890 欧洲全面</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#c8943a"></div>1891–1900 殖民地边缘</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#8b7040"></div>1901–1910 亚洲觉醒</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#5a6e4a"></div>1911–1920 革命浪潮</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#3d5a3e"></div>1921–1940 全球普及</div>
+      <div class="map-legend__item"><div class="map-legend__swatch" style="background:#ddd8ce"></div>暂无记录</div>
+    </div>
+    <div class="map-detail" id="map-detail">
+      <div class="map-detail__inner">
+        <div class="map-detail__year-block">
+          <div class="map-detail__year" id="detail-year"></div>
+          <div class="map-detail__year-label">首译年份</div>
+        </div>
+        <div class="map-detail__info">
+          <div class="map-detail__country" id="detail-country"></div>
+          <div class="map-detail__lang" id="detail-lang"></div>
+          <div class="map-detail__note" id="detail-note"></div>
+        </div>
+        <button class="map-detail__close" id="detail-close">关闭</button>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="container">
+    <p>© 大数据学院2024级本科生班第3团支部</p>
+    <p>数据来源：Wikimedia Commons · Project Gutenberg · marxists.org</p>
+  </div>
+</footer>
+<script src="assets/d3.min.js"></script>
+<script src="assets/topojson.min.js"></script>
+<script src="assets/data/world-110m-inline.js"></script>
+<script>
+const NUM_TO_ISO = {
+  "276":"DEU","826":"GBR","250":"FRA","616":"POL","208":"DNK","752":"SWE",
+  "643":"RUS","380":"ITA","724":"ESP","528":"NLD","620":"PRT","348":"HUN",
+  "203":"CZE","100":"BGR","642":"ROU","688":"SRB","246":"FIN","578":"NOR",
+  "300":"GRC","792":"TUR","392":"JPN","156":"CHN","410":"KOR","356":"IND",
+  "364":"IRN","32":"ARG","76":"BRA","484":"MEX","840":"USA","36":"AUS",
+  "710":"ZAF","818":"EGY","804":"UKR","112":"BLR","440":"LTU","428":"LVA",
+  "233":"EST","703":"SVK","191":"HRV","705":"SVN","8":"ALB","807":"MKD",
+  "360":"IDN","704":"VNM","764":"THA","458":"MYS","608":"PHL",
+  "586":"PAK","50":"BGD","144":"LKA","104":"MMR","116":"KHM",
+  "418":"LAO","496":"MNG","398":"KAZ","860":"UZB","795":"TKM",
+  "417":"KGZ","762":"TJK","31":"AZE","51":"ARM","268":"GEO",
+  "376":"ISR","368":"IRQ","760":"SYR","682":"SAU","887":"YEM",
+  "400":"JOR","422":"LBN","414":"KWT","784":"ARE","634":"QAT",
+  "48":"BHR","512":"OMN","524":"NPL","4":"AFG","408":"PRK",
+  "702":"SGP",
+  "504":"MAR","12":"DZA","788":"TUN","434":"LBY","729":"SDN",
+  "231":"ETH","566":"NGA","288":"GHA","404":"KEN","834":"TZA",
+  "800":"UGA","508":"MOZ","24":"AGO","120":"CMR","686":"SEN",
+  "384":"CIV","450":"MDG","716":"ZWE","894":"ZMB","516":"NAM",
+  "72":"BWA","454":"MWI","646":"RWA","108":"BDI","706":"SOM",
+  "466":"MLI","854":"BFA","562":"NER","148":"TCD","140":"CAF",
+  "180":"COD","178":"COG","266":"GAB","694":"SLE","324":"GIN",
+  "430":"LBR","768":"TGO","204":"BEN",
+  "170":"COL","862":"VEN","604":"PER","152":"CHL","68":"BOL",
+  "218":"ECU","600":"PRY","858":"URY","192":"CUB","320":"GTM",
+  "340":"HND","222":"SLV","558":"NIC","188":"CRI","591":"PAN",
+  "214":"DOM","124":"CAN",
+  "56":"BEL","756":"CHE","40":"AUT","442":"LUX","498":"MDA",
+  "70":"BIH","499":"MNE","372":"IRL","352":"ISL",
+  "554":"NZL"
+};
+const TRANSLATIONS = {
+  "DEU": {year:1848, lang:"德语", note:"马克思恩格斯原著，伦敦出版，标志着科学社会主义的诞生。"},
+  "GBR": {year:1850, lang:"英语", note:"Helen Macfarlane首译，发表于《红色共和党人》杂志。"},
+  "FRA": {year:1848, lang:"法语", note:"与德文版同年出版，在法国工人运动中广泛传播。"},
+  "POL": {year:1848, lang:"波兰语", note:"与德文版同年出版，面向波兰流亡者群体。"},
+  "DNK": {year:1848, lang:"丹麦语", note:"与德文版同年出版，北欧最早译本之一。"},
+  "SWE": {year:1848, lang:"瑞典语", note:"斯堪的纳维亚地区早期传播。"},
+  "RUS": {year:1869, lang:"俄语", note:"巴枯宁首译，后经普列汉诺夫重译，对俄国革命影响深远。"},
+  "ITA": {year:1871, lang:"意大利语", note:"巴黎公社后传入意大利，推动工人运动发展。"},
+  "ESP": {year:1872, lang:"西班牙语", note:"马德里首译，随后在拉丁美洲广泛传播。"},
+  "NLD": {year:1872, lang:"荷兰语", note:"荷兰社会民主运动的重要文献。"},
+  "PRT": {year:1873, lang:"葡萄牙语", note:"里斯本出版，后传入巴西。"},
+  "HUN": {year:1896, lang:"匈牙利语", note:"奥匈帝国时期工人运动的重要读本。"},
+  "CZE": {year:1882, lang:"捷克语", note:"波西米亚工人运动的核心文献。"},
+  "BGR": {year:1891, lang:"保加利亚语", note:"巴尔干地区社会主义运动的传播。"},
+  "ROU": {year:1892, lang:"罗马尼亚语", note:"罗马尼亚社会民主党成立前后出版。"},
+  "SRB": {year:1871, lang:"塞尔维亚语", note:"南斯拉夫地区最早译本之一。"},
+  "FIN": {year:1905, lang:"芬兰语", note:"俄国革命浪潮中传入芬兰。"},
+  "NOR": {year:1878, lang:"挪威语", note:"北欧工人运动的重要文献。"},
+  "GRC": {year:1907, lang:"希腊语", note:"希腊社会主义运动兴起时期出版。"},
+  "TUR": {year:1910, lang:"土耳其语", note:"奥斯曼帝国末期传入，推动土耳其左翼运动。"},
+  "JPN": {year:1904, lang:"日语", note:"幸德秋水等人翻译，对日本社会主义运动影响深远。"},
+  "CHN": {year:1920, lang:"中文", note:"陈望道译，上海出版，是中国共产党成立的重要思想基础。"},
+  "KOR": {year:1923, lang:"朝鲜语", note:"朝鲜独立运动与社会主义思潮结合的产物。"},
+  "IND": {year:1912, lang:"印地语", note:"印度民族解放运动中传入，多种地方语言相继出版。"},
+  "IRN": {year:1909, lang:"波斯语", note:"伊朗立宪革命时期传入。"},
+  "ARG": {year:1890, lang:"西班牙语", note:"布宜诺斯艾利斯出版，拉丁美洲工人运动的重要文献。"},
+  "BRA": {year:1890, lang:"葡萄牙语", note:"圣保罗出版，巴西工人运动的重要读本。"},
+  "MEX": {year:1888, lang:"西班牙语", note:"墨西哥城出版，推动墨西哥劳工运动发展。"},
+  "USA": {year:1871, lang:"英语", note:"纽约出版，在美国工人运动和移民社区中广泛传播。"},
+  "AUS": {year:1890, lang:"英语", note:"澳大利亚工党运动兴起时期传入。"},
+  "ZAF": {year:1920, lang:"英语", note:"南非工人运动中传播，多语言版本相继出现。"},
+  "EGY": {year:1920, lang:"阿拉伯语", note:"埃及民族主义与社会主义思潮结合时期出版。"},
+  "UKR": {year:1902, lang:"乌克兰语", note:"乌克兰民族运动与社会主义思潮结合的产物。"},
+  "BLR": {year:1905, lang:"白俄罗斯语", note:"俄国革命浪潮中传入白俄罗斯。"},
+  "LTU": {year:1895, lang:"立陶宛语", note:"波罗的海地区工人运动的重要文献。"},
+  "LVA": {year:1893, lang:"拉脱维亚语", note:"波罗的海地区最早译本之一。"},
+  "EST": {year:1905, lang:"爱沙尼亚语", note:"俄国1905年革命推动下出版。"},
+  "SVK": {year:1905, lang:"斯洛伐克语", note:"奥匈帝国时期工人运动的重要读本。"},
+  "HRV": {year:1902, lang:"克罗地亚语", note:"南斯拉夫地区社会主义运动的传播。"},
+  "SVN": {year:1898, lang:"斯洛文尼亚语", note:"奥匈帝国时期出版。"},
+  "ALB": {year:1930, lang:"阿尔巴尼亚语", note:"两战之间出版，推动阿尔巴尼亚左翼运动。"},
+  "MKD": {year:1920, lang:"马其顿语", note:"巴尔干地区社会主义运动的传播。"},
+  "BIH": {year:1920, lang:"波斯尼亚语", note:"南斯拉夫社会主义运动的重要组成部分。"},
+  "MNE": {year:1920, lang:"黑山语", note:"南斯拉夫联邦时期广泛传播。"},
+  "SVN": {year:1920, lang:"斯洛文尼亚语", note:"奥匈帝国解体后斯洛文尼亚工人运动兴起。"},
+  "ISL": {year:1934, lang:"冰岛语", note:"北欧劳工运动推动下的翻译出版。"},
+  "IRL": {year:1910, lang:"爱尔兰英语", note:"爱尔兰独立运动与社会主义思潮交汇。"},
+  "LUX": {year:1890, lang:"卢森堡语/法语", note:"卢森堡工人党成立后引入马克思主义文献。"},
+  "MLT": {year:1945, lang:"马耳他语", note:"二战后地中海地区社会主义思潮传播。"},
+  "CYP": {year:1926, lang:"希腊语/土耳其语", note:"塞浦路斯共产党成立后引入。"},
+  "MDA": {year:1920, lang:"摩尔多瓦语", note:"苏联时期广泛传播于摩尔多瓦地区。"},
+  "BLR": {year:1905, lang:"白俄罗斯语", note:"俄国革命运动中白俄罗斯语版本流传。"},
+  "GEO": {year:1900, lang:"格鲁吉亚语", note:"高加索地区社会民主运动的重要文献。"},
+  "ARM": {year:1904, lang:"亚美尼亚语", note:"亚美尼亚社会民主党传播马克思主义。"},
+  "AZE": {year:1905, lang:"阿塞拜疆语", note:"巴库石油工人运动中广泛传播。"},
+  "KAZ": {year:1920, lang:"哈萨克语", note:"苏联时期中亚各民族语言版本出版。"},
+  "UZB": {year:1920, lang:"乌兹别克语", note:"苏联时期中亚地区广泛传播。"},
+  "TKM": {year:1925, lang:"土库曼语", note:"苏联时期中亚地区出版。"},
+  "KGZ": {year:1925, lang:"吉尔吉斯语", note:"苏联时期中亚地区出版。"},
+  "TJK": {year:1925, lang:"塔吉克语", note:"苏联时期中亚地区出版。"},
+  "MNG": {year:1925, lang:"蒙古语", note:"蒙古人民共和国成立后引入马克思主义文献。"},
+  "NPL": {year:1940, lang:"尼泊尔语", note:"尼泊尔共产党成立前后传入。"},
+  "LKA": {year:1935, lang:"僧伽罗语/泰米尔语", note:"锡兰社会主义运动的重要文献。"},
+  "MMR": {year:1938, lang:"缅甸语", note:"缅甸共产党成立前后翻译出版。"},
+  "KHM": {year:1950, lang:"高棉语", note:"印度支那共产主义运动的传播。"},
+  "LAO": {year:1950, lang:"老挝语", note:"老挝人民革命党成立后引入。"},
+  "SGP": {year:1948, lang:"英语/中文/马来语", note:"新加坡多语种版本在工人运动中传播。"},
+  "MYS": {year:1930, lang:"马来语", note:"马来亚共产党成立后引入马克思主义文献。"},
+  "PHL": {year:1930, lang:"菲律宾语/英语", note:"菲律宾共产党成立后翻译传播。"},
+  "IDN": {year:1924, lang:"印度尼西亚语", note:"印尼共产党（PKI）成立后翻译出版，东南亚最早之一。"},
+  "THA": {year:1942, lang:"泰语", note:"泰国共产党成立后引入马克思主义文献。"},
+  "VNM": {year:1927, lang:"越南语", note:"胡志明领导的越南革命运动中广泛传播。"},
+  "PRK": {year:1925, lang:"朝鲜语", note:"朝鲜共产党成立后引入，与韩国共用朝鲜语版本。"},
+  "KOR": {year:1907, lang:"朝鲜语", note:"朝鲜半岛社会主义运动中最早的马克思主义文献之一。"},
+  "JPN": {year:1904, lang:"日语", note:"幸德秋水翻译，日本社会主义运动的奠基文献。"},
+  "CHN": {year:1920, lang:"中文", note:"陈望道译，中国共产党成立前夕出版，影响深远。"},
+  "IND": {year:1912, lang:"印地语/乌尔都语/孟加拉语", note:"印度多语种版本在民族解放运动中传播。"},
+  "PAK": {year:1920, lang:"乌尔都语", note:"南亚地区社会主义运动的重要文献。"},
+  "BGD": {year:1920, lang:"孟加拉语", note:"孟加拉地区工人运动中传播。"},
+  "AFG": {year:1965, lang:"达里语/普什图语", note:"阿富汗人民民主党成立后引入。"},
+  "IRN": {year:1907, lang:"波斯语", note:"伊朗立宪革命时期传入，影响伊朗社会主义运动。"},
+  "IRQ": {year:1935, lang:"阿拉伯语", note:"伊拉克共产党成立后引入马克思主义文献。"},
+  "SYR": {year:1930, lang:"阿拉伯语", note:"叙利亚共产党成立后传播。"},
+  "LBN": {year:1925, lang:"阿拉伯语", note:"黎巴嫩共产党成立后引入。"},
+  "ISR": {year:1920, lang:"希伯来语/意第绪语", note:"巴勒斯坦地区犹太工人运动中传播。"},
+  "JOR": {year:1943, lang:"阿拉伯语", note:"约旦共产党成立后引入。"},
+  "SAU": {year:1975, lang:"阿拉伯语", note:"阿拉伯语版本在海湾地区地下传播。"},
+  "YEM": {year:1965, lang:"阿拉伯语", note:"也门民主人民共和国成立前后广泛传播。"},
+  "EGY": {year:1910, lang:"阿拉伯语", note:"埃及社会主义运动的重要文献，影响纳赛尔主义。"},
+  "MAR": {year:1945, lang:"阿拉伯语/法语", note:"摩洛哥共产党成立后引入。"},
+  "DZA": {year:1936, lang:"阿拉伯语/法语", note:"阿尔及利亚共产党成立后传播。"},
+  "TUN": {year:1934, lang:"阿拉伯语/法语", note:"突尼斯共产党成立后引入。"},
+  "LBY": {year:1970, lang:"阿拉伯语", note:"卡扎菲革命后马克思主义文献广泛传播。"},
+  "SDN": {year:1946, lang:"阿拉伯语", note:"苏丹共产党成立后引入。"},
+  "ETH": {year:1974, lang:"阿姆哈拉语", note:"埃塞俄比亚革命后马克思主义成为官方意识形态。"},
+  "NGA": {year:1945, lang:"英语", note:"尼日利亚工人运动中传播，影响独立运动。"},
+  "GHA": {year:1950, lang:"英语", note:"恩克鲁玛领导的加纳独立运动中传播。"},
+  "KEN": {year:1950, lang:"英语/斯瓦希里语", note:"肯尼亚独立运动中传播。"},
+  "TZA": {year:1961, lang:"斯瓦希里语", note:"坦桑尼亚独立后引入马克思主义文献。"},
+  "UGA": {year:1962, lang:"英语", note:"乌干达独立后传播。"},
+  "MOZ": {year:1975, lang:"葡萄牙语", note:"莫桑比克独立后马克思主义成为官方意识形态。"},
+  "AGO": {year:1975, lang:"葡萄牙语", note:"安哥拉独立后马克思主义成为官方意识形态。"},
+  "ZAF": {year:1915, lang:"英语/南非荷兰语", note:"南非共产党（SACP）成立后引入，反种族隔离运动的重要文献。"},
+  "ZWE": {year:1980, lang:"英语/绍纳语", note:"津巴布韦独立后传播。"},
+  "ZMB": {year:1964, lang:"英语", note:"赞比亚独立后传播。"},
+  "SEN": {year:1945, lang:"法语", note:"塞内加尔共产党成立后引入。"},
+  "CIV": {year:1950, lang:"法语", note:"科特迪瓦独立运动中传播。"},
+  "CMR": {year:1948, lang:"法语", note:"喀麦隆共产党成立后引入。"},
+  "COD": {year:1960, lang:"法语", note:"刚果（金）独立后传播，卢蒙巴运动的重要文献。"},
+  "COG": {year:1963, lang:"法语", note:"刚果（布）革命后马克思主义成为官方意识形态。"},
+  "CUB": {year:1896, lang:"西班牙语", note:"古巴独立运动时期传入，后成为卡斯特罗革命的理论基础。"},
+  "MEX": {year:1888, lang:"西班牙语", note:"墨西哥最早的西班牙语版本之一，影响墨西哥革命。"},
+  "ARG": {year:1890, lang:"西班牙语", note:"阿根廷社会党成立后广泛传播。"},
+  "BRA": {year:1890, lang:"葡萄牙语", note:"巴西工人运动中传播，影响巴西共产党成立。"},
+  "CHL": {year:1897, lang:"西班牙语", note:"智利工人运动的重要文献，影响阿连德社会主义。"},
+  "COL": {year:1920, lang:"西班牙语", note:"哥伦比亚共产党成立后引入。"},
+  "VEN": {year:1910, lang:"西班牙语", note:"委内瑞拉社会主义运动的重要文献。"},
+  "PER": {year:1920, lang:"西班牙语", note:"秘鲁共产党成立后引入。"},
+  "BOL": {year:1925, lang:"西班牙语", note:"玻利维亚工人运动中传播。"},
+  "ECU": {year:1926, lang:"西班牙语", note:"厄瓜多尔共产党成立后引入。"},
+  "PRY": {year:1928, lang:"西班牙语", note:"巴拉圭共产党成立后引入。"},
+  "URY": {year:1910, lang:"西班牙语", note:"乌拉圭社会党成立后广泛传播。"},
+  "USA": {year:1871, lang:"英语", note:"美国最早的英文版本，影响美国劳工运动和社会主义党。"},
+  "CAN": {year:1872, lang:"英语/法语", note:"加拿大工人运动中传播，影响加拿大共产党成立。"},
+  "AUS": {year:1890, lang:"英语", note:"澳大利亚工党成立前后广泛传播。"},
+  "NZL": {year:1900, lang:"英语", note:"新西兰工人运动中传播。"}
+};
+
+function getEraClass(year) {
+  if (!year) return '';
+  if (year <= 1860) return 'era-1848';
+  if (year <= 1870) return 'era-1861';
+  if (year <= 1880) return 'era-1871';
+  if (year <= 1890) return 'era-1881';
+  if (year <= 1900) return 'era-1891';
+  if (year <= 1910) return 'era-1901';
+  if (year <= 1920) return 'era-1911';
+  return 'era-1921';
+}
+
+const wrap = document.getElementById('map-wrap');
+const svg = d3.select('#world-map');
+const tooltip = document.getElementById('map-tooltip');
+const detail = document.getElementById('map-detail');
+
+const W = wrap.clientWidth || 900;
+const H = Math.round(W * 0.52);
+svg.attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+
+const projection = d3.geoNaturalEarth1()
+  .scale(W / 6.2)
+  .translate([W / 2, H / 2]);
+const path = d3.geoPath().projection(projection);
+
+const g = svg.append('g');
+g.append('path').datum({type:'Sphere'}).attr('class','map-sphere').attr('d', path);
+g.append('path').datum(d3.geoGraticule()()).attr('class','map-graticule').attr('d', path);
+
+const zoom = d3.zoom().scaleExtent([1, 8]).on('zoom', e => g.attr('transform', e.transform));
+svg.call(zoom);
+
+document.getElementById('btn-zoom-in').onclick = () => svg.transition().call(zoom.scaleBy, 1.5);
+document.getElementById('btn-zoom-out').onclick = () => svg.transition().call(zoom.scaleBy, 0.67);
+document.getElementById('btn-reset').onclick = () => svg.transition().call(zoom.transform, d3.zoomIdentity);
+document.getElementById('detail-close').onclick = () => detail.classList.remove('visible');
+
+(function(world) {
+  const countries = topojson.feature(world, world.objects.countries);
+  g.selectAll('.map-country')
+    .data(countries.features)
+    .join('path')
+    .attr('class', d => {
+      const iso = d.id && NUM_TO_ISO[String(d.id)];
+      const t = TRANSLATIONS[iso];
+      return 'map-country ' + (t ? getEraClass(t.year) : '');
+    })
+    .attr('d', path)
+    .on('mousemove', function(event, d) {
+      const iso = d.id && NUM_TO_ISO[String(d.id)];
+      const t = TRANSLATIONS[iso];
+      if (!t) return;
+      const rect = wrap.getBoundingClientRect();
+      const x = event.clientX - rect.left + 12;
+      const y = event.clientY - rect.top - 10;
+      document.getElementById('tt-country').textContent = d.properties.name || iso;
+      document.getElementById('tt-year').textContent = t.year + ' 年';
+      document.getElementById('tt-lang').textContent = t.lang;
+      tooltip.style.left = Math.min(x, W - 230) + 'px';
+      tooltip.style.top = Math.max(y, 5) + 'px';
+      tooltip.classList.add('visible');
+    })
+    .on('mouseleave', () => tooltip.classList.remove('visible'))
+    .on('click', function(event, d) {
+      const iso = d.id && NUM_TO_ISO[String(d.id)];
+      const t = TRANSLATIONS[iso];
+      if (!t) return;
+      tooltip.classList.remove('visible');
+      document.getElementById('detail-year').textContent = t.year;
+      document.getElementById('detail-country').textContent = d.properties.name || iso;
+      document.getElementById('detail-lang').textContent = '语言：' + t.lang;
+      document.getElementById('detail-note').textContent = t.note;
+      detail.classList.add('visible');
+      detail.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+})(window.WORLD_TOPO);
+
+</script>
+</body>
+</html>

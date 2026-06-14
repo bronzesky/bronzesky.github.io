@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <clipPath id="c2">
+      <circle cx="200" cy="250" r="180"/>
+    </clipPath>
+  </defs>
+  <!-- Background Circle (Soft Sky Blue) -->
+  <circle cx="200" cy="250" r="180" fill="#B3E5FC"/>
+  
+  <g clip-path="url(#c2)">
+    <!-- Neck Drop Shadow / Neck -->
+    <rect x="175" y="240" width="50" height="80" fill="#FFAB91"/>
+    <rect x="175" y="240" width="50" height="30" fill="#FFCCBC"/>
+    
+    <!-- Torso / Suit (Charcoal) -->
+    <path d="M 60 450 C 60 360 120 340 200 340 C 280 340 340 360 340 450 Z" fill="#37474F"/>
+    
+    <!-- Inner Vest -->
+    <path d="M 150 340 L 200 430 L 250 340 Z" fill="#90A4AE"/>
+    
+    <!-- Shirt -->
+    <path d="M 175 340 L 200 380 L 225 340 Z" fill="#FFFFFF"/>
+    <!-- Tie (Dark Teal Accent) -->
+    <path d="M 190 340 L 210 340 L 205 380 L 195 380 Z" fill="#00838F"/>
+    
+    <!-- Head/Face (No Features) -->
+    <rect x="145" y="140" width="110" height="135" rx="45" fill="#FFCCBC"/>
+    
+    <!-- Beard Base -->
+    <path d="M 145 210 V 240 C 145 270 170 285 200 285 C 230 285 255 270 255 240 V 210 Z" fill="#4E342E"/>
+    <!-- Mustache -->
+    <path d="M 165 240 Q 200 220 235 240 Q 200 255 165 240 Z" fill="#3D251E"/>
+    <!-- Sideburns -->
+    <rect x="140" y="160" width="10" height="60" rx="5" fill="#4E342E"/>
+    <rect x="250" y="160" width="10" height="60" rx="5" fill="#4E342E"/>
+    
+    <!-- Glasses Props (Popular accessory for faceless designs) -->
+    <circle cx="172" cy="190" r="15" stroke="#3E2723" stroke-width="3" fill="none"/>
+    <circle cx="228" cy="190" r="15" stroke="#3E2723" stroke-width="3" fill="none"/>
+    <path d="M 187 190 Q 200 185 213 190" stroke="#3E2723" stroke-width="3" fill="none"/>
+    <path d="M 145 185 L 157 190" stroke="#3E2723" stroke-width="3"/>
+    <path d="M 255 185 L 243 190" stroke="#3E2723" stroke-width="3"/>
+    
+    <!-- Hair Overlap (Side parted) -->
+    <path d="M 145 170 C 135 120 180 110 215 110 C 245 110 260 130 255 170 C 255 140 235 130 200 130 C 170 130 155 150 145 170 Z" fill="#4E342E"/>
+  </g>
+</svg>

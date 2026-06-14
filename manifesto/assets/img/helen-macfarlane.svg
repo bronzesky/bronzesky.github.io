@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  <defs>
+    <clipPath id="c">
+      <circle cx="200" cy="250" r="180"/>
+    </clipPath>
+  </defs>
+  <!-- Background Circle (Soft Rose) -->
+  <circle cx="200" cy="250" r="180" fill="#F8BBD0"/>
+  
+  <g clip-path="url(#c)">
+    <!-- Neck Drop Shadow / Neck -->
+    <rect x="175" y="240" width="50" height="80" fill="#FFAB91"/>
+    <rect x="175" y="240" width="50" height="30" fill="#FFCCBC"/>
+    
+    <!-- Torso / Dress (Navy) -->
+    <path d="M 70 450 C 70 350 130 330 200 330 C 270 330 330 350 330 450 Z" fill="#283593"/>
+    
+    <!-- Victorian Lace Collar Details -->
+    <path d="M 155 330 L 245 330 L 225 390 L 175 390 Z" fill="#F5F5F5"/>
+    <path d="M 200 330 L 175 390 L 225 390 Z" fill="#E0E0E0"/>
+    <!-- Brooch / Ribbon -->
+    <circle cx="200" cy="350" r="10" fill="#C62828"/>
+    
+    <!-- Hair Layer (Back) -->
+    <circle cx="200" cy="160" r="65" fill="#3D251E"/>
+    <circle cx="200" cy="110" r="35" fill="#3D251E"/> <!-- Updo/Bun -->
+    <circle cx="140" cy="220" r="25" fill="#3D251E"/> <!-- Base curls -->
+    <circle cx="260" cy="220" r="25" fill="#3D251E"/>
+    
+    <!-- Head/Face (No Features) -->
+    <rect x="145" y="145" width="110" height="135" rx="50" fill="#FFCCBC"/>
+    
+    <!-- Hair Overlap (Sweeping bangs) -->
+    <path d="M 143 195 C 135 120 180 115 210 120 C 240 125 260 145 257 195 C 255 170 230 145 200 150 C 170 155 155 175 143 195 Z" fill="#3D251E"/>
+  </g>
+</svg>

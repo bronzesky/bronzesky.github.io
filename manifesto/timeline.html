@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>年表 — 共产党宣言</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.timeline-layout{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;max-width:1100px;margin:0 auto;padding:2rem 1rem}
+.timeline-col-header{text-align:center;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:#888;padding:.5rem;border-bottom:2px solid #e8e0d5;margin-bottom:1.5rem}
+.timeline-col-header.left{text-align:right}
+.timeline-col-header.right{text-align:left}
+.timeline-spine{display:flex;flex-direction:column;align-items:center;padding-top:2.5rem}
+.timeline-spine__line{width:2px;flex:1;background:linear-gradient(to bottom,#8b1a1a,#c9a96e)}
+.tl-item{display:contents}
+.tl-left{text-align:right;padding:.75rem 1.5rem .75rem 0;border-right:none}
+.tl-right{text-align:left;padding:.75rem 0 .75rem 1.5rem;border-left:none}
+.tl-center{display:flex;align-items:center;justify-content:center;position:relative}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:#8b1a1a;border:2px solid #fff;box-shadow:0 0 0 2px #8b1a1a;flex-shrink:0;z-index:1}
+.tl-dot.gold{background:#c9a96e;box-shadow:0 0 0 2px #c9a96e}
+.tl-year{font-family:"Playfair Display",Georgia,serif;font-size:1.1rem;font-weight:700;color:#8b1a1a;margin-bottom:.2rem}
+.tl-year.gold{color:#c9a96e}
+.tl-title{font-size:.9rem;font-weight:600;color:#1a1a1a;margin-bottom:.25rem}
+.tl-desc{font-size:.8rem;color:#666;line-height:1.5}
+.tl-tag{display:inline-block;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .5rem;border-radius:2px;margin-bottom:.3rem}
+.tl-tag.world{background:#f0ebe3;color:#8b6914}
+.tl-tag.manifesto{background:#fdf0f0;color:#8b1a1a}
+.tl-tag.china{background:#f0f5f0;color:#2d6a2d}
+.tl-empty{padding:.75rem 0}
+@media(max-width:640px){.timeline-layout{grid-template-columns:0 40px 1fr}.tl-left{display:none}.tl-center{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav__inner">
+    <a href="index.html" class="site-nav__logo">共产党宣言</a>
+    <ul class="site-nav__links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="person.html">人物志</a></li>
+      <li><a href="timeline.html" class="active">历史年表</a></li>
+      <li><a href="map.html">传播地图</a></li>
+      <li><a href="reader.html">三语原文</a></li>
+      <li><a href="quiz.html">知识问答</a></li>
+    </ul>
+  </div>
+</nav>
+<header class="page-hero" style="background:linear-gradient(135deg,#0a0a14 0%,#1a1a2e 50%,#2d1b4e 100%)">
+  <div class="container">
+    <p class="page-hero__eyebrow">历史脉络</p>
+    <h1 class="page-hero__title">年表</h1>
+    <p class="page-hero__desc">从1848年首版到1920年中文首译，《共产党宣言》如何在175年间改变世界。</p>
+  </div>
+</header>
+<div class="container" style="padding:2rem 1rem 0">
+  <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
+    <span style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#666"><span style="width:10px;height:10px;border-radius:50%;background:#8b6914;display:inline-block"></span>世界历史事件</span>
+    <span style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#666"><span style="width:10px;height:10px;border-radius:50%;background:#8b1a1a;display:inline-block"></span>宣言出版与传播</span>
+    <span style="display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:#666"><span style="width:10px;height:10px;border-radius:50%;background:#2d6a2d;display:inline-block"></span>中国传播</span>
+  </div>
+  <div class="timeline-layout">
+    <div class="timeline-col-header left">世界历史</div>
+    <div></div>
+    <div class="timeline-col-header right">宣言与中国</div>
+    <div id="timelineContent" style="display:contents"></div>
+  </div>
+</div>
+<footer class="site-footer">
+  <div class="container">
+    <p>© 大数据学院2024级本科生班第3团支部</p>
+    <p>数据来源：Project Gutenberg · Marxists Internet Archive · 各国国家图书馆</p>
+  </div>
+</footer>
+<script>
+const EVENTS = [
+  {year:1844, side:'left', tag:'world', title:'欧洲工人运动兴起',
+   desc:'西里西亚纺织工人起义，欧洲工业革命带来严重的社会分化，工人阶级开始组织化抗争。'},
+  {year:1845, side:'right', tag:'manifesto', title:'马克思与恩格斯在布鲁塞尔会面',
+   desc:'马克思与恩格斯在布鲁塞尔深化合作，开始系统阐述历史唯物主义理论，为宣言奠定思想基础。'},
+  {year:1847, side:'left', tag:'world', title:'共产主义者同盟成立',
+   desc:'1847年6月，共产主义者同盟在伦敦成立，委托马克思和恩格斯起草纲领性文件。'},
+  {year:1848, side:'right', tag:'manifesto', title:'《共产党宣言》德文首版出版',
+   desc:'1848年2月，《共产党宣言》在伦敦以德文首次出版，印量约1000册，共23页。开篇即是震撼人心的宣言："一个幽灵，共产主义的幽灵，在欧洲游荡。"'},
+  {year:1848, side:'left', tag:'world', title:'欧洲革命浪潮',
+   desc:'1848年革命席卷法国、德意志、奥地利、意大利等地，史称"民族之春"。宣言在革命浪潮中广泛传播。'},
+  {year:1850, side:'right', tag:'manifesto', title:'英文首译本出版',
+   desc:'海伦·麦克法兰完成英文首译，发表于《红色共和党人》杂志，这是宣言的第一个英文版本。'},
+  {year:1864, side:'left', tag:'world', title:'第一国际成立',
+   desc:'国际工人协会（第一国际）在伦敦成立，马克思担任总委员会委员，宣言思想在国际工人运动中广泛传播。'},
+  {year:1869, side:'right', tag:'manifesto', title:'德文第二版出版',
+   desc:'马克思和恩格斯修订出版德文第二版，对文本进行了重要修订和补充。'},
+  {year:1871, side:'left', tag:'world', title:'巴黎公社',
+   desc:'巴黎公社建立，历时72天，是人类历史上第一个无产阶级政权的尝试，深刻影响了马克思和恩格斯对宣言的修订。'},
+  {year:1872, side:'right', tag:'manifesto', title:'德文第三版+法文版',
+   desc:'马克思和恩格斯根据巴黎公社经验修订出版德文第三版，附重要序言；同年劳拉·拉法格完成法文译本。'},
+  {year:1882, side:'right', tag:'manifesto', title:'俄文版出版',
+   desc:'普列汉诺夫翻译的俄文版出版，附马克思和恩格斯专为俄文版撰写的序言，预言俄国革命的可能性。'},
+  {year:1883, side:'left', tag:'world', title:'马克思逝世',
+   desc:'1883年3月14日，卡尔·马克思在伦敦逝世，享年64岁。恩格斯继续推动宣言的传播和修订工作。'},
+  {year:1888, side:'right', tag:'manifesto', title:'英文权威版出版',
+   desc:'塞缪尔·摩尔在恩格斯指导下完成英文权威译本，附恩格斯详细注释，成为最广泛引用的英文版本。'},
+  {year:1890, side:'right', tag:'manifesto', title:'德文第四版（恩格斯最终修订）',
+   desc:'恩格斯独自修订出版德文第四版，附1890年序言，回顾宣言42年传播历史，确立权威文本。'},
+  {year:1895, side:'left', tag:'world', title:'恩格斯逝世',
+   desc:'1895年8月5日，弗里德里希·恩格斯在伦敦逝世，享年74岁。此时宣言已被译成十余种语言。'},
+  {year:1899, side:'right', tag:'china', title:'宣言内容首次传入中国',
+   desc:'梁启超在《清议报》中首次介绍马克思及其学说，宣言的部分思想开始进入中国知识界视野。'},
+  {year:1906, side:'right', tag:'china', title:'宣言章节首次中译',
+   desc:'朱执信在《民报》发表文章，翻译了宣言的部分段落，是宣言内容的最早中文译介之一。'},
+  {year:1917, side:'left', tag:'world', title:'俄国十月革命',
+   desc:'布尔什维克领导的十月革命推翻临时政府，建立苏维埃政权，极大地激励了中国先进知识分子。'},
+  {year:1919, side:'left', tag:'world', title:'五四运动',
+   desc:'五四运动爆发，中国知识界掀起思想解放浪潮，马克思主义开始在中国广泛传播，为宣言中译创造条件。'},
+  {year:1920, side:'right', tag:'china', title:'陈望道完成中文首个全译本',
+   desc:'陈望道在浙江义乌分水塘村，以日文版为主参照英文版，历时数月完成《共产党宣言》中文全译本，8月由上海社会主义研究社出版，首印1000册。'},
+  {year:1921, side:'right', tag:'china', title:'中国共产党成立',
+   desc:'1921年7月，中国共产党在上海成立。毛泽东、周恩来等早期领导人均读过陈望道译本，宣言成为建党的思想基础。'},
+  {year:1930, side:'right', tag:'china', title:'中文修订版出版',
+   desc:'华兴书局出版中文修订版，对陈望道译本进行了修订和完善，进一步扩大了宣言在中国的传播。'},
+  {year:1948, side:'right', tag:'manifesto', title:'出版百年纪念',
+   desc:'《共产党宣言》出版百年，已被译成数十种语言，全球发行数百万册，成为人类历史上发行量最大的政治文献之一。'},
+  {year:1927, side:'left', tag:'china', title:'大革命失败与南昌起义',
+   desc:'1927年蒋介石发动四一二政变，国共合作破裂。同年8月1日，中国共产党发动南昌起义，打响武装反抗国民党反动派的第一枪，开始独立领导武装斗争。'},
+  {year:1934, side:'left', tag:'china', title:'长征开始',
+   desc:'1934年10月，中央红军被迫开始战略转移，历时两年、跨越两万五千里的长征。这一壮举成为中国共产党历史上的重要转折点，展现了革命意志与马克思主义信仰的力量。'},
+  {year:1935, side:'left', tag:'china', title:'遵义会议',
+   desc:'1935年1月，遵义会议确立了毛泽东在党内的领导地位，是中国共产党历史上生死攸关的转折点，标志着党从幼稚走向成熟。'},
+  {year:1937, side:'left', tag:'china', title:'抗日战争全面爆发',
+   desc:'1937年7月7日卢沟桥事变，抗日战争全面爆发。中国共产党以马克思主义为指导，领导敌后抗日根据地，《共产党宣言》在艰苦岁月中激励无数革命者。'},
+  {year:1945, side:'left', tag:'china', title:'抗日战争胜利',
+   desc:'1945年8月15日，日本宣布无条件投降，中国人民取得抗日战争的伟大胜利。中国共产党在抗战中发展壮大，为解放战争奠定基础。'},
+  {year:1949, side:'left', tag:'china', title:'中华人民共和国成立',
+   desc:'1949年10月1日，毛泽东在天安门城楼宣告中华人民共和国成立。这是马克思主义在中国的伟大胜利，《共产党宣言》的思想在中国大地上结出了历史性果实。'}
+];
+function renderTimeline() {
+  const container = document.getElementById('timelineContent');
+  // Sort by year to ensure chronological order on the timeline
+  EVENTS.sort((a, b) => a.year - b.year || (a.side === 'left' ? -1 : 1));
+  let html = '';
+  EVENTS.forEach(ev => {
+    const tagLabel = ev.tag === 'world' ? '世界历史' : ev.tag === 'china' ? '中国传播' : '宣言传播';
+    const dotClass = ev.tag === 'world' ? '' : ev.tag === 'china' ? ' gold' : '';
+    const tagClass = ev.tag === 'world' ? 'world' : ev.tag === 'china' ? 'china' : 'manifesto';
+    const card = `<div class="tl-year${dotClass ? ' gold':''}">` + ev.year + `</div><span class="tl-tag ${tagClass}">` + tagLabel + `</span><div class="tl-title">` + ev.title + `</div><div class="tl-desc">` + ev.desc + `</div>`;
+    if (ev.side === 'left') {
+      html += `<div class="tl-left">${card}</div><div class="tl-center"><div class="tl-dot${dotClass}"></div></div><div class="tl-empty"></div>`;
+    } else {
+      html += `<div class="tl-empty"></div><div class="tl-center"><div class="tl-dot${dotClass}"></div></div><div class="tl-right">${card}</div>`;
+    }
+  });
+  container.innerHTML = html;
+}
+renderTimeline();
+</script>
+</body>
+</html>

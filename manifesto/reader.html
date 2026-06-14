@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>原文阅读 — 共产党宣言</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.reader-layout{display:grid;grid-template-columns:260px 1fr;gap:0;min-height:calc(100vh - 60px)}
+.reader-sidebar{background:#faf8f5;border-right:1px solid #e8e0d5;padding:1.5rem 0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.reader-sidebar__lang{padding:0 1rem 1rem;border-bottom:1px solid #e8e0d5;margin-bottom:1rem}
+.lang-btn{display:block;width:100%;text-align:left;padding:.5rem .75rem;border:1px solid #e8e0d5;background:#fff;cursor:pointer;font-size:.8rem;letter-spacing:.05em;margin-bottom:.4rem;border-radius:2px;transition:all .2s}
+.lang-btn.active{background:#8b1a1a;color:#fff;border-color:#8b1a1a}
+.reader-sidebar__toc{padding:0 1rem}
+.toc-label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#aaa;margin-bottom:.5rem}
+.toc-item{display:block;padding:.4rem .5rem;font-size:.82rem;color:#555;text-decoration:none;border-radius:2px;cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;line-height:1.4}
+.toc-item:hover{background:#f0ebe3;color:#1a1a1a}
+.toc-item.active{background:#fdf0f0;color:#8b1a1a;font-weight:600}
+.reader-main{padding:3rem 4rem;max-width:780px}
+.reader-lang-badge{display:inline-block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .6rem;border-radius:2px;background:#f0ebe3;color:#8b6914;margin-bottom:2rem}
+.reader-chapter{margin-bottom:4rem;padding-bottom:2rem;border-bottom:1px solid #e8e0d5;scroll-margin-top:80px}
+.reader-chapter:last-child{border-bottom:none}
+.reader-chapter__num{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:#aaa;margin-bottom:.3rem}
+.reader-chapter__title{font-family:"Playfair Display",Georgia,serif;font-size:1.6rem;color:#1a1a1a;margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:2px solid #e8e0d5}
+.reader-chapter__body{font-size:1rem;line-height:1.9;color:#333}
+.reader-chapter__body p{margin-bottom:1.2em}
+.reader-chapter__body h3{font-family:Georgia,serif;font-size:1.1rem;margin:1.5em 0 .6em;color:#1a1a1a}
+.reader-chapter__body h4{font-family:Georgia,serif;font-size:1rem;margin:1.2em 0 .5em;color:#333}
+.reader-chapter__body blockquote{border-left:3px solid #8b1a1a;padding-left:1.5rem;margin:1.5rem 0;color:#555;font-style:italic}
+.reader-chapter__body .mia-nav{display:none}
+@media(max-width:768px){.reader-layout{grid-template-columns:1fr}.reader-sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid #e8e0d5}.reader-main{padding:1.5rem 1rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav__inner">
+    <a href="index.html" class="site-nav__logo">共产党宣言</a>
+    <ul class="site-nav__links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="person.html">人物志</a></li>
+      <li><a href="timeline.html">历史年表</a></li>
+      <li><a href="map.html">传播地图</a></li>
+      <li><a href="reader.html" class="active">三语原文</a></li>
+      <li><a href="quiz.html">知识问答</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="reader-layout">
+  <aside class="reader-sidebar">
+    <div class="reader-sidebar__lang">
+      <p class="toc-label" style="margin-bottom:.6rem">选择语言</p>
+      <button class="lang-btn active" data-lang="zh" id="btn-zh">中文（陈望道译，1920）</button>
+      <button class="lang-btn" data-lang="en" id="btn-en">English (Moore, 1888)</button>
+      <button class="lang-btn" data-lang="de" id="btn-de">Deutsch (Erstausgabe, 1848)</button>
+    </div>
+    <div class="reader-sidebar__toc">
+      <p class="toc-label">目录</p>
+      <ul id="chapterList" style="list-style:none;padding:0;margin:0"></ul>
+    </div>
+  </aside>
+  <main class="reader-main" id="readerMain">
+    <div id="langBadge" class="reader-lang-badge">中文 · 陈望道译本（1920）</div>
+    <div id="readerContent"></div>
+  </main>
+</div>
+<footer class="site-footer">
+  <div class="container">
+    <p>© 大数据学院2024级本科生班第3团支部</p>
+    <p>数据来源：Project Gutenberg · Marxists Internet Archive · 各国国家图书馆</p>
+  </div>
+</footer>
+<script src="assets/data/chapters-en.js"></script>
+<script src="assets/data/chapters-de.js"></script>
+<script src="assets/data/chapters-zh.js"></script>
+<script>
+let currentLang = "zh";
+let observer = null;
+
+const LANG_LABELS = {
+  zh: "中文 · 陈望道译本（1920）",
+  en: "English · Samuel Moore trans. (1888)",
+  de: "Deutsch · Erstausgabe (1848)"
+};
+
+function getChapters(lang) {
+  if (lang === "zh" && typeof CHAPTERS_ZH !== "undefined") {
+    const numMap = {};
+    return CHAPTERS_ZH.map(c => ({id:c.id, num:c.num, title:c.title, html:c.html}));
+  }
+  if (lang === "en" && typeof CHAPTERS_EN !== "undefined") {
+    const numMap = {preface:"Preface", ch1:"Chapter I", ch2:"Chapter II", ch3:"Chapter III", ch4:"Chapter IV"};
+    return CHAPTERS_EN.map(c => ({id:c.id, num:numMap[c.id]||c.id, title:c.title, html:cleanHtml(c.html, "en")}));
+  }
+  if (lang === "de" && typeof CHAPTERS_DE !== "undefined") {
+    const numMap = {preface:"Vorwort", ch1:"I. Kapitel", ch2:"II. Kapitel", ch3:"III. Kapitel", ch4:"IV. Kapitel"};
+    return CHAPTERS_DE.map(c => ({id:c.id, num:numMap[c.id]||c.id, title:c.title, html:cleanHtml(c.html, "de")}));
+  }
+  return [];
+}
+
+function cleanHtml(html, lang) {
+  let tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  tmp.querySelectorAll("p").forEach(p => {
+    const t = p.textContent.trim();
+    if (t.startsWith("MIA") || t.startsWith("Anfang der Seite") ||
+        t.startsWith("Zuletzt aktualisiert") || t.startsWith("The Communist Manifesto") ||
+        t === "[From the English edition of 1888, edited by Friedrich Engels]" ||
+        t.startsWith("Contents") || /^[IVX]+\.$/.test(t) ||
+        (lang==="de" && /^Karl Marx.*Friedrich Engels$/.test(t))) {
+      p.remove();
+    }
+  });
+  // Remove standalone h3 that are just roman numerals like "I.", "II.", "III.", "IV."
+  tmp.querySelectorAll("h3").forEach(h => {
+    const t = h.textContent.trim();
+    if (/^[IVX]+\.$/.test(t)) { h.remove(); return; }
+    if (t.startsWith("Karl Marx") || t.startsWith("Manifest der") ||
+        t === "Manifesto of the Communist Party" ||
+        t === "BOURGEOIS AND PROLETARIANS" ||
+        t === "PROLETARIANS AND COMMUNISTS" ||
+        t === "SOCIALIST AND COMMUNIST LITERATURE" ||
+        t === "POSITION OF THE COMMUNISTS IN RELATION TO THE VARIOUS EXISTING OPPOSITION PARTIES") {
+      h.remove();
+    }
+  });
+  return tmp.innerHTML;
+}
+
+function renderAll(lang) {
+  const chapters = getChapters(lang);
+  document.getElementById("langBadge").textContent = LANG_LABELS[lang];
+
+  // Sidebar TOC
+  const list = document.getElementById("chapterList");
+  list.innerHTML = chapters.map(c =>
+    `<li><a href="#chapter-${c.id}" class="toc-item" data-id="${c.id}">${c.title}</a></li>`
+  ).join("");
+  list.querySelectorAll("a").forEach(a => {
+    a.addEventListener("click", e => {
+      e.preventDefault();
+      const el = document.getElementById("chapter-" + a.dataset.id);
+      if (el) el.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+
+  // Render all chapters
+  document.getElementById("readerContent").innerHTML = chapters.map(c => `
+    <section class="reader-chapter" id="chapter-${c.id}">
+      <h2 class="reader-chapter__title">${c.title}</h2>
+      <div class="reader-chapter__body">${c.html}</div>
+    </section>
+  `).join("");
+
+  setupObserver(chapters);
+}
+
+function setupObserver(chapters) {
+  if (observer) observer.disconnect();
+  observer = new IntersectionObserver(entries => {
+    let best = null, bestRatio = -1;
+    entries.forEach(e => {
+      if (e.isIntersecting && e.intersectionRatio > bestRatio) {
+        bestRatio = e.intersectionRatio;
+        best = e.target.id.replace("chapter-", "");
+      }
+    });
+    if (best) highlightToc(best);
+  }, {threshold: [0, 0.1, 0.3], rootMargin: "-80px 0px -40% 0px"});
+
+  chapters.forEach(c => {
+    const el = document.getElementById("chapter-" + c.id);
+    if (el) observer.observe(el);
+  });
+}
+
+function highlightToc(id) {
+  document.querySelectorAll(".toc-item").forEach(a => {
+    a.classList.toggle("active", a.dataset.id === id);
+  });
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentLang = btn.dataset.lang;
+    renderAll(currentLang);
+    window.scrollTo(0, 0);
+  });
+});
+
+renderAll("zh");
+</script>
+</body>
+</html>

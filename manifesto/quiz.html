@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知识问答 — 共产党宣言</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* Quiz styles */
+.c-quiz{max-width:720px;margin:0 auto}
+.c-quiz__progress{display:flex;gap:4px;margin-bottom:40px}
+.c-quiz__progress-step{flex:1;height:3px;background:#e8e0d5;transition:background .3s}
+.c-quiz__progress-step.is-done{background:#8b1a1a}
+.c-quiz__progress-step.is-current{background:#555}
+.c-quiz__progress-step.is-correct{background:#2D6A2D}
+.c-quiz__progress-step.is-wrong{background:#8b1a1a}
+.c-quiz__question-num{font-size:.6875rem;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:12px}
+.c-quiz__question-text{font-family:"Playfair Display",Georgia,serif;font-size:1.375rem;font-weight:normal;line-height:1.4;margin-bottom:32px}
+.c-quiz__options{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.c-quiz__option{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;border:1px solid #e8e0d5;cursor:pointer;transition:border-color .15s,background .15s;text-align:left;width:100%;background:none;font:inherit}
+.c-quiz__option:hover{border-color:#555;background:#f5f1eb}
+.c-quiz__option.is-selected{border-color:#1a1a1a;background:#f5f1eb}
+.c-quiz__option.is-correct{border-color:#2D6A2D;background:#F0F7F0}
+.c-quiz__option.is-wrong{border-color:#8b1a1a;background:#FDF5F5}
+.c-quiz__option-letter{width:24px;height:24px;border:1px solid #e8e0d5;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0}
+.c-quiz__option-text{font-size:.9375rem;line-height:1.5}
+.c-quiz__explanation{padding:16px 20px;background:#f5f1eb;border-left:3px solid #8b1a1a;font-size:.875rem;line-height:1.6;color:#555;margin-bottom:24px;display:none}
+.c-quiz__explanation.is-visible{display:block}
+.c-quiz__btn{padding:12px 32px;background:#1a1a1a;color:#fff;font-size:.8125rem;letter-spacing:.08em;text-transform:uppercase;transition:background .15s;border:none;cursor:pointer}
+.c-quiz__btn:hover{background:#8b1a1a}
+.c-quiz__btn:disabled{opacity:.4;cursor:not-allowed}
+.c-quiz__result{text-align:center;padding:48px 0}
+.c-quiz__result-score{font-family:Georgia,serif;font-size:4rem;font-weight:normal;color:#8b1a1a;line-height:1;margin-bottom:8px}
+.c-quiz__result-label{font-size:.8125rem;letter-spacing:.1em;text-transform:uppercase;color:#888;margin-bottom:24px}
+.c-quiz__result-msg{font-family:Georgia,serif;font-size:1.25rem;font-weight:normal;line-height:1.5;margin-bottom:32px}
+.c-quiz__nav{display:flex}
+</style>
+</head><body>
+<nav class="site-nav">
+  <div class="site-nav__inner">
+    <a href="index.html" class="site-nav__logo">共产党宣言</a>
+    <ul class="site-nav__links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="person.html">人物志</a></li>
+      <li><a href="timeline.html">历史年表</a></li>
+      <li><a href="map.html">传播地图</a></li>
+      <li><a href="reader.html">三语原文</a></li>
+      <li><a href="quiz.html" class="active">知识问答</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="page-hero" style="background:#1a1a1a"><div class="container">
+<p class="page-hero__eyebrow">互动展题</p>
+<h1 class="page-hero__title">知识问答</h1>
+<p class="page-hero__desc">测试你对共产党宣言的了解，涉及内容、历史与中文翻译的小知识。共 10 题。</p>
+</div></div>
+<main><div class="container"><section class="section">
+<div class="c-quiz" id="quiz-app">
+<div class="c-quiz__progress" id="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"><div class="c-quiz__progress-step" id="step-0"></div><div class="c-quiz__progress-step" id="step-1"></div><div class="c-quiz__progress-step" id="step-2"></div><div class="c-quiz__progress-step" id="step-3"></div><div class="c-quiz__progress-step" id="step-4"></div><div class="c-quiz__progress-step" id="step-5"></div><div class="c-quiz__progress-step" id="step-6"></div><div class="c-quiz__progress-step" id="step-7"></div><div class="c-quiz__progress-step" id="step-8"></div><div class="c-quiz__progress-step" id="step-9"></div></div>
+<div id="qwrap"></div>
+<div id="result" class="c-quiz__result" style="display:none">
+<div class="c-quiz__result-score" id="rscore"></div>
+<div class="c-quiz__result-label">答题完成</div>
+<div class="c-quiz__result-msg" id="rmsg"></div>
+<button class="c-quiz__btn" onclick="restart()">重新作答</button>
+</div>
+</div>
+</section></div></main>
+<footer class="site-footer"><div class="container">
+<p>© 大数据学院2024级本科生班第3团支部</p>
+<p>数据来源：Project Gutenberg · Marxists Internet Archive · 各国国家图书馆</p>
+</div></footer>
+<script>
+var QUESTIONS = [{"q": "共产党宣言最初于哪一年出版？", "opts": ["1845", "1848", "1851", "1867"], "ans": 1, "exp": "共产党宣言于1848年2月在伦敦首次出版，由马克思与恩格斯合著。"}, {"q": "共产党宣言的第一个中文完整译本由谁翻译？", "opts": ["李大钊", "陈独秀", "陈望道", "毛泽东"], "ans": 2, "exp": "陈望道于1920年完成中文首个完整译本，在义乌县分水塘故居翻译完成。"}, {"q": "陈望道翻译时发生了哪个著名的小故事？", "opts": ["翻译时蜡烛熄灭摸黑完成", "将墨汁当红糖吃浑然不觉", "翻译稿被水浸湿重新誊写", "在船上完成翻译颠簸不止"], "ans": 1, "exp": "相传陈望道翻译时专注入神，将墨汁当红糖蘸粽子吃，母亲问甜不甜，他答甜极了，留下真理的味道非常甜的佳话。"}, {"q": "共产党宣言的英语首译本发表于哪本杂志？", "opts": ["工人日报", "红共和党人", "新莱茵报", "社会主义者"], "ans": 1, "exp": "1850年，赫尔恩·麦克莱兰完成英语首译，登载于《红共和党人》（The Red Republican）杂志。"}, {"q": "共产党宣言的俄语首译者是谁？", "opts": ["列宁", "普列汉诺夫", "巴库宁", "赫尔岑"], "ans": 2, "exp": "巴库宁（Mikhail Bakunin）于1869年完成俄语首译，对俄国革命运动影响深远。"}, {"q": "共产党宣言开篇第一句话的大意是？", "opts": ["工人阶级将统治世界", "一个幽灵在欧洲游荡——共产主义的幽灵", "全世界无产者联合起来", "资产阶级必将灭亡"], "ans": 1, "exp": "宣言开篇写道：一个幽灵在欧洲游荡——共产主义的幽灵。这是世界文学史上最著名的开篇之一。"}, {"q": "陈望道故居位于中国哪个省份？", "opts": ["江苏省", "安徽省", "浙江省", "福建省"], "ans": 2, "exp": "陈望道故居位于浙江省义乌县（今义乌市）分水塘村，现已成为重要的红色教育基地。"}, {"q": "共产党宣言的日语首译者是谁？", "opts": ["河上肇", "幸德秀三郎", "片山潜", "山川均"], "ans": 1, "exp": "幸德秀三郎于1904年完成日语首译，对早期日本社会主义运动产生了重要影响。"}, {"q": "共产党宣言结尾的著名口号是？", "opts": ["革命万岁", "打倒资产阶级", "全世界无产者联合起来", "工人阶级团结就是力量"], "ans": 2, "exp": "宣言以全世界无产者，联合起来！作为结尾口号，陈望道将其译为万国劳动者，团结起来呀！"}, {"q": "共产党宣言迄今已被译成多少种语言？", "opts": ["约50种", "约70种", "超过100种", "约30种"], "ans": 2, "exp": "共产党宣言已被译成超过100种语言，是世界上被翻译语言最多的政治文献之一。"}];
+var current = 0, score = 0, answered = false;
+function renderQuestion(idx) {
+  answered = false;
+  var q = QUESTIONS[idx];
+  var L = ['A','B','C','D'];
+  var h = '<div class="c-quiz__question-num">第 '+(idx+1)+' 题，共 '+QUESTIONS.length+' 题</div>';
+  h += '<div class="c-quiz__question-text">'+q.q+'</div>';
+  h += '<div class="c-quiz__options">';
+  q.opts.forEach(function(opt,i) {
+    h += '<button class="c-quiz__option" onclick="pick(this,'+i+','+idx+')"><span class="c-quiz__option-letter">'+L[i]+'</span><span class="c-quiz__option-text">'+opt+'</span></button>';
+  });
+  h += '</div><div class="c-quiz__explanation" id="exp" style="display:none"></div>';
+  h += '<div class="c-quiz__nav" id="qnav" style="display:none">';
+  h += idx < QUESTIONS.length-1 ? '<button class="c-quiz__btn" onclick="next()">下一题</button>' : '<button class="c-quiz__btn" onclick="showResult()">查看结果</button>';
+  h += '</div>';
+  document.getElementById('qwrap').innerHTML = h;
+  document.getElementById('quiz-progress').setAttribute('aria-valuenow', idx);
+  document.querySelectorAll('.c-quiz__progress-step').forEach(function(s,i){ s.classList.toggle('is-current', i===idx); });
+}
+function pick(btn, idx, qIdx) {
+  if (answered) return; answered = true;
+  var q = QUESTIONS[qIdx];
+  document.querySelectorAll('.c-quiz__option').forEach(function(o){ o.disabled=true; });
+  btn.classList.add(idx===q.ans ? 'is-correct' : 'is-wrong');
+  if (idx!==q.ans) document.querySelectorAll('.c-quiz__option')[q.ans].classList.add('is-correct');
+  if (idx===q.ans) score++;
+  var e=document.getElementById('exp'); e.textContent=q.exp; e.style.display='block';
+  document.getElementById('qnav').style.display='flex';
+  var s=document.getElementById('step-'+qIdx);
+  s.classList.add(idx===q.ans?'is-correct':'is-wrong'); s.classList.remove('is-current');
+}
+function next(){ current++; renderQuestion(current); }
+function showResult(){
+  document.getElementById('qwrap').style.display='none';
+  var r=document.getElementById('result'); r.style.display='block';
+  document.getElementById('rscore').textContent=score+' / '+QUESTIONS.length;
+  var msgs=['建议浏览年表和传播地图，加深了解。','还有提升空间，欢迎重新作答。','不错！继续探索宣言的传播历史。','非常出色！对宣言历史有深入了解。','满分！你对共产党宣言了如指掌。'];
+  document.getElementById('rmsg').textContent=msgs[Math.min(Math.floor(score/2),4)];
+}
+function restart(){
+  current=0; score=0; answered=false;
+  document.querySelectorAll('.c-quiz__progress-step').forEach(function(s){ s.className='c-quiz__progress-step'; });
+  document.getElementById('result').style.display='none';
+  document.getElementById('qwrap').style.display=''; renderQuestion(0);
+}
+renderQuestion(0);
+</script>
+</body></html>
