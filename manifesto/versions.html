@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>版本库 — 共产党宣言</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+.vlib-hero{background:#1a1a1a;color:#fff;padding:4rem 0 3rem;text-align:center}
+.vlib-hero__label{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:1rem}
+.vlib-hero__title{font-family:"Noto Serif SC",Georgia,serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;margin-bottom:.75rem}
+.vlib-hero__sub{color:rgba(255,255,255,.55);font-size:.95rem;max-width:500px;margin:0 auto}
+.vlib-stats{display:flex;justify-content:center;gap:3rem;margin-top:2rem;flex-wrap:wrap}
+.vlib-stat__num{font-family:Georgia,serif;font-size:2rem;font-weight:700;color:#c0392b}
+.vlib-stat__label{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:.25rem}
+.filter-wrap{background:#f5f0eb;border-bottom:1px solid #e8e0d5;padding:.75rem 0;position:sticky;top:60px;z-index:10}
+.filter-inner{display:flex;gap:.5rem;overflow-x:auto;padding:0 1.5rem;scrollbar-width:none}
+.filter-inner::-webkit-scrollbar{display:none}
+.fbtn{background:none;border:1px solid #ccc;padding:.4rem 1rem;font-size:.78rem;letter-spacing:.06em;cursor:pointer;white-space:nowrap;transition:all .2s;border-radius:2px}
+.fbtn.active,.fbtn:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.books-section{padding:3rem 0}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.5rem;margin-top:2rem}
+.book-card{cursor:pointer;transition:transform .2s;position:relative}
+.book-card:hover{transform:translateY(-4px)}
+.book-cover{width:100%;aspect-ratio:2/3;position:relative;overflow:hidden;box-shadow:4px 6px 20px rgba(0,0,0,.25);border-radius:2px}
+.book-cover img{width:100%;height:100%;object-fit:cover}
+.book-cover-bg{width:100%;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:1rem .75rem;position:relative}
+.book-cover-bg::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,.7) 100%)}
+.book-cover-title{position:relative;z-index:1;font-family:Georgia,serif;font-size:.85rem;font-weight:700;color:#fff;line-height:1.3;margin-bottom:.25rem}
+.book-cover-year{position:relative;z-index:1;font-size:.7rem;color:rgba(255,255,255,.7);letter-spacing:.05em}
+.book-lang-badge{position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.6);color:#fff;font-size:.75rem;padding:.2rem .4rem;border-radius:2px;backdrop-filter:blur(4px)}
+.book-info{padding:.6rem .25rem 0}
+.book-info__title{font-size:.82rem;font-weight:600;color:#1a1a1a;line-height:1.3;margin-bottom:.2rem}
+.book-info__meta{font-size:.72rem;color:#888}
+.book-new-badge{position:absolute;top:.5rem;left:.5rem;background:#c0392b;color:#fff;font-size:.65rem;padding:.15rem .4rem;letter-spacing:.05em;text-transform:uppercase}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;position:relative;border-radius:2px}
+.modal-inner{display:grid;grid-template-columns:200px 1fr;gap:0}
+@media(max-width:600px){.modal-inner{grid-template-columns:1fr}.modal-cover-col{display:none}}
+.modal-cover-col{background:#f5f0eb;padding:2rem 1.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem}
+.modal-cover-img{width:140px;aspect-ratio:2/3;object-fit:cover;box-shadow:4px 6px 20px rgba(0,0,0,.2)}
+.modal-cover-bg{width:140px;aspect-ratio:2/3;display:flex;flex-direction:column;justify-content:flex-end;padding:.75rem;box-shadow:4px 6px 20px rgba(0,0,0,.2)}
+.modal-dl-btn{display:block;width:100%;text-align:center;background:#c0392b;color:#fff;padding:.6rem;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.modal-dl-btn:hover{background:#a93226}
+.modal-body-col{padding:2rem}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#666;z-index:1}
+.modal-lang-tag{display:inline-block;background:#f0ebe3;color:#666;font-size:.7rem;padding:.2rem .6rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem}
+.modal-title{font-family:"Noto Serif SC",Georgia,serif;font-size:1.4rem;font-weight:700;color:#1a1a1a;margin-bottom:.25rem;line-height:1.3}
+.modal-year{font-size:.85rem;color:#c0392b;font-weight:600;margin-bottom:1rem}
+.modal-desc{font-size:.88rem;color:#444;line-height:1.7;margin-bottom:1.25rem}
+.modal-facts{border-top:1px solid #eee;padding-top:1rem}
+.modal-fact{display:flex;gap:.75rem;margin-bottom:.5rem;font-size:.82rem}
+.modal-fact__key{color:#999;min-width:70px;flex-shrink:0}
+.modal-fact__val{color:#333}
+.section-label-sm{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:#999;margin-bottom:.5rem}
+@media(max-width:768px){.books-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem}}
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <div class="site-nav__inner">
+    <a href="index.html" class="site-nav__logo">共产党宣言</a>
+    <ul class="site-nav__links">
+      <li><a href="index.html">首页</a></li>
+      <li><a href="versions.html" class="active">版本库</a></li>
+      <li><a href="person.html">人物志</a></li>
+      <li><a href="timeline.html">历史年表</a></li>
+      <li><a href="map.html">传播地图</a></li>
+      <li><a href="reader.html">三语原文</a></li>
+      <li><a href="quiz.html">知识问答</a></li>
+    </ul>
+  </div>
+</nav>
+<section class="vlib-hero">
+  <div class="container">
+    <p class="vlib-hero__label">Communist Manifesto · Archive</p>
+    <h1 class="vlib-hero__title">版本库</h1>
+    <p class="vlib-hero__sub">自1848年首版至今，《共产党宣言》已被译成逾200种语言，是人类历史上传播最广的政治文献之一。</p>
+    <div class="vlib-stats">
+      <div><div class="vlib-stat__num">200+</div><div class="vlib-stat__label">语言版本</div></div>
+      <div><div class="vlib-stat__num">1848</div><div class="vlib-stat__label">首版年份</div></div>
+      <div><div class="vlib-stat__num">175+</div><div class="vlib-stat__label">年传播史</div></div>
+    </div>
+  </div>
+</section>
+<div class="filter-wrap">
+  <div class="filter-inner">
+    <button class="fbtn active" data-filter="all">全部</button>
+    <button class="fbtn" data-filter="de">🇩🇪 德语</button>
+    <button class="fbtn" data-filter="en">🇬🇧 英语</button>
+    <button class="fbtn" data-filter="fr">🇫🇷 法语</button>
+    <button class="fbtn" data-filter="ru">🇷🇺 俄语</button>
+    <button class="fbtn" data-filter="zh">🇨🇳 中文</button>
+    <button class="fbtn" data-filter="other">🌍 其他语言</button>
+  </div>
+</div>
+<section class="books-section">
+  <div class="container">
+    <p class="section-label-sm">点击书封查看详情</p>
+    <div class="books-grid" id="booksGrid"></div>
+  </div>
+</section>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-inner">
+      <div class="modal-cover-col"><div id="modalCoverWrap"></div><div id="modalDlWrap"></div></div>
+      <div class="modal-body-col">
+        <div id="modalLangTag" class="modal-lang-tag"></div>
+        <h2 id="modalTitle" class="modal-title"></h2>
+        <div id="modalYear" class="modal-year"></div>
+        <p id="modalDesc" class="modal-desc"></p>
+        <div class="modal-facts" id="modalFacts"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const VERSIONS = [
+  {id:"de1848",lang:"de",langLabel:"🇩🇪 德语",flag:"🇩🇪",title:"Manifest der Kommunistischen Partei",titleLocal:"共产党宣言（德文原版）",year:1848,place:"伦敦",publisher:"Bildungs-Gesellschaft für Arbeiter",translators:"Karl Marx & Friedrich Engels（原著）",color:"#2c3e50",desc:"1848年2月，《共产党宣言》在伦敦以德文首次出版，由工人教育协会印行。这是马克思和恩格斯受共产主义者同盟委托撰写的纲领性文件，全文约23000字，分为序言和四章。首版印量有限，但随即在欧洲革命浪潮中广泛流传。",facts:[{k:"语言",v:"德语（原著）"},{k:"出版地",v:"英国伦敦"},{k:"出版年",v:"1848年2月"},{k:"历史意义",v:"人类历史上最具影响力的政治文献之一，标志着科学社会主义的诞生"}]},
+  {id:"de1890",lang:"de",langLabel:"🇩🇪 德语",flag:"🇩🇪",title:"Manifest der Kommunistischen Partei (4. Aufl.)",titleLocal:"共产党宣言（德文权威版）",year:1890,place:"汉堡",publisher:"Meissner",translators:"Friedrich Engels（最终修订）",color:"#1a252f",desc:"1890年德文第四版是恩格斯生前最后一次修订，被视为德文权威版本。恩格斯撰写了详尽的新序言，回顾了宣言自1848年以来的传播历史，并对各国工人运动的发展作出评述。",facts:[{k:"语言",v:"德语"},{k:"出版地",v:"德国汉堡"},{k:"出版年",v:"1890年"},{k:"特点",v:"恩格斯最终权威版，含详尽历史序言"}]},
+  {id:"en1850",lang:"en",langLabel:"🇬🇧 英语",flag:"🇬🇧",title:"Manifesto of the German Communist Party",titleLocal:"共产党宣言（首个英译本）",year:1850,place:"伦敦",publisher:"The Red Republican",translators:"Helen Macfarlane",color:"#8b1a1a",cover:"assets/images/covers/cover-en.png",desc:"1850年，海伦·麦克法兰在英国宪章派报纸《红色共和党人》上连载发表了宣言的首个英译本。麦克法兰是苏格兰激进主义者，她的译文文笔流畅，但当时未获广泛关注。这是宣言进入英语世界的第一步，比摩尔的权威译本早了近40年。",facts:[{k:"语言",v:"英语"},{k:"出版地",v:"英国伦敦"},{k:"出版年",v:"1850年"},{k:"译者",v:"Helen Macfarlane（海伦·麦克法兰）"},{k:"意义",v:"首个英译本，宣言进入英语世界的开端"}]},
+  {id:"en1888",lang:"en",langLabel:"🇬🇧 英语",flag:"🇬🇧",title:"Manifesto of the Communist Party",titleLocal:"共产党宣言（摩尔权威英译本）",year:1888,place:"伦敦",publisher:"William Reeves",translators:"Samuel Moore（塞缪尔·摩尔）",color:"#1a3a5c",cover:"assets/images/covers/cover-en-moore.png",desc:"1888年，塞缪尔·摩尔在恩格斯亲自审校下完成了迄今最权威的英译本。恩格斯为此版撰写了英文版序言，并添加了大量注释。此译本成为英语世界的标准版本，被全球各地广泛引用至今。",facts:[{k:"语言",v:"英语"},{k:"出版地",v:"英国伦敦"},{k:"出版年",v:"1888年"},{k:"译者",v:"Samuel Moore（塞缪尔·摩尔）"},{k:"地位",v:"英语世界标准权威译本"}]},
+  {id:"fr1872",lang:"fr",langLabel:"🇫🇷 法语",flag:"🇫🇷",title:"Manifeste du Parti Communiste (Lafargue)",titleLocal:"共产党宣言（拉法格译本）",year:1872,place:"巴黎",publisher:"Le Socialiste",translators:"Laura Lafargue（劳拉·拉法格）",color:"#2a5a8a",desc:"1872年，马克思之女劳拉·拉法格与其丈夫保罗·拉法格合作完成了新的法文译本。劳拉深谙父亲的思想，译文准确流畅，马克思亲自审阅并高度评价。此版本成为法语世界最重要的权威译本。",facts:[{k:"语言",v:"法语"},{k:"出版地",v:"法国巴黎"},{k:"出版年",v:"1872年"},{k:"译者",v:"Laura Lafargue（马克思之女）"},{k:"特点",v:"马克思亲自审阅，法语权威译本"}]},
+  {id:"ru1882",lang:"ru",langLabel:"🇷🇺 俄语",flag:"🇷🇺",title:"Манифест Коммунистической партии (Плеханов)",titleLocal:"共产党宣言（普列汉诺夫译本）",year:1882,place:"日内瓦",publisher:"Освобождение труда",translators:"Georgi Plekhanov & Vera Zasulich",color:"#8b2a2a",desc:"1882年，俄国马克思主义之父格奥尔基·普列汉诺夫与薇拉·扎苏利奇合作完成了新的俄文译本。马克思和恩格斯专门为此版撰写了俄文版序言，高度评价俄国革命运动的前景。此版本成为俄国社会民主运动的核心文献。",facts:[{k:"语言",v:"俄语"},{k:"出版地",v:"瑞士日内瓦"},{k:"出版年",v:"1882年"},{k:"译者",v:"Plekhanov & Zasulich"},{k:"特点",v:"含马恩专为俄文版撰写的序言"}]},
+  {id:"ja1904",lang:"other",langLabel:"🇯🇵 日语",flag:"🇯🇵",title:"共産党宣言",titleLocal:"共产党宣言（日文版）",year:1904,place:"东京",publisher:"平民社",translators:"幸德秋水、堺利彦",color:"#2c3e50",desc:"1904年，日本社会主义运动先驱幸德秋水与堺利彦合作将宣言译为日文，由平民社出版。这是宣言在亚洲的最早完整译本之一，对日本社会主义运动和中国早期马克思主义者（包括陈望道）产生了重要影响。陈望道翻译中文版时即以此日文版为主要参考。",facts:[{k:"语言",v:"日语"},{k:"出版地",v:"日本东京"},{k:"出版年",v:"1904年"},{k:"译者",v:"幸德秋水、堺利彦"},{k:"特殊意义",v:"陈望道翻译中文版的主要参考底本"}]},
+  {id:"pl1848",lang:"other",langLabel:"🇵🇱 波兰语",flag:"🇵🇱",title:"Manifest Partii Komunistycznej",titleLocal:"共产党宣言（波兰文版）",year:1848,place:"巴黎",publisher:"Centralizacja Towarzystwa Demokratycznego Polskiego",translators:"不详",color:"#c0392b",desc:"1848年，宣言的波兰文译本与德文原版同年出版，由波兰民主协会中央委员会在巴黎印行。波兰当时处于俄、普、奥三国瓜分之下，宣言的波兰文版将民族解放与阶级解放相结合，在波兰流亡者和革命运动中产生了重要影响。",facts:[{k:"语言",v:"波兰语"},{k:"出版地",v:"法国巴黎"},{k:"出版年",v:"1848年"},{k:"意义",v:"与德文原版同年出版，最早的译本之一"}]},
+  {id:"es1872",lang:"other",langLabel:"🇪🇸 西班牙语",flag:"🇪🇸",title:"Manifiesto del Partido Comunista",titleLocal:"共产党宣言（西班牙文首译）",year:1872,place:"马德里",publisher:"Emancipación",translators:"Mesa y Leompart",color:"#922b21",desc:"1872年，宣言的西班牙文首译本在马德里《解放》报上连载发表，由梅萨和莱昂帕特翻译。这是宣言在伊比利亚半岛的首次传播，对西班牙工人运动和第一国际西班牙支部的发展产生了深远影响。",facts:[{k:"语言",v:"西班牙语"},{k:"出版地",v:"西班牙马德里"},{k:"出版年",v:"1872年"},{k:"意义",v:"西班牙文首译，推动伊比利亚工人运动"}]},
+  {id:"zh1920",lang:"zh",langLabel:"🇨🇳 中文",flag:"🇨🇳",title:"共产党宣言",titleLocal:"共产党宣言（陈望道首译本）",year:1920,place:"上海",publisher:"社会主义研究社",translators:"陈望道",color:"#c0392b",isNew:true,desc:"1920年8月，陈望道在浙江义乌分水塘村完成了《共产党宣言》的首个完整中文译本，由上海社会主义研究社出版，印刷1000册。陈望道以日文版为主、英文版为辅进行翻译，历时数月，据说因专注翻译而将墨汁当红糖蘸粽子吃。此译本是中国共产党创始人的必读书目，对中国共产主义运动的兴起具有决定性意义。",facts:[{k:"语言",v:"中文"},{k:"出版地",v:"中国上海"},{k:"出版年",v:"1920年8月"},{k:"译者",v:"陈望道"},{k:"印数",v:"首版1000册，后多次重印"},{k:"意义",v:"首个完整中文译本，中共创始人必读书目"},{k:"典故",v:"陈望道翻译时误将墨汁当红糖，专注程度可见一斑"}]},
+  {id:"zh1995",lang:"zh",langLabel:"🇨🇳 中文",flag:"🇨🇳",title:"共产党宣言",titleLocal:"共产党宣言（中央编译局权威版）",year:1995,place:"北京",publisher:"人民出版社",translators:"中央编译局",color:"#1a5276",desc:"1995年，中央编译局完成了迄今最权威的中文译本，收录于《马克思恩格斯选集》第一卷。此版本经过数十年的学术积累，参照德文原版和多种语言译本，对译文进行了全面修订，是当代中国学术界和政界引用的标准版本。",facts:[{k:"语言",v:"中文"},{k:"出版地",v:"中国北京"},{k:"出版年",v:"1995年"},{k:"地位",v:"当代中国标准权威译本，收录于《马恩选集》"}]}
+];
+function renderBooks(list) {
+  const grid = document.getElementById('booksGrid');
+  grid.innerHTML = list.map(b => {
+    const coverHtml = b.cover
+      ? `<img src="${b.cover}" alt="${b.title}" loading="lazy">`
+      : `<div class="book-cover-bg" style="background:${b.color||'#1a1a1a'}">
+           <div class="book-cover-title">${b.title}</div>
+           <div class="book-cover-year">${b.year}</div>
+         </div>`;
+    return `<div class="book-card" onclick="openModal('${b.id}')">
+      <div class="book-cover">
+        ${coverHtml}
+        <span class="book-lang-badge">${b.flag||''}</span>
+        ${b.isNew ? '<span class="book-new-badge">精选</span>' : ''}
+      </div>
+      <div class="book-info">
+        <div class="book-info__title">${b.titleLocal||b.title}</div>
+        <div class="book-info__meta">${b.year} · ${b.place||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function filterBooks(lang) {
+  document.querySelectorAll('.fbtn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === lang));
+  const filtered = lang === 'all' ? VERSIONS : VERSIONS.filter(b => b.lang === lang);
+  renderBooks(filtered);
+}
+function openModal(id) {
+  const b = VERSIONS.find(v => v.id === id);
+  if (!b) return;
+  const coverHtml = b.cover
+    ? `<img class="modal-cover-img" src="${b.cover}" alt="${b.title}">`
+    : `<div class="modal-cover-bg" style="background:${b.color||'#1a1a1a'}">
+         <div class="book-cover-title">${b.title}</div>
+         <div class="book-cover-year">${b.year}</div>
+       </div>`;
+  document.getElementById('modalCoverWrap').innerHTML = coverHtml;
+  document.getElementById('modalDlWrap').innerHTML = '';
+  document.getElementById('modalLangTag').textContent = b.langLabel || b.lang;
+  document.getElementById('modalTitle').textContent = b.titleLocal || b.title;
+  document.getElementById('modalYear').textContent = `${b.year}年 · ${b.place||''} · ${b.publisher||''}`;
+  document.getElementById('modalDesc').textContent = b.desc || '';
+  const factsHtml = (b.facts||[]).map(f =>
+    `<tr><td style="color:#888;padding:.3rem .5rem .3rem 0;font-size:.8rem;white-space:nowrap">${f.k}</td>
+         <td style="padding:.3rem 0;font-size:.85rem">${f.v}</td></tr>`
+  ).join('');
+  document.getElementById('modalFacts').innerHTML = factsHtml
+    ? `<table style="width:100%;border-collapse:collapse">${factsHtml}</table>` : '';
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  renderBooks(VERSIONS);
+  document.querySelectorAll('.fbtn').forEach(btn => {
+    btn.addEventListener('click', () => filterBooks(btn.dataset.filter));
+  });
+});
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <p>© 大数据学院2024级本科生班第3团支部</p>
+    <p>数据来源：Project Gutenberg · Marxists Internet Archive · 各国国家图书馆</p>
+  </div>
+</footer>
+</body>
+</html>
