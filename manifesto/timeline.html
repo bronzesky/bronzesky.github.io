@@ -43,6 +43,11 @@
 }
 @media(min-width:641px){
   .tl-left-mobile{display:none}
+  /* 显式锁定三列，避免 left 事件缺失第三格导致自动排版错位 */
+  .tl-left{grid-column:1}
+  .tl-empty{grid-column:1}
+  .tl-center{grid-column:2}
+  .tl-right{grid-column:3}
 }
 </style>
 </head>
